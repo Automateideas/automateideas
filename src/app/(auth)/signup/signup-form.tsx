@@ -467,4 +467,40 @@ export function SignupForm() {
                 onClick={() => setStep(1)}
                 disabled={pending}
               >
-                <ArrowLeft
+                <ArrowLeftIcon data-icon="inline-start" />
+                Back
+              </Button>
+              <Button type="submit" size="lg" disabled={pending}>
+                {pending ? <Spinner data-icon="inline-start" /> : null}
+                Register
+              </Button>
+            </div>
+          </FieldGroup>
+        </form>
+      )}
+    </div>
+  );
+}
+
+function StepIndicator({ step }: { step: 1 | 2 }) {
+  const label = step === 1 ? "Your details" : "Company details";
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-sm text-muted-foreground" aria-live="polite">
+        Step {step} of 2:{" "}
+        <span className="font-medium text-foreground">{label}</span>
+      </p>
+      <div className="grid grid-cols-2 gap-2" aria-hidden="true">
+        {[1, 2].map((n) => (
+          <div
+            key={n}
+            className={cn(
+              "h-1 rounded-full",
+              n <= step ? "bg-primary" : "bg-muted",
+            )}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
