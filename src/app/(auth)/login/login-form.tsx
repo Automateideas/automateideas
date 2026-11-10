@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 import { Button } from "@/components/ui/button";
@@ -16,75 +17,96 @@ import {
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { authClient } from "@/lib/auth-client";
 
 import { GoogleButton } from "../_components/google-button";
 import { PasswordInput } from "../_components/password-input";
+import { nextPath } from "../_lib/next-path";
 import { isEmail } from "../_lib/validate";
-
-// TODO(backend): replace with real auth calls.
-const fakeRequest = () => new Promise<void>((resolve) => setTimeout(resolve, 900));
-
-const RESEND_SECONDS = 30;
 
 export function LoginForm() {
   return (
     <FieldGroup>
       <GoogleButton label="Continue with Google" />
       <FieldSeparator>or log in with email</FieldSeparator>
-
-      <Tabs defaultValue="password">
-        <TabsList className="w-full rounded-xl group-data-horizontal/tabs:h-11">
-          <TabsTrigger value="password">Password</TabsTrigger>
-          <TabsTrigger value="otp">Email code</TabsTrigger>
-        </TabsList>
-        <TabsContent value="password" className="pt-4">
-          <PasswordLogin />
-        </TabsContent>
-        <TabsContent value="otp" className="pt-4">
-          <OtpLogin />
-        </TabsContent>
-      </Tabs>
+      {/* The "Email code" tab returns when the backend supports email OTP; see OtpLogin below. */}
+      <PasswordLogin />
     </FieldGroup>
   );
 }
 
-function PasswordLogin() {
-  const [loginId, setLoginId] = useState("");
+const LOGIN_ERRORS: Record<string, string> = {
+  INVALID_EMAIL_OR_PASSWORD: "That email and password don't match. Check them and try again.",
+  EMAIL_NOT_VERIFIED: "Verify your email first. Check your inbox for the link.",
+};
+
+/**
+ * Email + password login. After success it goes to `?next=` or the dashboard,
+ * unless `onLoggedIn` is given (the accept-invite page stays put).
+ */
+export function PasswordLogin({
+  defaultEmail = "",
+  onLoggedIn,
+}: {
+  defaultEmail?: string;
+  onLoggedIn?: () => void;
+}) {
+  const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const loginIdError = submitted && !loginId.trim() ? "Enter your email or login ID." : null;
+  const emailError = submitted && !isEmail(email) ? "Enter the email you signed up with." : null;
   const passwordError = submitted && !password ? "Enter your password." : null;
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitted(true);
-    if (!loginId.trim() || !password) return;
-    startTransition(fakeRequest);
+    setFormError(null);
+    if (!isEmail(email) || !password) return;
+    startTransition(async () => {
+      const { error } = await authClient.signIn.email({ email: email.trim(), password });
+      if (error) {
+        setFormError(
+          (error.code && LOGIN_ERRORS[error.code]) ?? error.message ?? "Couldn't log you in. Try again.",
+        );
+        return;
+      }
+      if (onLoggedIn) {
+        onLoggedIn();
+      } else {
+        router.push(nextPath());
+        router.refresh();
+      }
+    });
   }
 
   return (
     <form noValidate onSubmit={onSubmit}>
       <FieldGroup>
-        <Field data-invalid={!!loginIdError}>
-          <FieldLabel htmlFor="login-id">Email or login ID</FieldLabel>
+        <Field data-invalid={!!emailError}>
+          <FieldLabel htmlFor="login-email">Email</FieldLabel>
           <Input
-            id="login-id"
+            id="login-email"
+            type="email"
             autoComplete="username"
             placeholder="you@company.com"
-            value={loginId}
-            onChange={(e) => setLoginId(e.target.value)}
-            aria-invalid={!!loginIdError}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            aria-invalid={!!emailError}
           />
-          <FieldError>{loginIdError}</FieldError>
+          <FieldError>{emailError}</FieldError>
         </Field>
 
         <Field data-invalid={!!passwordError}>
           <div className="flex items-center justify-between gap-2">
             <FieldLabel htmlFor="login-password">Password</FieldLabel>
-            <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline hover:underline-offset-4">
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-primary hover:underline hover:underline-offset-4"
+            >
               Forgot password?
             </Link>
           </div>
@@ -98,6 +120,8 @@ function PasswordLogin() {
           <FieldError>{passwordError}</FieldError>
         </Field>
 
+        {formError ? <FieldError>{formError}</FieldError> : null}
+
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? <Spinner data-icon="inline-start" /> : null}
           Log in
@@ -107,7 +131,16 @@ function PasswordLogin() {
   );
 }
 
-function OtpLogin() {
+/* ------------------------------------------------------------------------- */
+/* Email-code login. Not shown yet: the backend has no email OTP endpoint.    */
+/* TODO(backend): enable Better Auth's emailOTP plugin, then render this in a */
+/* "Password | Email code" tab inside LoginForm and replace fakeRequest.      */
+/* ------------------------------------------------------------------------- */
+
+const fakeRequest = () => new Promise<void>((resolve) => setTimeout(resolve, 900));
+const RESEND_SECONDS = 30;
+
+export function OtpLogin() {
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -115,6 +148,7 @@ function OtpLogin() {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -144,7 +178,10 @@ function OtpLogin() {
       return;
     }
     setCodeError(null);
-    startTransition(fakeRequest);
+    startTransition(async () => {
+      await fakeRequest();
+      router.push(nextPath());
+    });
   }
 
   if (sentTo === null) {

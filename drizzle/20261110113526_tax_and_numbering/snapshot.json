@@ -1,0 +1,367 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "866a5cb0-b4b3-4d4b-a0d7-8e8af413e3e2",
+  "prevIds": [
+    "24f89708-9e33-47c8-9c5e-6d4136e0ba35"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "state_code"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.state_code",
+        "n|col|public.billing_settings.state_code",
+        "e|col|public.billing_settings.state_code"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.prices_include_tax",
+        "n|col|public.billing_settings.prices_include_tax",
+        "e|col|public.billing_settings.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "round_off"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.round_off",
+        "n|col|public.billing_settings.round_off",
+        "e|col|public.billing_settings.round_off"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "document_numbering"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.document_numbering",
+        "n|col|public.billing_settings.document_numbering",
+        "e|col|public.billing_settings.document_numbering"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "products",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.products.tax_category",
+        "n|col|public.products.tax_category",
+        "e|col|public.products.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "products",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.products.cess_rate",
+        "n|col|public.products.cess_rate",
+        "e|col|public.products.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "services",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.services.tax_category",
+        "n|col|public.services.tax_category",
+        "e|col|public.services.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.services",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "billing_settings"
+      ],
+      "writes": [
+        "s|ck|public.billing_settings.billing_settings_round_off_check",
+        "n|ck|public.billing_settings.billing_settings_round_off_check",
+        "e|ck|public.billing_settings.billing_settings_round_off_check",
+        "n|con|public.billing_settings.billing_settings_round_off_check"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public",
+        "n|col|public.billing_settings.round_off"
+      ]
+    },
+    {
+      "statementType": "add_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "products"
+      ],
+      "writes": [
+        "s|ck|public.products.products_cess_rate_check",
+        "n|ck|public.products.products_cess_rate_check",
+        "e|ck|public.products.products_cess_rate_check",
+        "n|con|public.products.products_cess_rate_check"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.products.cess_rate"
+      ]
+    },
+    {
+      "statementType": "add_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "products"
+      ],
+      "writes": [
+        "s|ck|public.products.products_tax_category_check",
+        "n|ck|public.products.products_tax_category_check",
+        "e|ck|public.products.products_tax_category_check",
+        "n|con|public.products.products_tax_category_check"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.products.tax_category"
+      ]
+    },
+    {
+      "statementType": "add_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "services"
+      ],
+      "writes": [
+        "s|ck|public.services.services_tax_category_check",
+        "n|ck|public.services.services_tax_category_check",
+        "e|ck|public.services.services_tax_category_check",
+        "n|con|public.services.services_tax_category_check"
+      ],
+      "reads": [
+        "n|tbl|public.services",
+        "n|sch|public",
+        "n|col|public.services.tax_category"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "state_code",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "round_off",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'nearest_rupee'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "document_numbering",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "services",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "billing_settings_round_off_check",
+        "value": "\"round_off\" in ('nearest_rupee', 'none')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "products_cess_rate_check",
+        "value": "\"cess_rate\" between 0 and 400",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "products_tax_category_check",
+        "value": "\"tax_category\" in ('taxable', 'exempt', 'nil_rated', 'non_gst')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "services",
+        "name": "services_tax_category_check",
+        "value": "\"tax_category\" in ('taxable', 'exempt', 'nil_rated', 'non_gst')",
+        "entityType": "checks"
+      }
+    }
+  ]
+}

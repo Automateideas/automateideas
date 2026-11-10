@@ -1,0 +1,217 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "bb52940c-e582-4c6c-becc-b3ca67f22789",
+  "prevIds": [
+    "21f55e8d-b5ca-4e77-a4a5-e631251ede4b"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "organization",
+        "plan_id"
+      ],
+      "writes": [
+        "s|col|public.organization.plan_id",
+        "n|col|public.organization.plan_id",
+        "e|col|public.organization.plan_id"
+      ],
+      "reads": [
+        "n|tbl|public.organization",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "organization",
+        "billing_cycle"
+      ],
+      "writes": [
+        "s|col|public.organization.billing_cycle",
+        "n|col|public.organization.billing_cycle",
+        "e|col|public.organization.billing_cycle"
+      ],
+      "reads": [
+        "n|tbl|public.organization",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "organization",
+        "current_period_end"
+      ],
+      "writes": [
+        "s|col|public.organization.current_period_end",
+        "n|col|public.organization.current_period_end",
+        "e|col|public.organization.current_period_end"
+      ],
+      "reads": [
+        "n|tbl|public.organization",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "organization",
+        "cancel_at_period_end"
+      ],
+      "writes": [
+        "s|col|public.organization.cancel_at_period_end",
+        "n|col|public.organization.cancel_at_period_end",
+        "e|col|public.organization.cancel_at_period_end"
+      ],
+      "reads": [
+        "n|tbl|public.organization",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "subscription_payment",
+        "plan_id"
+      ],
+      "writes": [
+        "s|col|public.subscription_payment.plan_id",
+        "n|col|public.subscription_payment.plan_id",
+        "e|col|public.subscription_payment.plan_id"
+      ],
+      "reads": [
+        "n|tbl|public.subscription_payment",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "subscription_payment",
+        "billing_cycle"
+      ],
+      "writes": [
+        "s|col|public.subscription_payment.billing_cycle",
+        "n|col|public.subscription_payment.billing_cycle",
+        "e|col|public.subscription_payment.billing_cycle"
+      ],
+      "reads": [
+        "n|tbl|public.subscription_payment",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "organization",
+        "name": "plan_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'starter'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "organization",
+        "name": "billing_cycle",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'monthly'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "organization",
+        "name": "current_period_end",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "organization",
+        "name": "cancel_at_period_end",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "subscription_payment",
+        "name": "plan_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "subscription_payment",
+        "name": "billing_cycle",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    }
+  ]
+}

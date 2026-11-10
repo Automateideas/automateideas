@@ -53,7 +53,10 @@ export function Showcase() {
   useEffect(() => {
     if (paused) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setTimeout(() => setIndex((i) => (i + 1) % slides.length), AUTOPLAY_MS);
+    const id = setTimeout(
+      () => setIndex((i) => (i + 1) % slides.length),
+      AUTOPLAY_MS,
+    );
     return () => clearTimeout(id);
   }, [index, paused]);
 
@@ -81,7 +84,9 @@ export function Showcase() {
             {slide.title}
             <span className="block text-primary">{slide.accent}</span>
           </h2>
-          <p className="max-w-md text-base leading-relaxed text-muted-foreground">{slide.body}</p>
+          <p className="max-w-md text-base leading-relaxed text-muted-foreground">
+            {slide.body}
+          </p>
         </div>
 
         <div className="flex flex-1 items-center justify-center px-2">
@@ -100,16 +105,30 @@ export function Showcase() {
               onClick={() => go(i)}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                i === index ? "w-6 bg-primary" : "w-1.5 bg-foreground/20 hover:bg-foreground/40"
+                i === index
+                  ? "w-6 bg-primary"
+                  : "w-1.5 bg-foreground/20 hover:bg-foreground/40",
               )}
             />
           ))}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon-lg" className="rounded-full" aria-label="Previous slide" onClick={() => go(index - 1)}>
+          <Button
+            variant="outline"
+            size="icon-lg"
+            className="rounded-full"
+            aria-label="Previous slide"
+            onClick={() => go(index - 1)}
+          >
             <ArrowLeftIcon />
           </Button>
-          <Button variant="outline" size="icon-lg" className="rounded-full" aria-label="Next slide" onClick={() => go(index + 1)}>
+          <Button
+            variant="outline"
+            size="icon-lg"
+            className="rounded-full"
+            aria-label="Next slide"
+            onClick={() => go(index + 1)}
+          >
             <ArrowRightIcon />
           </Button>
         </div>
@@ -120,13 +139,19 @@ export function Showcase() {
 
 /* ---------- Preview visuals (decorative mock UI) ---------- */
 
-function PreviewCard({ children, className }: { children: React.ReactNode; className?: string }) {
+function PreviewCard({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div
       aria-hidden="true"
       className={cn(
         "relative w-full max-w-md rounded-2xl bg-card p-5 shadow-xl ring-1 shadow-foreground/5 ring-foreground/10",
-        className
+        className,
       )}
     >
       {children}
@@ -135,22 +160,49 @@ function PreviewCard({ children, className }: { children: React.ReactNode; class
 }
 
 const modules = [
-  { name: "Team", hint: "Who's doing what", Icon: UsersIcon, tone: "bg-brand-green/10 text-brand-green" },
-  { name: "Customers", hint: "Every contact, one list", Icon: ContactIcon, tone: "bg-brand-amber/15 text-brand-amber" },
-  { name: "Sales", hint: "Move every deal forward", Icon: TrendingUpIcon, tone: "bg-brand-red/10 text-brand-red" },
-  { name: "Reports", hint: "Numbers that matter", Icon: BarChart3Icon, tone: "bg-brand-green/10 text-brand-green" },
+  {
+    name: "Team",
+    hint: "Who's doing what",
+    Icon: UsersIcon,
+    tone: "bg-brand-green/10 text-brand-green",
+  },
+  {
+    name: "Customers",
+    hint: "Every contact, one list",
+    Icon: ContactIcon,
+    tone: "bg-brand-amber/15 text-brand-amber",
+  },
+  {
+    name: "Sales",
+    hint: "Move every deal forward",
+    Icon: TrendingUpIcon,
+    tone: "bg-brand-red/10 text-brand-red",
+  },
+  {
+    name: "Reports",
+    hint: "Numbers that matter",
+    Icon: BarChart3Icon,
+    tone: "bg-brand-green/10 text-brand-green",
+  },
 ];
 
 function WorkspacePreview() {
   return (
     <PreviewCard className="mb-10 -rotate-2">
-      <p className="text-xs text-muted-foreground">Good morning, Rahul</p>
-      <p className="mt-1 text-xl font-semibold tracking-tight">What&apos;s on today?</p>
+      <p className="text-xs text-muted-foreground">Good morning, Amit</p>
+      <p className="mt-1 text-xl font-semibold tracking-tight">
+        What&apos;s on today?
+      </p>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {modules.map(({ name, hint, Icon, tone }) => (
           <div key={name} className="relative rounded-xl border p-3">
             <ArrowUpRightIcon className="absolute top-3 right-3 size-3.5 text-muted-foreground" />
-            <span className={cn("flex size-8 items-center justify-center rounded-lg", tone)}>
+            <span
+              className={cn(
+                "flex size-8 items-center justify-center rounded-lg",
+                tone,
+              )}
+            >
               <Icon className="size-4" />
             </span>
             <p className="mt-3 text-sm font-medium">{name}</p>
@@ -163,7 +215,9 @@ function WorkspacePreview() {
           <CheckIcon className="size-4" />
         </span>
         <div>
-          <p className="text-sm font-semibold">One login. Your whole business.</p>
+          <p className="text-sm font-semibold">
+            One login. Your whole business.
+          </p>
           <p className="text-xs opacity-80">Pick a module and get to work.</p>
         </div>
       </div>
@@ -173,7 +227,12 @@ function WorkspacePreview() {
 
 const tasks = [
   { title: "Send March invoices", who: "PK", due: "Today", done: true },
-  { title: "Follow up with Sharma Traders", who: "AS", due: "Today", done: false },
+  {
+    title: "Follow up with Sharma Traders",
+    who: "AS",
+    due: "Today",
+    done: false,
+  },
   { title: "Update price list", who: "RV", due: "Tomorrow", done: false },
   { title: "Interview for store manager", who: "NK", due: "Fri", done: false },
 ];
@@ -182,7 +241,9 @@ function TasksPreview() {
   return (
     <PreviewCard className="rotate-1">
       <div className="flex items-baseline justify-between">
-        <p className="text-xl font-semibold tracking-tight">Today&apos;s tasks</p>
+        <p className="text-xl font-semibold tracking-tight">
+          Today&apos;s tasks
+        </p>
         <p className="text-xs text-muted-foreground">1 of 4 done</p>
       </div>
       <ul className="mt-4 flex flex-col divide-y">
@@ -191,12 +252,17 @@ function TasksPreview() {
             <span
               className={cn(
                 "flex size-4.5 shrink-0 items-center justify-center rounded-full border",
-                t.done && "border-primary bg-primary text-primary-foreground"
+                t.done && "border-primary bg-primary text-primary-foreground",
               )}
             >
               {t.done ? <CheckIcon className="size-3" /> : null}
             </span>
-            <span className={cn("flex-1 truncate text-sm", t.done && "text-muted-foreground line-through")}>
+            <span
+              className={cn(
+                "flex-1 truncate text-sm",
+                t.done && "text-muted-foreground line-through",
+              )}
+            >
               {t.title}
             </span>
             <span className="text-xs text-muted-foreground">{t.due}</span>
@@ -217,7 +283,9 @@ function ReportsPreview() {
     <PreviewCard className="-rotate-1">
       <p className="text-xs text-muted-foreground">Sales this week</p>
       <div className="mt-1 flex items-baseline gap-2">
-        <p className="text-3xl font-semibold tracking-tight tabular-nums">1,284</p>
+        <p className="text-3xl font-semibold tracking-tight tabular-nums">
+          1,284
+        </p>
         <p className="text-sm font-medium text-primary">+18% vs last week</p>
       </div>
       <div className="mt-5 flex h-32 items-end gap-2">
@@ -225,13 +293,18 @@ function ReportsPreview() {
           <div
             key={i}
             style={{ height: `${h}%` }}
-            className={cn("flex-1 rounded-md", i === bars.length - 1 ? "bg-primary" : "bg-primary/20")}
+            className={cn(
+              "flex-1 rounded-md",
+              i === bars.length - 1 ? "bg-primary" : "bg-primary/20",
+            )}
           />
         ))}
       </div>
       <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-          <span key={d} className="flex-1 text-center">{d}</span>
+          <span key={d} className="flex-1 text-center">
+            {d}
+          </span>
         ))}
       </div>
     </PreviewCard>

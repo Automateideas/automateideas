@@ -1,0 +1,44 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "a2c05d98-3f82-4d52-acb7-d5e5099ab063",
+  "prevIds": [
+    "1ef2ec5b-330c-4095-924f-41f7e23b9a32"
+  ],
+  "footprints": [
+    {
+      "statementType": "recreate_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "subscription_payment"
+      ],
+      "writes": [
+        "s|fk|public.subscription_payment.subscription_payment_organization_id_organization_id_fkey",
+        "n|fk|public.subscription_payment.subscription_payment_organization_id_organization_id_fkey",
+        "e|fk|public.subscription_payment.subscription_payment_organization_id_organization_id_fkey",
+        "n|con|public.subscription_payment.subscription_payment_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.subscription_payment",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.subscription_payment.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ],
+      "sqlHash": "e3eda412f0f470ac"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "alter",
+      "key": "fks\u0000[\"public\",\"subscription_payment\",\"subscription_payment_organization_id_organization_id_fkey\"]",
+      "set": {
+        "onDelete": "RESTRICT"
+      }
+    }
+  ]
+}

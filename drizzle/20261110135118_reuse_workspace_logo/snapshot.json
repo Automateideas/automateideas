@@ -1,0 +1,87 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "416a969c-c040-4b89-b8a2-1b02f0a0638a",
+  "prevIds": [
+    "b5e9d230-7024-4bb4-b47c-e39c0656def0"
+  ],
+  "footprints": [
+    {
+      "statementType": "drop_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "billing_settings"
+      ],
+      "writes": [
+        "s|fk|public.billing_settings.billing_settings_logo_fk",
+        "n|fk|public.billing_settings.billing_settings_logo_fk",
+        "e|fk|public.billing_settings.billing_settings_logo_fk",
+        "n|con|public.billing_settings.billing_settings_logo_fk"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public",
+        "e|col|public.billing_settings.organization_id",
+        "e|col|public.billing_settings.logo_file_id"
+      ]
+    },
+    {
+      "statementType": "drop_unique",
+      "statementTarget": [
+        "table",
+        "public",
+        "billing_files"
+      ],
+      "writes": [
+        "s|uq|public.billing_files.billing_files_org_id_uq",
+        "n|uq|public.billing_files.billing_files_org_id_uq",
+        "e|uq|public.billing_files.billing_files_org_id_uq",
+        "n|con|public.billing_files.billing_files_org_id_uq",
+        "n|rel|public.billing_files_org_id_uq"
+      ],
+      "reads": [
+        "n|tbl|public.billing_files",
+        "n|sch|public",
+        "e|col|public.billing_files.organization_id",
+        "e|col|public.billing_files.id"
+      ],
+      "sharedWrites": [
+        "e|uniqueness|public.billing_files.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "drop_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "logo_file_id"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.logo_file_id",
+        "n|col|public.billing_settings.logo_file_id",
+        "e|col|public.billing_settings.logo_file_id"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "drop",
+      "key": "columns\u0000[\"public\",\"billing_settings\",\"logo_file_id\"]"
+    },
+    {
+      "op": "drop",
+      "key": "fks\u0000[\"public\",\"billing_settings\",\"billing_settings_logo_fk\"]"
+    },
+    {
+      "op": "drop",
+      "key": "uniques\u0000[\"public\",\"billing_files\",\"billing_files_org_id_uq\"]"
+    }
+  ]
+}

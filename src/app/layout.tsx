@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
+import { MotionProvider } from "@/components/motion-provider";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-sans",
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${instrumentSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

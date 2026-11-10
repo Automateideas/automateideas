@@ -1,0 +1,1 @@
+ALTER TABLE "subscription_payment" DROP CONSTRAINT "subscription_payment_organization_id_organization_id_fkey", ADD CONSTRAINT "subscription_payment_organization_id_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organization"("id") ON DELETE RESTRICT;

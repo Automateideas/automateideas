@@ -24,6 +24,27 @@ export type Country = {
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
+/** "+91 98765 43210" from a country and the number typed after its code. */
+export function formatPhone(country: Country | null, number: string) {
+  const local = number.trim().replace(/\s+/g, " ");
+  return country ? `${country.dialCode} ${local}` : local;
+}
+
+/**
+ * Splits a saved "+91 98765 43210" back into its country and local number.
+ * Shared codes (+1, +7, +44…) pick the most common country; the user can change it.
+ */
+export function parsePhone(phone: string | null | undefined): { country: Country | null; number: string } {
+  const value = (phone ?? "").trim();
+  const match = value.match(/^(\+\d{1,4})\s*(.*)$/);
+  if (!match) return { country: null, number: value };
+  const [, code, rest] = match;
+  const preferred: Record<string, string> = { "+1": "US", "+7": "RU", "+44": "GB", "+61": "AU" };
+  const options = countries.filter((c) => c.dialCode === code);
+  const country = options.find((c) => c.code === preferred[code]) ?? options[0] ?? null;
+  return country ? { country, number: rest } : { country: null, number: value };
+}
+
 export const countries: Country[] = DIAL_CODES.split(/\s+/)
   .map((entry) => {
     const code = entry.slice(0, 2);

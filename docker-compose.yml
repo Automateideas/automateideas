@@ -31,6 +31,20 @@ services:
       timeout: 3s
       retries: 10
 
+  # S3-compatible file storage for development (logos, later PDFs). Production
+  # uses Cloudflare R2 or AWS S3: same code, different S3_* values in .env.
+  # Dev-only keys live in docker/seaweedfs/s3.json.
+  s3:
+    image: chrislusf/seaweedfs:3.97
+    restart: unless-stopped
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json", "-ip.bind=0.0.0.0"]
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - s3_data:/data
+      - ./docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
 volumes:
   pg_data:
   valkey_data:
+  s3_data:

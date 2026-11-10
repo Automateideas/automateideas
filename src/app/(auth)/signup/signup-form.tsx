@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeftIcon, Building2Icon, UploadIcon, XIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,11 +25,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { countries, type Country } from "@/lib/countries";
+import { countries, formatPhone, type Country } from "@/lib/countries";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 import { GoogleButton } from "../_components/google-button";
 import { PasswordInput } from "../_components/password-input";
+import { PhoneField } from "@/components/phone-field";
 import { isEmail } from "../_lib/validate";
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
@@ -93,25 +96,31 @@ function focusFirstError(errors: Errors) {
     ?.focus();
 }
 
-// Country-code search matches the country name or the code itself ("ind", "+91", "91").
-function matchCountry(c: Country, query: string) {
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  return (
-    c.label.toLowerCase().includes(q) ||
-    c.dialCode.includes(q.replace(/^\+?/, "+"))
-  );
-}
+const SIGNUP_ERRORS: Record<string, string> = {
+  USER_ALREADY_EXISTS: "An account with this email already exists. Log in instead.",
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "An account with this email already exists. Log in instead.",
+  PASSWORD_TOO_SHORT: "Use at least 8 characters for your password.",
+  INVALID_EMAIL: "Enter a valid email address.",
+};
 
-// TODO(backend): replace with the real registration call.
-const fakeRequest = () =>
-  new Promise<void>((resolve) => setTimeout(resolve, 1200));
+async function uploadLogo(file: File) {
+  const body = new FormData();
+  body.append("file", file);
+  try {
+    const res = await fetch("/api/organization/logo", { method: "POST", body });
+    if (!res.ok) console.warn("Logo upload failed", res.status, await res.text());
+  } catch (error) {
+    console.warn("Logo upload failed", error);
+  }
+}
 
 export function SignupForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [values, setValues] = useState<Values>(initialValues);
   const [submitted, setSubmitted] = useState({ 1: false, 2: false });
   const [pending, startTransition] = useTransition();
+  const [formError, setFormError] = useState<string | null>(null);
+  const router = useRouter();
 
   const [logo, setLogo] = useState<{ file: File; url: string } | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);
@@ -161,7 +170,29 @@ export function SignupForm() {
       focusFirstError(found);
       return;
     }
-    startTransition(fakeRequest);
+    setFormError(null);
+    startTransition(async () => {
+      // The backend names the new organization from `companyName` (see lib/auth.ts).
+      // TODO(backend): country has no backend field yet, so it isn't sent.
+      const { error } = await authClient.signUp.email({
+        name: `${values.firstName.trim()} ${values.lastName.trim()}`,
+        email: values.email.trim(),
+        password: values.password,
+        phone: formatPhone(values.phoneCountry, values.phone),
+        companyName: values.companyName.trim(),
+      } as Parameters<typeof authClient.signUp.email>[0]);
+      if (error) {
+        setFormError(
+          (error.code && SIGNUP_ERRORS[error.code]) ?? error.message ?? "Couldn't create your account. Try again.",
+        );
+        return;
+      }
+      // The account and workspace exist now, so the logo can go to S3.
+      // A failed upload doesn't undo the sign-up; the logo can be added later.
+      if (logo) await uploadLogo(logo.file);
+      router.push("/dashboard");
+      router.refresh();
+    });
   }
 
   function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -251,61 +282,15 @@ export function SignupForm() {
               )}
             </Field>
 
-            <Field data-invalid={!!(errors.phoneCountry || errors.phone)}>
-              <FieldLabel htmlFor="phone">Contact number</FieldLabel>
-              <div className="grid grid-cols-[7.5rem_minmax(0,1fr)] gap-2">
-                <div data-field="phoneCountry">
-                  <Combobox
-                    items={countries}
-                    value={values.phoneCountry}
-                    onValueChange={onPhoneCountryChange}
-                    itemToStringLabel={(c: Country) => c.dialCode}
-                    isItemEqualToValue={(a: Country, b: Country) =>
-                      a.code === b.code
-                    }
-                    filter={matchCountry}
-                    autoHighlight
-                  >
-                    <ComboboxInput
-                      aria-label="Country code"
-                      placeholder="Code"
-                      className="w-full"
-                      aria-invalid={!!errors.phoneCountry}
-                    />
-                    <ComboboxContent className="w-72">
-                      <ComboboxEmpty>
-                        No country matches that search.
-                      </ComboboxEmpty>
-                      <ComboboxList>
-                        {(c: Country) => (
-                          <ComboboxItem key={c.code} value={c}>
-                            <span className="flex-1 truncate">{c.label}</span>
-                            <span className="text-muted-foreground tabular-nums">
-                              {c.dialCode}
-                            </span>
-                          </ComboboxItem>
-                        )}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
-                </div>
-                <div data-field="phone">
-                  <Input
-                    id="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel-national"
-                    placeholder="98765 43210"
-                    value={values.phone}
-                    onChange={(e) =>
-                      set("phone", e.target.value.replace(/[^\d\s-]/g, ""))
-                    }
-                    aria-invalid={!!errors.phone}
-                  />
-                </div>
-              </div>
-              <FieldError>{errors.phoneCountry ?? errors.phone}</FieldError>
-            </Field>
+            <PhoneField
+              id="phone"
+              country={values.phoneCountry}
+              onCountryChange={onPhoneCountryChange}
+              number={values.phone}
+              onNumberChange={(n) => set("phone", n)}
+              countryError={errors.phoneCountry}
+              numberError={errors.phone}
+            />
 
             <Button type="submit" size="lg">
               Next
@@ -457,6 +442,20 @@ export function SignupForm() {
             </Field>
             {errors.agreed ? (
               <FieldError className="-mt-3">{errors.agreed}</FieldError>
+            ) : null}
+
+            {formError ? (
+              <FieldError>
+                {formError}
+                {formError.includes("Log in instead") ? (
+                  <>
+                    {" "}
+                    <Link href="/login" className="font-medium underline underline-offset-4">
+                      Go to log in
+                    </Link>
+                  </>
+                ) : null}
+              </FieldError>
             ) : null}
 
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">

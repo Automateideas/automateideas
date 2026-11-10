@@ -1,0 +1,682 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "24f89708-9e33-47c8-9c5e-6d4136e0ba35",
+  "prevIds": [
+    "bb52940c-e582-4c6c-becc-b3ca67f22789"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "customers",
+        "customer_type"
+      ],
+      "writes": [
+        "s|col|public.customers.customer_type",
+        "n|col|public.customers.customer_type",
+        "e|col|public.customers.customer_type"
+      ],
+      "reads": [
+        "n|tbl|public.customers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "customers",
+        "contact_person"
+      ],
+      "writes": [
+        "s|col|public.customers.contact_person",
+        "n|col|public.customers.contact_person",
+        "e|col|public.customers.contact_person"
+      ],
+      "reads": [
+        "n|tbl|public.customers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "customers",
+        "category"
+      ],
+      "writes": [
+        "s|col|public.customers.category",
+        "n|col|public.customers.category",
+        "e|col|public.customers.category"
+      ],
+      "reads": [
+        "n|tbl|public.customers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "products",
+        "barcode"
+      ],
+      "writes": [
+        "s|col|public.products.barcode",
+        "n|col|public.products.barcode",
+        "e|col|public.products.barcode"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "products",
+        "brand"
+      ],
+      "writes": [
+        "s|col|public.products.brand",
+        "n|col|public.products.brand",
+        "e|col|public.products.brand"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "products",
+        "min_stock_qty"
+      ],
+      "writes": [
+        "s|col|public.products.min_stock_qty",
+        "n|col|public.products.min_stock_qty",
+        "e|col|public.products.min_stock_qty"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "services",
+        "category_id"
+      ],
+      "writes": [
+        "s|col|public.services.category_id",
+        "n|col|public.services.category_id",
+        "e|col|public.services.category_id"
+      ],
+      "reads": [
+        "n|tbl|public.services",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "suppliers",
+        "contact_person"
+      ],
+      "writes": [
+        "s|col|public.suppliers.contact_person",
+        "n|col|public.suppliers.contact_person",
+        "e|col|public.suppliers.contact_person"
+      ],
+      "reads": [
+        "n|tbl|public.suppliers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "suppliers",
+        "bank_name"
+      ],
+      "writes": [
+        "s|col|public.suppliers.bank_name",
+        "n|col|public.suppliers.bank_name",
+        "e|col|public.suppliers.bank_name"
+      ],
+      "reads": [
+        "n|tbl|public.suppliers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "suppliers",
+        "bank_account_name"
+      ],
+      "writes": [
+        "s|col|public.suppliers.bank_account_name",
+        "n|col|public.suppliers.bank_account_name",
+        "e|col|public.suppliers.bank_account_name"
+      ],
+      "reads": [
+        "n|tbl|public.suppliers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "suppliers",
+        "bank_account_number"
+      ],
+      "writes": [
+        "s|col|public.suppliers.bank_account_number",
+        "n|col|public.suppliers.bank_account_number",
+        "e|col|public.suppliers.bank_account_number"
+      ],
+      "reads": [
+        "n|tbl|public.suppliers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "suppliers",
+        "bank_ifsc"
+      ],
+      "writes": [
+        "s|col|public.suppliers.bank_ifsc",
+        "n|col|public.suppliers.bank_ifsc",
+        "e|col|public.suppliers.bank_ifsc"
+      ],
+      "reads": [
+        "n|tbl|public.suppliers",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "customers",
+        "customers_active_gstin_uq"
+      ],
+      "writes": [
+        "s|idx|public.customers_active_gstin_uq",
+        "n|idx|public.customers_active_gstin_uq",
+        "e|idx|public.customers_active_gstin_uq",
+        "n|rel|public.customers_active_gstin_uq"
+      ],
+      "reads": [
+        "n|tbl|public.customers",
+        "n|sch|public",
+        "n|col|public.customers.organization_id",
+        "n|col|public.customers.gstin"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "products",
+        "products_barcode_uq"
+      ],
+      "writes": [
+        "s|idx|public.products_barcode_uq",
+        "n|idx|public.products_barcode_uq",
+        "e|idx|public.products_barcode_uq",
+        "n|rel|public.products_barcode_uq"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.products.organization_id",
+        "n|col|public.products.barcode"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "suppliers",
+        "suppliers_active_gstin_uq"
+      ],
+      "writes": [
+        "s|idx|public.suppliers_active_gstin_uq",
+        "n|idx|public.suppliers_active_gstin_uq",
+        "e|idx|public.suppliers_active_gstin_uq",
+        "n|rel|public.suppliers_active_gstin_uq"
+      ],
+      "reads": [
+        "n|tbl|public.suppliers",
+        "n|sch|public",
+        "n|col|public.suppliers.organization_id",
+        "n|col|public.suppliers.gstin"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "services"
+      ],
+      "writes": [
+        "s|fk|public.services.services_category_fk",
+        "n|fk|public.services.services_category_fk",
+        "e|fk|public.services.services_category_fk",
+        "n|con|public.services.services_category_fk"
+      ],
+      "reads": [
+        "n|tbl|public.services",
+        "n|sch|public",
+        "n|tbl|public.product_categories",
+        "n|sch|public",
+        "n|col|public.services.organization_id",
+        "n|col|public.services.category_id",
+        "n|col|public.product_categories.organization_id",
+        "n|col|public.product_categories.id",
+        "e|uniqueness|public.product_categories.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "add_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "customers"
+      ],
+      "writes": [
+        "s|ck|public.customers.customers_type_check",
+        "n|ck|public.customers.customers_type_check",
+        "e|ck|public.customers.customers_type_check",
+        "n|con|public.customers.customers_type_check"
+      ],
+      "reads": [
+        "n|tbl|public.customers",
+        "n|sch|public",
+        "n|col|public.customers.customer_type"
+      ]
+    },
+    {
+      "statementType": "add_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "products"
+      ],
+      "writes": [
+        "s|ck|public.products.products_min_stock_check",
+        "n|ck|public.products.products_min_stock_check",
+        "e|ck|public.products.products_min_stock_check",
+        "n|con|public.products.products_min_stock_check"
+      ],
+      "reads": [
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.products.min_stock_qty"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "customers",
+        "name": "customer_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'business'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "customers",
+        "name": "contact_person",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "customers",
+        "name": "category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "barcode",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "brand",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "min_stock_qty",
+        "type": "numeric(15,3)",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "services",
+        "name": "category_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "suppliers",
+        "name": "contact_person",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "suppliers",
+        "name": "bank_name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "suppliers",
+        "name": "bank_account_name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "suppliers",
+        "name": "bank_account_number",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "suppliers",
+        "name": "bank_ifsc",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "customers",
+        "name": "customers_active_gstin_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "gstin",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"gstin\" is not null and \"archived_at\" is null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "products_barcode_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "barcode",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"barcode\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "suppliers",
+        "name": "suppliers_active_gstin_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "gstin",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"gstin\" is not null and \"archived_at\" is null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "services",
+        "name": "services_category_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "category_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "product_categories",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "customers",
+        "name": "customers_type_check",
+        "value": "\"customer_type\" in ('individual', 'business')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "products",
+        "name": "products_min_stock_check",
+        "value": "\"min_stock_qty\" is null or \"min_stock_qty\" >= 0",
+        "entityType": "checks"
+      }
+    }
+  ]
+}

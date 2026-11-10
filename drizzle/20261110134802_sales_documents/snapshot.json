@@ -1,0 +1,4924 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "d0bd52ef-a038-4958-8e0c-4ad31452adfd",
+  "prevIds": [
+    "866a5cb0-b4b3-4d4b-a0d7-8e8af413e3e2"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "logo_file_id"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.logo_file_id",
+        "n|col|public.billing_settings.logo_file_id",
+        "e|col|public.billing_settings.logo_file_id"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "show_logo"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.show_logo",
+        "n|col|public.billing_settings.show_logo",
+        "e|col|public.billing_settings.show_logo"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoice_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.business_invoice_items.discount",
+        "n|col|public.business_invoice_items.discount",
+        "e|col|public.business_invoice_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoice_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoice_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoice_items.gross_paise",
+        "n|col|public.business_invoice_items.gross_paise",
+        "e|col|public.business_invoice_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoice_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoice_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoice_items.invoice_discount_paise",
+        "n|col|public.business_invoice_items.invoice_discount_paise",
+        "e|col|public.business_invoice_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoice_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoice_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.business_invoice_items.tax_category",
+        "n|col|public.business_invoice_items.tax_category",
+        "e|col|public.business_invoice_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoice_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoice_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.business_invoice_items.cess_rate",
+        "n|col|public.business_invoice_items.cess_rate",
+        "e|col|public.business_invoice_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoice_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.prices_include_tax",
+        "n|col|public.business_invoices.prices_include_tax",
+        "e|col|public.business_invoices.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.reverse_charge",
+        "n|col|public.business_invoices.reverse_charge",
+        "e|col|public.business_invoices.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.zero_rated",
+        "n|col|public.business_invoices.zero_rated",
+        "e|col|public.business_invoices.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.supply_type",
+        "n|col|public.business_invoices.supply_type",
+        "e|col|public.business_invoices.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.invoice_discount",
+        "n|col|public.business_invoices.invoice_discount",
+        "e|col|public.business_invoices.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.charges",
+        "n|col|public.business_invoices.charges",
+        "e|col|public.business_invoices.charges"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.taxable_paise",
+        "n|col|public.business_invoices.taxable_paise",
+        "e|col|public.business_invoices.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.cgst_paise",
+        "n|col|public.business_invoices.cgst_paise",
+        "e|col|public.business_invoices.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.sgst_paise",
+        "n|col|public.business_invoices.sgst_paise",
+        "e|col|public.business_invoices.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.igst_paise",
+        "n|col|public.business_invoices.igst_paise",
+        "e|col|public.business_invoices.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.cess_paise",
+        "n|col|public.business_invoices.cess_paise",
+        "e|col|public.business_invoices.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.seller",
+        "n|col|public.business_invoices.seller",
+        "e|col|public.business_invoices.seller"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.financial_year",
+        "n|col|public.business_invoices.financial_year",
+        "e|col|public.business_invoices.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.sequence_number",
+        "n|col|public.business_invoices.sequence_number",
+        "e|col|public.business_invoices.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.issued_at",
+        "n|col|public.business_invoices.issued_at",
+        "e|col|public.business_invoices.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_note_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.credit_note_items.discount",
+        "n|col|public.credit_note_items.discount",
+        "e|col|public.credit_note_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.credit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_note_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_note_items.gross_paise",
+        "n|col|public.credit_note_items.gross_paise",
+        "e|col|public.credit_note_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_note_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_note_items.invoice_discount_paise",
+        "n|col|public.credit_note_items.invoice_discount_paise",
+        "e|col|public.credit_note_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_note_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.credit_note_items.tax_category",
+        "n|col|public.credit_note_items.tax_category",
+        "e|col|public.credit_note_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.credit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_note_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.credit_note_items.cess_rate",
+        "n|col|public.credit_note_items.cess_rate",
+        "e|col|public.credit_note_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.credit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.prices_include_tax",
+        "n|col|public.credit_notes.prices_include_tax",
+        "e|col|public.credit_notes.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.reverse_charge",
+        "n|col|public.credit_notes.reverse_charge",
+        "e|col|public.credit_notes.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.zero_rated",
+        "n|col|public.credit_notes.zero_rated",
+        "e|col|public.credit_notes.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.supply_type",
+        "n|col|public.credit_notes.supply_type",
+        "e|col|public.credit_notes.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.invoice_discount",
+        "n|col|public.credit_notes.invoice_discount",
+        "e|col|public.credit_notes.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.charges",
+        "n|col|public.credit_notes.charges",
+        "e|col|public.credit_notes.charges"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.taxable_paise",
+        "n|col|public.credit_notes.taxable_paise",
+        "e|col|public.credit_notes.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.cgst_paise",
+        "n|col|public.credit_notes.cgst_paise",
+        "e|col|public.credit_notes.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.sgst_paise",
+        "n|col|public.credit_notes.sgst_paise",
+        "e|col|public.credit_notes.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.igst_paise",
+        "n|col|public.credit_notes.igst_paise",
+        "e|col|public.credit_notes.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.cess_paise",
+        "n|col|public.credit_notes.cess_paise",
+        "e|col|public.credit_notes.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.seller",
+        "n|col|public.credit_notes.seller",
+        "e|col|public.credit_notes.seller"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.financial_year",
+        "n|col|public.credit_notes.financial_year",
+        "e|col|public.credit_notes.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.sequence_number",
+        "n|col|public.credit_notes.sequence_number",
+        "e|col|public.credit_notes.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.issued_at",
+        "n|col|public.credit_notes.issued_at",
+        "e|col|public.credit_notes.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_note_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.debit_note_items.discount",
+        "n|col|public.debit_note_items.discount",
+        "e|col|public.debit_note_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.debit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_note_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_note_items.gross_paise",
+        "n|col|public.debit_note_items.gross_paise",
+        "e|col|public.debit_note_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_note_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_note_items.invoice_discount_paise",
+        "n|col|public.debit_note_items.invoice_discount_paise",
+        "e|col|public.debit_note_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_note_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.debit_note_items.tax_category",
+        "n|col|public.debit_note_items.tax_category",
+        "e|col|public.debit_note_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.debit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_note_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.debit_note_items.cess_rate",
+        "n|col|public.debit_note_items.cess_rate",
+        "e|col|public.debit_note_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.debit_note_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.prices_include_tax",
+        "n|col|public.debit_notes.prices_include_tax",
+        "e|col|public.debit_notes.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.reverse_charge",
+        "n|col|public.debit_notes.reverse_charge",
+        "e|col|public.debit_notes.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.zero_rated",
+        "n|col|public.debit_notes.zero_rated",
+        "e|col|public.debit_notes.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.supply_type",
+        "n|col|public.debit_notes.supply_type",
+        "e|col|public.debit_notes.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.invoice_discount",
+        "n|col|public.debit_notes.invoice_discount",
+        "e|col|public.debit_notes.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.charges",
+        "n|col|public.debit_notes.charges",
+        "e|col|public.debit_notes.charges"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.taxable_paise",
+        "n|col|public.debit_notes.taxable_paise",
+        "e|col|public.debit_notes.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.cgst_paise",
+        "n|col|public.debit_notes.cgst_paise",
+        "e|col|public.debit_notes.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.sgst_paise",
+        "n|col|public.debit_notes.sgst_paise",
+        "e|col|public.debit_notes.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.igst_paise",
+        "n|col|public.debit_notes.igst_paise",
+        "e|col|public.debit_notes.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.cess_paise",
+        "n|col|public.debit_notes.cess_paise",
+        "e|col|public.debit_notes.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.seller",
+        "n|col|public.debit_notes.seller",
+        "e|col|public.debit_notes.seller"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.financial_year",
+        "n|col|public.debit_notes.financial_year",
+        "e|col|public.debit_notes.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.sequence_number",
+        "n|col|public.debit_notes.sequence_number",
+        "e|col|public.debit_notes.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "debit_notes",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.debit_notes.issued_at",
+        "n|col|public.debit_notes.issued_at",
+        "e|col|public.debit_notes.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.debit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bill_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.purchase_bill_items.discount",
+        "n|col|public.purchase_bill_items.discount",
+        "e|col|public.purchase_bill_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bill_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bill_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bill_items.gross_paise",
+        "n|col|public.purchase_bill_items.gross_paise",
+        "e|col|public.purchase_bill_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bill_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bill_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bill_items.invoice_discount_paise",
+        "n|col|public.purchase_bill_items.invoice_discount_paise",
+        "e|col|public.purchase_bill_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bill_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bill_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.purchase_bill_items.tax_category",
+        "n|col|public.purchase_bill_items.tax_category",
+        "e|col|public.purchase_bill_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bill_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bill_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.purchase_bill_items.cess_rate",
+        "n|col|public.purchase_bill_items.cess_rate",
+        "e|col|public.purchase_bill_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bill_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.prices_include_tax",
+        "n|col|public.purchase_bills.prices_include_tax",
+        "e|col|public.purchase_bills.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.reverse_charge",
+        "n|col|public.purchase_bills.reverse_charge",
+        "e|col|public.purchase_bills.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.zero_rated",
+        "n|col|public.purchase_bills.zero_rated",
+        "e|col|public.purchase_bills.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.supply_type",
+        "n|col|public.purchase_bills.supply_type",
+        "e|col|public.purchase_bills.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.invoice_discount",
+        "n|col|public.purchase_bills.invoice_discount",
+        "e|col|public.purchase_bills.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.charges",
+        "n|col|public.purchase_bills.charges",
+        "e|col|public.purchase_bills.charges"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.taxable_paise",
+        "n|col|public.purchase_bills.taxable_paise",
+        "e|col|public.purchase_bills.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.cgst_paise",
+        "n|col|public.purchase_bills.cgst_paise",
+        "e|col|public.purchase_bills.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.sgst_paise",
+        "n|col|public.purchase_bills.sgst_paise",
+        "e|col|public.purchase_bills.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.igst_paise",
+        "n|col|public.purchase_bills.igst_paise",
+        "e|col|public.purchase_bills.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.cess_paise",
+        "n|col|public.purchase_bills.cess_paise",
+        "e|col|public.purchase_bills.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.seller",
+        "n|col|public.purchase_bills.seller",
+        "e|col|public.purchase_bills.seller"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.financial_year",
+        "n|col|public.purchase_bills.financial_year",
+        "e|col|public.purchase_bills.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.sequence_number",
+        "n|col|public.purchase_bills.sequence_number",
+        "e|col|public.purchase_bills.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.issued_at",
+        "n|col|public.purchase_bills.issued_at",
+        "e|col|public.purchase_bills.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_order_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.purchase_order_items.discount",
+        "n|col|public.purchase_order_items.discount",
+        "e|col|public.purchase_order_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_order_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_order_items.gross_paise",
+        "n|col|public.purchase_order_items.gross_paise",
+        "e|col|public.purchase_order_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_order_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_order_items.invoice_discount_paise",
+        "n|col|public.purchase_order_items.invoice_discount_paise",
+        "e|col|public.purchase_order_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_order_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.purchase_order_items.tax_category",
+        "n|col|public.purchase_order_items.tax_category",
+        "e|col|public.purchase_order_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_order_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.purchase_order_items.cess_rate",
+        "n|col|public.purchase_order_items.cess_rate",
+        "e|col|public.purchase_order_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.prices_include_tax",
+        "n|col|public.purchase_orders.prices_include_tax",
+        "e|col|public.purchase_orders.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.reverse_charge",
+        "n|col|public.purchase_orders.reverse_charge",
+        "e|col|public.purchase_orders.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.zero_rated",
+        "n|col|public.purchase_orders.zero_rated",
+        "e|col|public.purchase_orders.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.supply_type",
+        "n|col|public.purchase_orders.supply_type",
+        "e|col|public.purchase_orders.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.invoice_discount",
+        "n|col|public.purchase_orders.invoice_discount",
+        "e|col|public.purchase_orders.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.charges",
+        "n|col|public.purchase_orders.charges",
+        "e|col|public.purchase_orders.charges"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.taxable_paise",
+        "n|col|public.purchase_orders.taxable_paise",
+        "e|col|public.purchase_orders.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.cgst_paise",
+        "n|col|public.purchase_orders.cgst_paise",
+        "e|col|public.purchase_orders.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.sgst_paise",
+        "n|col|public.purchase_orders.sgst_paise",
+        "e|col|public.purchase_orders.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.igst_paise",
+        "n|col|public.purchase_orders.igst_paise",
+        "e|col|public.purchase_orders.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.cess_paise",
+        "n|col|public.purchase_orders.cess_paise",
+        "e|col|public.purchase_orders.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.seller",
+        "n|col|public.purchase_orders.seller",
+        "e|col|public.purchase_orders.seller"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.financial_year",
+        "n|col|public.purchase_orders.financial_year",
+        "e|col|public.purchase_orders.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.sequence_number",
+        "n|col|public.purchase_orders.sequence_number",
+        "e|col|public.purchase_orders.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.issued_at",
+        "n|col|public.purchase_orders.issued_at",
+        "e|col|public.purchase_orders.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotation_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.quotation_items.discount",
+        "n|col|public.quotation_items.discount",
+        "e|col|public.quotation_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.quotation_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotation_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.quotation_items.gross_paise",
+        "n|col|public.quotation_items.gross_paise",
+        "e|col|public.quotation_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotation_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotation_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.quotation_items.invoice_discount_paise",
+        "n|col|public.quotation_items.invoice_discount_paise",
+        "e|col|public.quotation_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotation_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotation_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.quotation_items.tax_category",
+        "n|col|public.quotation_items.tax_category",
+        "e|col|public.quotation_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.quotation_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotation_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.quotation_items.cess_rate",
+        "n|col|public.quotation_items.cess_rate",
+        "e|col|public.quotation_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.quotation_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.quotations.prices_include_tax",
+        "n|col|public.quotations.prices_include_tax",
+        "e|col|public.quotations.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.quotations.reverse_charge",
+        "n|col|public.quotations.reverse_charge",
+        "e|col|public.quotations.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.quotations.zero_rated",
+        "n|col|public.quotations.zero_rated",
+        "e|col|public.quotations.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.quotations.supply_type",
+        "n|col|public.quotations.supply_type",
+        "e|col|public.quotations.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.quotations.invoice_discount",
+        "n|col|public.quotations.invoice_discount",
+        "e|col|public.quotations.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.quotations.charges",
+        "n|col|public.quotations.charges",
+        "e|col|public.quotations.charges"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.quotations.taxable_paise",
+        "n|col|public.quotations.taxable_paise",
+        "e|col|public.quotations.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.quotations.cgst_paise",
+        "n|col|public.quotations.cgst_paise",
+        "e|col|public.quotations.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.quotations.sgst_paise",
+        "n|col|public.quotations.sgst_paise",
+        "e|col|public.quotations.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.quotations.igst_paise",
+        "n|col|public.quotations.igst_paise",
+        "e|col|public.quotations.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.quotations.cess_paise",
+        "n|col|public.quotations.cess_paise",
+        "e|col|public.quotations.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.quotations.seller",
+        "n|col|public.quotations.seller",
+        "e|col|public.quotations.seller"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.quotations.financial_year",
+        "n|col|public.quotations.financial_year",
+        "e|col|public.quotations.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.quotations.sequence_number",
+        "n|col|public.quotations.sequence_number",
+        "e|col|public.quotations.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "quotations",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.quotations.issued_at",
+        "n|col|public.quotations.issued_at",
+        "e|col|public.quotations.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.quotations",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_order_items",
+        "discount"
+      ],
+      "writes": [
+        "s|col|public.sales_order_items.discount",
+        "n|col|public.sales_order_items.discount",
+        "e|col|public.sales_order_items.discount"
+      ],
+      "reads": [
+        "n|tbl|public.sales_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_order_items",
+        "gross_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_order_items.gross_paise",
+        "n|col|public.sales_order_items.gross_paise",
+        "e|col|public.sales_order_items.gross_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_order_items",
+        "invoice_discount_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_order_items.invoice_discount_paise",
+        "n|col|public.sales_order_items.invoice_discount_paise",
+        "e|col|public.sales_order_items.invoice_discount_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_order_items",
+        "tax_category"
+      ],
+      "writes": [
+        "s|col|public.sales_order_items.tax_category",
+        "n|col|public.sales_order_items.tax_category",
+        "e|col|public.sales_order_items.tax_category"
+      ],
+      "reads": [
+        "n|tbl|public.sales_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_order_items",
+        "cess_rate"
+      ],
+      "writes": [
+        "s|col|public.sales_order_items.cess_rate",
+        "n|col|public.sales_order_items.cess_rate",
+        "e|col|public.sales_order_items.cess_rate"
+      ],
+      "reads": [
+        "n|tbl|public.sales_order_items",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "prices_include_tax"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.prices_include_tax",
+        "n|col|public.sales_orders.prices_include_tax",
+        "e|col|public.sales_orders.prices_include_tax"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "reverse_charge"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.reverse_charge",
+        "n|col|public.sales_orders.reverse_charge",
+        "e|col|public.sales_orders.reverse_charge"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "zero_rated"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.zero_rated",
+        "n|col|public.sales_orders.zero_rated",
+        "e|col|public.sales_orders.zero_rated"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "supply_type"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.supply_type",
+        "n|col|public.sales_orders.supply_type",
+        "e|col|public.sales_orders.supply_type"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "invoice_discount"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.invoice_discount",
+        "n|col|public.sales_orders.invoice_discount",
+        "e|col|public.sales_orders.invoice_discount"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "charges"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.charges",
+        "n|col|public.sales_orders.charges",
+        "e|col|public.sales_orders.charges"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "taxable_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.taxable_paise",
+        "n|col|public.sales_orders.taxable_paise",
+        "e|col|public.sales_orders.taxable_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "cgst_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.cgst_paise",
+        "n|col|public.sales_orders.cgst_paise",
+        "e|col|public.sales_orders.cgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "sgst_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.sgst_paise",
+        "n|col|public.sales_orders.sgst_paise",
+        "e|col|public.sales_orders.sgst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "igst_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.igst_paise",
+        "n|col|public.sales_orders.igst_paise",
+        "e|col|public.sales_orders.igst_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "cess_paise"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.cess_paise",
+        "n|col|public.sales_orders.cess_paise",
+        "e|col|public.sales_orders.cess_paise"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "seller"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.seller",
+        "n|col|public.sales_orders.seller",
+        "e|col|public.sales_orders.seller"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "financial_year"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.financial_year",
+        "n|col|public.sales_orders.financial_year",
+        "e|col|public.sales_orders.financial_year"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "sequence_number"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.sequence_number",
+        "n|col|public.sales_orders.sequence_number",
+        "e|col|public.sales_orders.sequence_number"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "sales_orders",
+        "issued_at"
+      ],
+      "writes": [
+        "s|col|public.sales_orders.issued_at",
+        "n|col|public.sales_orders.issued_at",
+        "e|col|public.sales_orders.issued_at"
+      ],
+      "reads": [
+        "n|tbl|public.sales_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_unique",
+      "statementTarget": [
+        "table",
+        "public",
+        "billing_files"
+      ],
+      "writes": [
+        "s|uq|public.billing_files.billing_files_org_id_uq",
+        "n|uq|public.billing_files.billing_files_org_id_uq",
+        "e|uq|public.billing_files.billing_files_org_id_uq",
+        "n|con|public.billing_files.billing_files_org_id_uq",
+        "n|rel|public.billing_files_org_id_uq"
+      ],
+      "reads": [
+        "n|tbl|public.billing_files",
+        "n|sch|public",
+        "n|col|public.billing_files.organization_id",
+        "n|col|public.billing_files.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "billing_settings"
+      ],
+      "writes": [
+        "s|fk|public.billing_settings.billing_settings_logo_fk",
+        "n|fk|public.billing_settings.billing_settings_logo_fk",
+        "e|fk|public.billing_settings.billing_settings_logo_fk",
+        "n|con|public.billing_settings.billing_settings_logo_fk"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public",
+        "n|tbl|public.billing_files",
+        "n|sch|public",
+        "n|col|public.billing_settings.organization_id",
+        "n|col|public.billing_settings.logo_file_id",
+        "n|col|public.billing_files.organization_id",
+        "n|col|public.billing_files.id",
+        "e|uniqueness|public.billing_files.id.organization_id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "logo_file_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "show_logo",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoice_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoice_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoice_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoice_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoice_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_note_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_note_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_note_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_note_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_note_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_note_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_note_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_note_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_note_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_note_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "debit_notes",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bill_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bill_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bill_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bill_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bill_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_order_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_order_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_order_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_order_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_order_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotation_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotation_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotation_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotation_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotation_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "quotations",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_order_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_order_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_order_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_order_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_order_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "sales_orders",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "billing_settings_logo_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "logo_file_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "billing_files",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_files",
+        "name": "billing_files_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    }
+  ]
+}
