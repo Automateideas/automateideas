@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PencilIcon, PlusIcon, UsersIcon } from "lucide-react";
 
-import { PhoneField } from "@/components/phone-field";
+import { PhoneField, phoneError } from "@/components/phone-field";
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ApiError, api, useApiQuery } from "@/lib/api";
 import { type CustomerType, validateCustomer } from "@/lib/business-billing/contacts-validation";
+import { cleanGstin, cleanPan, cleanPostalCode } from "@/lib/business-billing/input-limits";
 import { type AddressValues, formatPaise, paiseToRupees, stateByCode } from "@/lib/business-billing/fields";
 import { type Country, countries, formatPhone, parsePhone } from "@/lib/countries";
 
@@ -326,8 +327,10 @@ function CustomerForm({ initial }: { initial: CustomerDetail | null }) {
     setFormError(null);
     const payload = toPayload(form);
     const local = validateCustomer(payload);
-    if (!local.ok || (form.phoneNumber.trim() && !form.phoneCountry)) {
-      setErrors({ ...(local.ok ? {} : local.errors), ...(form.phoneNumber.trim() && !form.phoneCountry ? { phone: "Choose a country code." } : {}) });
+    // Optional phone; when given it must fit its country (10 digits for India).
+    const phoneProblem = form.phoneNumber.trim() ? phoneError(form.phoneCountry, form.phoneNumber) : null;
+    if (!local.ok || phoneProblem) {
+      setErrors({ ...(local.ok ? {} : local.errors), ...(phoneProblem ? { phone: phoneProblem } : {}) });
       focusFirstError();
       return;
     }
@@ -409,15 +412,14 @@ function CustomerForm({ initial }: { initial: CustomerDetail | null }) {
                 label="GSTIN"
                 optional
                 value={form.gstin}
-                onValue={(v) => set("gstin", v.toUpperCase())}
+                onValue={(v) => set("gstin", cleanGstin(v))}
                 error={errors.gstin}
-                maxLength={15}
                 spellCheck={false}
                 autoComplete="off"
                 className="font-mono"
                 hint={gstState ? `Registered in ${gstState.name}.` : "Leave blank for unregistered customers."}
               />
-              <TextField id="c-pan" label="PAN" optional value={form.pan} onValue={(v) => set("pan", v.toUpperCase())} error={errors.pan} maxLength={10} spellCheck={false} autoComplete="off" />
+              <TextField id="c-pan" label="PAN" optional value={form.pan} onValue={(v) => set("pan", cleanPan(v))} error={errors.pan} spellCheck={false} autoComplete="off" />
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
               <TextField id="c-email" label="Email" optional type="email" value={form.email} onValue={(v) => set("email", v)} error={errors.email} autoComplete="off" />
@@ -596,9 +598,8 @@ export function AddressFields({ prefix, value, errors, onChange }: AddressFields
           label={inIndia ? "PIN code" : "Postal code"}
           optional
           inputMode={inIndia ? "numeric" : undefined}
-          maxLength={inIndia ? 6 : 12}
           value={value.postalCode}
-          onValue={(v) => onChange("postalCode", v)}
+          onValue={(v) => onChange("postalCode", cleanPostalCode(v, value.country?.code))}
           error={e("postalCode")}
           autoComplete="off"
         />

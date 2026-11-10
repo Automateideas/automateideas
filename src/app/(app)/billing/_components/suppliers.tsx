@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PencilIcon, PlusIcon, TruckIcon } from "lucide-react";
 
-import { PhoneField } from "@/components/phone-field";
+import { PhoneField, phoneError } from "@/components/phone-field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { api, useApiQuery } from "@/lib/api";
 import { validateSupplier } from "@/lib/business-billing/contacts-validation";
+import { cleanBankAccount, cleanGstin, cleanIfsc, cleanPan } from "@/lib/business-billing/input-limits";
 import { type AddressValues, formatPaise, paiseToRupees, stateByCode } from "@/lib/business-billing/fields";
 import { type Country, countries, formatPhone, parsePhone } from "@/lib/countries";
 
@@ -275,8 +276,10 @@ function SupplierForm({ initial }: { initial: SupplierDetail | null }) {
     setFormError(null);
     const payload = toPayload(form);
     const local = validateSupplier(payload);
-    if (!local.ok) {
-      setErrors(local.errors);
+    // Optional phone; when given it must fit its country (10 digits for India).
+    const phoneProblem = form.phoneNumber.trim() ? phoneError(form.phoneCountry, form.phoneNumber) : null;
+    if (!local.ok || phoneProblem) {
+      setErrors({ ...(local.ok ? {} : local.errors), ...(phoneProblem ? { phone: phoneProblem } : {}) });
       focusFirstError();
       return;
     }
@@ -312,15 +315,14 @@ function SupplierForm({ initial }: { initial: SupplierDetail | null }) {
                 label="GSTIN"
                 optional
                 value={form.gstin}
-                onValue={(v) => set("gstin", v.toUpperCase())}
+                onValue={(v) => set("gstin", cleanGstin(v))}
                 error={errors.gstin}
-                maxLength={15}
                 spellCheck={false}
                 autoComplete="off"
                 className="font-mono"
                 hint={gstState ? `Registered in ${gstState.name}.` : undefined}
               />
-              <TextField id="s-pan" label="PAN" optional value={form.pan} onValue={(v) => set("pan", v.toUpperCase())} error={errors.pan} maxLength={10} spellCheck={false} autoComplete="off" />
+              <TextField id="s-pan" label="PAN" optional value={form.pan} onValue={(v) => set("pan", cleanPan(v))} error={errors.pan} spellCheck={false} autoComplete="off" />
               <TextField id="s-email" label="Email" optional type="email" value={form.email} onValue={(v) => set("email", v)} error={errors.email} autoComplete="off" />
               <PhoneField
                 id="s-phone"
@@ -362,12 +364,11 @@ function SupplierForm({ initial }: { initial: SupplierDetail | null }) {
                 optional
                 inputMode="numeric"
                 value={form.bankAccountNumber}
-                onValue={(v) => set("bankAccountNumber", v.replace(/\D/g, ""))}
+                onValue={(v) => set("bankAccountNumber", cleanBankAccount(v))}
                 error={errors.bankAccountNumber}
-                maxLength={18}
                 autoComplete="off"
               />
-              <TextField id="s-ifsc" label="IFSC" optional value={form.bankIfsc} onValue={(v) => set("bankIfsc", v.toUpperCase())} error={errors.bankIfsc} maxLength={11} spellCheck={false} autoComplete="off" />
+              <TextField id="s-ifsc" label="IFSC" optional value={form.bankIfsc} onValue={(v) => set("bankIfsc", cleanIfsc(v))} error={errors.bankIfsc} spellCheck={false} autoComplete="off" />
               <TextField
                 id="s-terms"
                 label="Payment terms (days)"

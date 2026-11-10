@@ -49,6 +49,23 @@ const PAN_RE = /^[A-Z]{5}\d{4}[A-Z]$/;
 const PREFIX_RE = /^[A-Za-z0-9/_-]{1,10}$/;
 const COUNTRY_CODES = new Set(countries.map((c) => c.code));
 
+/** Longest value each text field accepts. The form uses these as its input limits too. */
+export const BILLING_SETTINGS_MAX = {
+  legalName: 200,
+  tradeName: 200,
+  gstin: 15,
+  pan: 10,
+  email: 254,
+  phone: 30,
+  addressLine1: 200,
+  addressLine2: 200,
+  city: 100,
+  state: 100,
+  /** Other countries' postal codes; an Indian PIN must be exactly 6 digits (checked below). */
+  postalCode: 12,
+  invoicePrefix: 10,
+} as const;
+
 /** Trimmed string, or null when empty or not a string. */
 function text(value: unknown, max: number): string | null | undefined {
   if (value === undefined || value === null) return null;
@@ -68,20 +85,20 @@ export function validateBillingSettings(raw: Record<string, unknown>):
   const errors: BillingSettingsErrors = {};
   const tooLong = "This is too long.";
 
-  const legalName = text(raw.legalName, 200);
+  const legalName = text(raw.legalName, BILLING_SETTINGS_MAX.legalName);
   if (legalName === undefined) errors.legalName = tooLong;
   else if (!legalName) errors.legalName = "Enter your registered business name.";
 
-  const tradeName = text(raw.tradeName, 200);
+  const tradeName = text(raw.tradeName, BILLING_SETTINGS_MAX.tradeName);
   if (tradeName === undefined) errors.tradeName = tooLong;
 
-  const gstinRaw = text(raw.gstin, 15);
+  const gstinRaw = text(raw.gstin, BILLING_SETTINGS_MAX.gstin);
   const gstin = gstinRaw ? gstinRaw.toUpperCase() : gstinRaw;
   if (gstin === undefined || (gstin && !GSTIN_RE.test(gstin))) {
     errors.gstin = "Enter a valid 15-character GSTIN, e.g. 27ABCDE1234F1Z5.";
   }
 
-  const panRaw = text(raw.pan, 10);
+  const panRaw = text(raw.pan, BILLING_SETTINGS_MAX.pan);
   const pan = panRaw ? panRaw.toUpperCase() : panRaw;
   if (pan === undefined || (pan && !PAN_RE.test(pan))) {
     errors.pan = "Enter a valid 10-character PAN, e.g. ABCDE1234F.";
@@ -91,17 +108,17 @@ export function validateBillingSettings(raw: Record<string, unknown>):
     errors.pan = "This PAN doesn't match the one inside your GSTIN.";
   }
 
-  const email = text(raw.email, 254);
+  const email = text(raw.email, BILLING_SETTINGS_MAX.email);
   if (email === undefined || (email && !isEmail(email))) errors.email = "Enter a valid email address.";
 
-  const phone = text(raw.phone, 30);
+  const phone = text(raw.phone, BILLING_SETTINGS_MAX.phone);
   if (phone === undefined) errors.phone = "Enter a valid contact number.";
 
-  const addressLine1 = text(raw.addressLine1, 200);
-  const addressLine2 = text(raw.addressLine2, 200);
-  const city = text(raw.city, 100);
-  const state = text(raw.state, 100);
-  const postalCode = text(raw.postalCode, 12);
+  const addressLine1 = text(raw.addressLine1, BILLING_SETTINGS_MAX.addressLine1);
+  const addressLine2 = text(raw.addressLine2, BILLING_SETTINGS_MAX.addressLine2);
+  const city = text(raw.city, BILLING_SETTINGS_MAX.city);
+  const state = text(raw.state, BILLING_SETTINGS_MAX.state);
+  const postalCode = text(raw.postalCode, BILLING_SETTINGS_MAX.postalCode);
   if (addressLine1 === undefined) errors.addressLine1 = tooLong;
   if (addressLine2 === undefined) errors.addressLine2 = tooLong;
   if (city === undefined) errors.city = tooLong;
@@ -111,6 +128,9 @@ export function validateBillingSettings(raw: Record<string, unknown>):
   const countryCode = typeof raw.countryCode === "string" ? raw.countryCode.toUpperCase() : "";
   if (!COUNTRY_CODES.has(countryCode)) errors.countryCode = "Choose a country.";
   if (gstin && countryCode !== "IN") errors.gstin = "GSTIN applies only to businesses in India.";
+  if (countryCode === "IN" && postalCode && !/^\d{6}$/.test(postalCode)) {
+    errors.postalCode = "Enter a 6-digit PIN code.";
+  }
 
   const currency = raw.currency ?? DEFAULT_BILLING_SETTINGS.currency;
   if (!BILLING_CURRENCIES.includes(currency as BillingSettingsValues["currency"])) {

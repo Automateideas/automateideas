@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { CircleCheckIcon } from "lucide-react";
 
-import { PhoneField, cleanPhone } from "@/components/phone-field";
+import { PhoneField, cleanPhone, phoneError } from "@/components/phone-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -22,8 +22,10 @@ import { ApiError, api, useApiQuery } from "@/lib/api";
 import {
   type BillingSettingsErrors,
   type BillingSettingsValues,
+  BILLING_SETTINGS_MAX as MAX,
   validateBillingSettings,
 } from "@/lib/business-billing/settings-validation";
+import { cleanGstin, cleanInvoicePrefix, cleanPan, cleanPostalCode } from "@/lib/business-billing/input-limits";
 import { type Country, countries, formatPhone, parsePhone } from "@/lib/countries";
 
 import { LoadError } from "../../_components/page-parts";
@@ -112,6 +114,30 @@ export function BillingSettingsView() {
   return <SettingsForm key={query.data.updatedAt ?? "new"} initial={query.data} onSaved={query.reload} />;
 }
 
+/** A row of short fields: stacked on phones, side by side (and wrapping) from sm up. */
+const ROW = "flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start";
+
+/** Field widths from sm up, sized to what each one holds. */
+const W = {
+  gstin: "sm:w-56", // 15 characters
+  pan: "sm:w-44", // 10 characters
+  email: "sm:w-80",
+  phone: "sm:w-80", // country code + up to 12 digits
+  place: "sm:w-60", // city, state, country, currency, month
+  pin: "sm:w-36", // 6-digit PIN or a short postal code
+  prefix: "sm:w-40", // up to 10 characters (on the input, so the hint can run wider)
+  name: "sm:max-w-md", // business names
+  address: "sm:max-w-xl",
+};
+
+/** Fields that drop stray characters and stop at their real length as you type (lib/business-billing/input-limits.ts). */
+const CLEAN: Partial<Record<keyof FormState, (value: string, form: FormState) => string>> = {
+  gstin: cleanGstin,
+  pan: cleanPan,
+  postalCode: (v, f) => cleanPostalCode(v, f.country?.code),
+  invoicePrefix: cleanInvoicePrefix,
+};
+
 function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved: () => void }) {
   const [form, setForm] = useState<FormState>(() => toForm(initial));
   const [errors, setErrors] = useState<BillingSettingsErrors>({});
@@ -132,10 +158,11 @@ function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved
 
     const payload = toPayload(form);
     const local = validateBillingSettings(payload);
-    const phoneMissingCode = form.phoneNumber.trim() && !form.phoneCountry;
-    if (!local.ok || phoneMissingCode) {
+    // The phone is optional; when given, it must fit its country (10 digits for India).
+    const phoneProblem = form.phoneNumber.trim() ? phoneError(form.phoneCountry, form.phoneNumber) : null;
+    if (!local.ok || phoneProblem) {
       const found = { ...(local.ok ? {} : local.errors) };
-      if (phoneMissingCode) found.phone = "Choose a country code.";
+      if (phoneProblem) found.phone = phoneProblem;
       setErrors(found);
       document.querySelector<HTMLElement>("[aria-invalid=true]")?.focus();
       return;
@@ -154,13 +181,21 @@ function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved
     });
   }
 
-  const text = (key: keyof FormState & keyof BillingSettingsErrors, id: string, label: string, props: React.ComponentProps<typeof Input> = {}, hint?: string) => (
-    <Field data-invalid={!!errors[key]}>
+  // `width` sizes the field to what it holds (from sm up; phones always get the full width).
+  const text = (
+    key: keyof FormState & keyof BillingSettingsErrors,
+    id: string,
+    label: string,
+    props: React.ComponentProps<typeof Input> = {},
+    hint?: string,
+    width?: string,
+  ) => (
+    <Field data-invalid={!!errors[key]} className={width}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <Input
         id={id}
         value={form[key] as string}
-        onChange={(e) => set(key, e.target.value as FormState[typeof key])}
+        onChange={(e) => set(key, (CLEAN[key]?.(e.target.value, form) ?? e.target.value) as FormState[typeof key])}
         aria-invalid={!!errors[key]}
         disabled={readOnly || pending}
         {...props}
@@ -184,21 +219,25 @@ function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            {text("legalName", "bb-legal-name", "Registered business name", { autoComplete: "organization" })}
-            {text("tradeName", "bb-trade-name", "Trade name (optional)", {}, "If you trade under a different name.")}
-            <div className="grid gap-5 sm:grid-cols-2">
-              {text("gstin", "bb-gstin", "GSTIN (optional)", {
-                maxLength: 15,
-                autoCapitalize: "characters",
-                spellCheck: false,
-                className: "uppercase",
-              })}
-              {text("pan", "bb-pan", "PAN (optional)", {
-                maxLength: 10,
-                autoCapitalize: "characters",
-                spellCheck: false,
-                className: "uppercase",
-              })}
+            {text("legalName", "bb-legal-name", "Registered business name", { autoComplete: "organization", maxLength: MAX.legalName }, undefined, W.name)}
+            {text("tradeName", "bb-trade-name", "Trade name (optional)", { maxLength: MAX.tradeName }, "If you trade under a different name.", W.name)}
+            <div className={ROW}>
+              {text(
+                "gstin",
+                "bb-gstin",
+                "GSTIN (optional)",
+                { autoCapitalize: "characters", spellCheck: false, className: "uppercase tabular-nums" },
+                undefined,
+                W.gstin,
+              )}
+              {text(
+                "pan",
+                "bb-pan",
+                "PAN (optional)",
+                { autoCapitalize: "characters", spellCheck: false, className: "uppercase tabular-nums" },
+                undefined,
+                W.pan,
+              )}
             </div>
           </FieldGroup>
         </CardContent>
@@ -211,26 +250,41 @@ function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            {text("email", "bb-email", "Billing email (optional)", { type: "email", autoComplete: "email" })}
-            <PhoneField
-              id="bb-phone"
-              label="Phone (optional)"
-              country={form.phoneCountry}
-              onCountryChange={(c) => set("phoneCountry", c)}
-              number={form.phoneNumber}
-              onNumberChange={(n) => set("phoneNumber", cleanPhone(n))}
-              numberError={errors.phone ?? null}
-              disabled={readOnly || pending}
-            />
-            {text("addressLine1", "bb-address1", "Address line 1", { autoComplete: "address-line1" })}
-            {text("addressLine2", "bb-address2", "Address line 2 (optional)", { autoComplete: "address-line2" })}
-            <div className="grid gap-5 sm:grid-cols-2">
-              {text("city", "bb-city", "City", { autoComplete: "address-level2" })}
-              {text("state", "bb-state", "State", { autoComplete: "address-level1" })}
+            <div className={ROW}>
+              {text("email", "bb-email", "Billing email (optional)", { type: "email", autoComplete: "email", maxLength: MAX.email }, undefined, W.email)}
+              <div className={W.phone}>
+                <PhoneField
+                  id="bb-phone"
+                  label="Phone (optional)"
+                  country={form.phoneCountry}
+                  onCountryChange={(c) => set("phoneCountry", c)}
+                  number={form.phoneNumber}
+                  onNumberChange={(n) => set("phoneNumber", cleanPhone(n))}
+                  numberError={errors.phone ?? null}
+                  disabled={readOnly || pending}
+                />
+              </div>
             </div>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {text("postalCode", "bb-postal", "PIN / postal code", { autoComplete: "postal-code", inputMode: "numeric" })}
-              <Field data-invalid={!!errors.countryCode}>
+            {text("addressLine1", "bb-address1", "Address line 1", { autoComplete: "address-line1", maxLength: MAX.addressLine1 }, undefined, W.address)}
+            {text("addressLine2", "bb-address2", "Address line 2 (optional)", { autoComplete: "address-line2", maxLength: MAX.addressLine2 }, undefined, W.address)}
+            <div className={ROW}>
+              {text("city", "bb-city", "City", { autoComplete: "address-level2", maxLength: MAX.city }, undefined, W.place)}
+              {text("state", "bb-state", "State", { autoComplete: "address-level1", maxLength: MAX.state }, undefined, W.place)}
+            </div>
+            <div className={ROW}>
+              {text(
+                "postalCode",
+                "bb-postal",
+                "PIN / postal code",
+                {
+                  autoComplete: "postal-code",
+                  inputMode: form.country?.code === "IN" ? "numeric" : "text",
+                  className: "tabular-nums",
+                },
+                undefined,
+                W.pin,
+              )}
+              <Field data-invalid={!!errors.countryCode} className={W.place}>
                 <FieldLabel htmlFor="bb-country">Country</FieldLabel>
                 <Combobox
                   items={countries}
@@ -272,13 +326,13 @@ function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field data-disabled>
+            <div className={ROW}>
+              <Field data-disabled className={W.place}>
                 <FieldLabel htmlFor="bb-currency">Currency</FieldLabel>
                 <Input id="bb-currency" value="INR, Indian rupee" disabled readOnly />
                 <FieldDescription>Only INR for now.</FieldDescription>
               </Field>
-              <Field data-invalid={!!errors.financialYearStartMonth}>
+              <Field data-invalid={!!errors.financialYearStartMonth} className={W.place}>
                 <FieldLabel htmlFor="bb-fy">Financial year starts in</FieldLabel>
                 <Combobox
                   items={MONTHS}
@@ -312,7 +366,7 @@ function SettingsForm({ initial, onSaved }: { initial: SettingsResponse; onSaved
               "invoicePrefix",
               "bb-prefix",
               "Invoice number prefix",
-              { maxLength: 10, spellCheck: false, className: "max-w-40" },
+              { spellCheck: false, className: W.prefix },
               "Starts every invoice number, e.g. INV- or ACME/.",
             )}
           </FieldGroup>

@@ -108,4 +108,12 @@ describe("validateBillingSettings", () => {
     expect(r.errors.city).toBeTruthy();
     expect(r.errors.financialYearStartMonth).toBeTruthy();
   });
+  it("needs a 6-digit PIN in India, but not elsewhere", () => {
+    for (const postalCode of ["20100", "2010011", "20100A"]) {
+      const r = validateBillingSettings({ ...valid, postalCode });
+      expect(r.ok).toBe(false);
+      if (!r.ok) expect(r.errors.postalCode).toBe("Enter a 6-digit PIN code.");
+    }
+    expect(validateBillingSettings({ ...valid, gstin: "", pan: "", countryCode: "GB", postalCode: "SW1A 1AA" }).ok).toBe(true);
+  });
 });

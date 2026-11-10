@@ -22,10 +22,39 @@ function matchCountry(c: Country, query: string) {
 /** Only digits, spaces and dashes in the local number. */
 export const cleanPhone = (value: string) => value.replace(/[^\d\s-]/g, "");
 
+/**
+ * How many digits the local number may have. India: exactly 10 (mobile, or a
+ * landline with its STD code and no leading 0). Elsewhere: whatever is left of
+ * the 15 digits an international number can have, after the country code.
+ */
+export function maxPhoneDigits(country: Country | null) {
+  if (!country) return 15;
+  if (country.code === "IN") return 10;
+  return Math.max(6, 15 - country.dialCode.replace(/\D/g, "").length);
+}
+
+/** cleanPhone, then stops at the country's digit limit, so extra digits can't be typed or pasted. */
+export function limitPhone(value: string, country: Country | null) {
+  const max = maxPhoneDigits(country);
+  let digits = 0;
+  let out = "";
+  for (const ch of cleanPhone(value)) {
+    if (/\d/.test(ch)) {
+      if (digits === max) break;
+      digits++;
+    }
+    out += ch;
+  }
+  return out;
+}
+
 export function phoneError(country: Country | null, number: string) {
   if (!country) return "Choose a country code.";
   const digits = number.replace(/\D/g, "");
-  if (digits.length < 6 || digits.length > 15) return "Enter a valid contact number.";
+  if (country.code === "IN") {
+    return digits.length === 10 ? null : "Enter the 10-digit number, without 0 or +91.";
+  }
+  if (digits.length < 6 || digits.length > maxPhoneDigits(country)) return "Enter a valid contact number.";
   return null;
 }
 
@@ -96,7 +125,7 @@ export function PhoneField({
             autoComplete="tel-national"
             placeholder="98765 43210"
             value={number}
-            onChange={(e) => onNumberChange(cleanPhone(e.target.value))}
+            onChange={(e) => onNumberChange(limitPhone(e.target.value, country))}
             aria-invalid={!!numberError}
             disabled={disabled}
           />
