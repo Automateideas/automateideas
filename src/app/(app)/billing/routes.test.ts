@@ -54,7 +54,7 @@ describe("business billing routes", () => {
     }
   });
 
-  it.each(["invoices", "quotations", "sales-orders", "credit-notes", "debit-notes"])("/billing/%s has list, create, view and edit pages", (slug) => {
+  it.each(["invoices", "quotations", "sales-orders", "credit-notes", "debit-notes", "purchase-orders", "purchase-bills", "purchase-returns"])("/billing/%s has list, create, view and edit pages", (slug) => {
     for (const seg of ["", "create", "[id]", "[id]/edit"]) {
       expect(existsSync(path.join(billingDir, slug, seg, "page.tsx")), `${slug}/${seg}`).toBe(true);
     }
@@ -71,5 +71,15 @@ describe("business billing routes", () => {
       expect(existsSync(path.join(api, r2, "route.ts")), r2).toBe(true);
     }
     expect(existsSync(path.resolve(billingDir, "../../(print)/billing/print/[type]/[id]/page.tsx"))).toBe(true);
+  });
+
+  it("has supplier payments, payables and their APIs", () => {
+    for (const seg of ["supplier-payments", "supplier-payments/create", "supplier-payments/[id]", "payables"]) {
+      expect(existsSync(path.join(billingDir, seg, "page.tsx")), seg).toBe(true);
+    }
+    const api = path.resolve(billingDir, "../../api/business-billing");
+    for (const r of ["supplier-payments", "supplier-payments/[id]", "supplier-payments/[id]/allocate", "supplier-payments/[id]/void", "supplier-payments/open-items", "suppliers/[id]/account", "payables", "documents/[type]/[id]/received"]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
   });
 });

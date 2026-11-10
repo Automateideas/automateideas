@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { SectionPlaceholder } from "../_components/section-placeholder";
-
-export const metadata: Metadata = {
-  title: "Purchases · Billing",
-};
-
+// /billing/purchases is the Purchases tab; bills are its main list.
 export default function Page() {
-  return <SectionPlaceholder slug="purchases" />;
+  redirect("/billing/purchase-bills");
 }

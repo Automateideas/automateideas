@@ -30,7 +30,8 @@ const POS_OPTIONS = [...STATE_OPTIONS, { value: "96", label: "Outside India (96)
 type CatalogueItem = { id: string; name: string; code: string | null; hsnSac: string | null; ratePaise: number; listPricePaise: number | null; taxCategory: TaxCategoryValue; taxRate: string; cessRate: string; unitCode: string | null };
 type Lookups = {
   company: { configured: boolean; registered: boolean; stateCode: string | null; pricesIncludeTax: boolean; roundOff: string };
-  customer: { id: string; name: string; gstin: string | null; archived: boolean; placeOfSupply: string | null; paymentTermsDays: number | null } | null;
+  /** The chosen customer or supplier. */
+  party: { id: string; name: string; gstin: string | null; archived: boolean; placeOfSupply: string | null; stateCode: string | null; paymentTermsDays: number | null } | null;
   catalogue: { products: CatalogueItem[]; services: CatalogueItem[] };
   invoices: { id: string; number: string; issueDate: string; totalPaise: number }[];
 };
@@ -42,11 +43,12 @@ type StoredItem = { productId: string | null; serviceId: string | null; descript
 type StoredDoc = {
   id: string;
   status: string;
-  customerId: string;
+  partyId: string;
   partyName: string | null;
+  partyReference: string | null;
   issueDate: string;
   extraDate: string | null;
-  invoiceId: string | null;
+  sourceId: string | null;
   reason: string | null;
   placeOfSupply: string | null;
   pricesIncludeTax: boolean;
@@ -77,11 +79,15 @@ type LineForm = {
 };
 type ChargeForm = { key: number; label: string; amount: string; taxRate: string };
 type FormState = {
-  customerId: string;
-  customerName: string;
+  /** Customer (sales) or supplier (purchases). */
+  partyId: string;
+  partyName: string;
+  /** Supplier's bill number (purchase bills). */
+  partyReference: string;
   issueDate: string;
   extraDate: string;
-  invoiceId: string;
+  /** What a note or return adjusts: an invoice or a bill. */
+  sourceId: string;
   reason: string;
   placeOfSupply: string;
   /** null: use the company default. */
@@ -104,14 +110,15 @@ function discountForm(d: Discount): { type: "percent" | "amount"; value: string 
   return d.type === "percent" ? { type: "percent", value: d.percent } : { type: "amount", value: paiseToRupees(d.paise) };
 }
 
-function toForm(d: StoredDoc | null, prefill?: { customerId: string | null }): FormState {
+function toForm(d: StoredDoc | null): FormState {
   const inv = discountForm(d?.invoiceDiscount ?? null);
   return {
-    customerId: d?.customerId ?? prefill?.customerId ?? "",
-    customerName: d?.partyName ?? "",
+    partyId: d?.partyId ?? "",
+    partyName: d?.partyName ?? "",
+    partyReference: d?.partyReference ?? "",
     issueDate: d?.issueDate ?? todayInIndia(),
     extraDate: d?.extraDate ?? "",
-    invoiceId: d?.invoiceId ?? "",
+    sourceId: d?.sourceId ?? "",
     reason: d?.reason ?? "",
     placeOfSupply: d?.placeOfSupply ?? "",
     pricesIncludeTax: d ? d.pricesIncludeTax : null,
@@ -145,12 +152,20 @@ function toForm(d: StoredDoc | null, prefill?: { customerId: string | null }): F
   };
 }
 
-function toPayload(f: FormState) {
+/** API field names: customerId/supplierId for the party; invoiceId/billId for the source. */
+const fieldsFor = (slug: DocumentSlug) => ({
+  party: DOCUMENT_TYPES[slug].party === "customer" ? "customerId" : "supplierId",
+  source: DOCUMENT_TYPES[slug].source === "purchase-bills" ? "billId" : "invoiceId",
+});
+
+function toPayload(f: FormState, slug: DocumentSlug) {
+  const k = fieldsFor(slug);
   return {
-    customerId: f.customerId,
+    [k.party]: f.partyId,
+    partyReference: f.partyReference,
     issueDate: f.issueDate,
     extraDate: f.extraDate || null,
-    invoiceId: f.invoiceId || null,
+    [k.source]: f.sourceId || null,
     reason: f.reason,
     placeOfSupply: f.placeOfSupply || null,
     pricesIncludeTax: f.pricesIncludeTax ?? false,
@@ -214,8 +229,10 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, start] = useTransition();
-  const customers = useApiQuery<{ items: CustomerOption[] }>(`${BASE}/customers?pageSize=200`);
-  const lookups = useApiQuery<Lookups>(`${BASE}/documents/lookups${form.customerId ? `?customerId=${form.customerId}` : ""}`);
+  const purchase = type.party === "supplier";
+  const fields = fieldsFor(slug);
+  const customers = useApiQuery<{ items: CustomerOption[] }>(`${BASE}/${purchase ? "suppliers" : "customers"}?pageSize=200`);
+  const lookups = useApiQuery<Lookups>(`${BASE}/documents/lookups?type=${slug}${form.partyId ? `&${fields.party}=${form.partyId}` : ""}`);
   const company = lookups.data?.company;
 
 
@@ -229,7 +246,7 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
 
   // Picking a customer clears the place of supply, so it falls back to theirs.
   function chooseCustomer(c: CustomerOption | null) {
-    setForm((f) => ({ ...f, customerId: c?.id ?? "", customerName: c?.name ?? "", invoiceId: "", placeOfSupply: "" }));
+    setForm((f) => ({ ...f, partyId: c?.id ?? "", partyName: c?.name ?? "", sourceId: "", placeOfSupply: "" }));
   }
 
   function chooseItem(key: number, p: Pick | null) {
@@ -248,7 +265,7 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
   }
 
   // Blank choices fall back to defaults: the customer's place of supply, the company's GST-inclusive setting.
-  const defaultPos = lookups.data?.customer?.id === form.customerId ? (lookups.data.customer.placeOfSupply ?? "") : "";
+  const defaultPos = lookups.data?.party?.id === form.partyId ? (lookups.data.party.placeOfSupply ?? "") : "";
   const effective: FormState = {
     ...form,
     placeOfSupply: form.placeOfSupply || defaultPos,
@@ -256,7 +273,7 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
   };
 
   // Live totals from the server's GST engine (debounced).
-  const payload = toPayload(effective);
+  const payload = toPayload(effective, slug);
   const payloadKey = JSON.stringify(payload);
   const [preview, setPreview] = useState<{ result: DocumentTaxResult | null; error: string | null }>({ result: null, error: null });
   useEffect(() => {
@@ -313,7 +330,7 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
   }
 
   const customerItems = customers.data?.items ?? [];
-  const chosenCustomer = customerItems.find((c) => c.id === form.customerId) ?? (form.customerId ? { id: form.customerId, name: form.customerName, gstin: null } : null);
+  const chosenCustomer = customerItems.find((c) => c.id === form.partyId) ?? (form.partyId ? { id: form.partyId, name: form.partyName, gstin: null } : null);
   const backHref = initial ? `/billing/${slug}/${initial.id}` : `/billing/${slug}`;
 
   return (
@@ -331,13 +348,13 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
 
       <Card>
         <CardHeader>
-          <CardTitle>Customer and dates</CardTitle>
+          <CardTitle>{purchase ? "Supplier and dates" : "Customer and dates"}</CardTitle>
         </CardHeader>
         <CardContent>
           <FieldGroup>
             <div className="grid gap-5 md:grid-cols-3">
-              <Field data-invalid={!!errors.customerId} className="md:col-span-1">
-                <FieldLabel htmlFor="d-customer">Customer</FieldLabel>
+              <Field data-invalid={!!errors[fields.party]} className="md:col-span-1">
+                <FieldLabel htmlFor="d-customer">{purchase ? "Supplier" : "Customer"}</FieldLabel>
                 <Combobox
                   items={customerItems}
                   value={chosenCustomer}
@@ -345,11 +362,11 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
                   itemToStringLabel={(c: CustomerOption) => c.name}
                   isItemEqualToValue={(a: CustomerOption, b: CustomerOption) => a.id === b.id}
                   autoHighlight
-                  disabled={type.needsInvoice && !!initial?.invoiceId}
+                  disabled={type.needsInvoice && !!initial?.sourceId}
                 >
-                  <ComboboxInput id="d-customer" placeholder="Search customers" className="w-full" aria-invalid={!!errors.customerId} />
+                  <ComboboxInput id="d-customer" placeholder={purchase ? "Search suppliers" : "Search customers"} className="w-full" aria-invalid={!!errors[fields.party]} />
                   <ComboboxContent>
-                    <ComboboxEmpty>No customer matches. Add them under Customers first.</ComboboxEmpty>
+                    <ComboboxEmpty>{purchase ? "No supplier matches. Add them under Suppliers first." : "No customer matches. Add them under Customers first."}</ComboboxEmpty>
                     <ComboboxList>
                       {(c: CustomerOption) => (
                         <ComboboxItem key={c.id} value={c}>
@@ -360,7 +377,7 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
                     </ComboboxList>
                   </ComboboxContent>
                 </Combobox>
-                <FieldError>{errors.customerId}</FieldError>
+                <FieldError>{errors[fields.party]}</FieldError>
               </Field>
               <TextField id="d-date" label="Date" type="date" value={form.issueDate} onValue={(v) => set("issueDate", v)} error={errors.issueDate} />
               {type.extraDate ? (
@@ -372,22 +389,34 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
                   value={form.extraDate}
                   onValue={(v) => set("extraDate", v)}
                   error={errors.extraDate}
-                  hint={slug === "invoices" && lookups.data?.customer?.paymentTermsDays != null && !form.extraDate ? `Blank: ${lookups.data.customer.paymentTermsDays} days (customer's terms).` : undefined}
+                  hint={(slug === "invoices" || slug === "purchase-bills") && lookups.data?.party?.paymentTermsDays != null && !form.extraDate ? `Blank: ${lookups.data.party.paymentTermsDays} days (${type.party}'s terms).` : undefined}
                 />
               ) : null}
             </div>
+            {type.partyReference ? (
+              <TextField
+                id="d-partyref"
+                label={type.partyReference.label}
+                value={form.partyReference}
+                onValue={(v) => set("partyReference", v)}
+                error={errors.partyReference}
+                maxLength={30}
+                className="md:max-w-xs"
+                hint="As printed on their bill. Used to stop the same bill being entered twice."
+              />
+            ) : null}
             {type.needsInvoice ? (
               <div className="grid gap-5 md:grid-cols-2">
                 <SelectField
                   id="d-invoice"
-                  label="Against invoice"
-                  value={form.invoiceId}
-                  onValue={(v) => set("invoiceId", v)}
+                  label={`Against ${type.source ? DOCUMENT_TYPES[type.source].singular.toLowerCase() : "invoice"}`}
+                  value={form.sourceId}
+                  onValue={(v) => set("sourceId", v)}
                   options={(lookups.data?.invoices ?? []).map((i) => ({ value: i.id, label: `${i.number} · ${formatPaise(i.totalPaise)}` }))}
-                  placeholder={form.customerId ? "Choose the invoice" : "Choose a customer first"}
-                  error={errors.invoiceId}
+                  placeholder={form.partyId ? `Choose the ${purchase ? "bill" : "invoice"}` : `Choose a ${type.party} first`}
+                  error={errors[fields.source]}
                 />
-                <TextField id="d-reason" label="Reason" value={form.reason} onValue={(v) => set("reason", v)} error={errors.reason} placeholder={slug === "credit-notes" ? "e.g. Goods returned" : "e.g. Extra freight"} />
+                <TextField id="d-reason" label="Reason" value={form.reason} onValue={(v) => set("reason", v)} error={errors.reason} placeholder={slug === "debit-notes" ? "e.g. Extra freight" : "e.g. Goods returned"} />
               </div>
             ) : null}
           </FieldGroup>
@@ -486,9 +515,25 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
                   value={effective.placeOfSupply}
                   onValue={(v) => set("placeOfSupply", v)}
                   options={POS_OPTIONS}
-                  placeholder="Customer's state"
+                  placeholder={purchase ? "Your state" : "Customer's state"}
                   error={errors.placeOfSupply}
-                  hint={company?.registered ? (effective.placeOfSupply && effective.placeOfSupply === company.stateCode ? "Same state: CGST + SGST." : effective.placeOfSupply ? "Other state or abroad: IGST." : undefined) : "You're not GST registered, so no GST is charged."}
+                  hint={
+                    purchase
+                      ? !lookups.data?.party
+                        ? "Usually your own state: where you receive the goods."
+                        : !lookups.data.party.gstin && !form.reverseCharge
+                          ? "Unregistered supplier: no GST on this bill (tick reverse charge if you pay it)."
+                          : effective.placeOfSupply && effective.placeOfSupply === lookups.data.party.stateCode
+                            ? "Supplier in your state: CGST + SGST."
+                            : "Supplier in another state: IGST."
+                      : company?.registered
+                        ? effective.placeOfSupply && effective.placeOfSupply === company.stateCode
+                          ? "Same state: CGST + SGST."
+                          : effective.placeOfSupply
+                            ? "Other state or abroad: IGST."
+                            : undefined
+                        : "You're not GST registered, so no GST is charged."
+                  }
                 />
                 <SelectField
                   id="d-zero"

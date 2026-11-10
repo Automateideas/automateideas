@@ -112,3 +112,38 @@ export function readIdempotencyKey(header: string | null): string | null {
   const k = header.trim();
   return /^[A-Za-z0-9_-]{8,80}$/.test(k) ? k : null;
 }
+
+export type SupplierPaymentInput = {
+  supplierId: string;
+  paymentDate: string;
+  amountPaise: number;
+  method: PaymentMethod;
+  reference: string | null;
+  notes: string | null;
+  allocations: { billId: string; amountPaise: number }[];
+};
+
+/** Bill allocations arrive as [{ billId, amount }] in rupees; zero rows are dropped. */
+export function readBillAllocations(raw: unknown, errors: FieldErrors) {
+  const asInvoices = (Array.isArray(raw) ? raw : []).map((x) =>
+    x && typeof x === "object" ? { invoiceId: (x as Record<string, unknown>).billId, amount: (x as Record<string, unknown>).amount } : x,
+  );
+  const found: FieldErrors = {};
+  const list = readAllocations(asInvoices, found);
+  for (const [k, v] of Object.entries(found)) errors[k.replace(".invoiceId", ".billId")] ??= v;
+  return list.map((a) => ({ billId: a.invoiceId, amountPaise: a.amountPaise }));
+}
+
+/** A payment made to a supplier, optionally set against their bills. */
+export function validateSupplierPayment(raw: Record<string, unknown>): { ok: true; values: SupplierPaymentInput } | { ok: false; errors: FieldErrors } {
+  const r = new FieldReader(raw);
+  const supplierId = r.id("supplierId", "Choose a supplier.");
+  const paymentDate = readDate(r, "paymentDate");
+  const amountPaise = r.rupees("amount", { required: "Enter the amount paid." }) ?? 0;
+  if (!r.has("amount") && amountPaise <= 0) r.fail("amount", "Enter an amount more than zero.");
+  const common = readCommon(r);
+  const allocations = readBillAllocations(raw.allocations, r.errors);
+  if (allocations.reduce((a, x) => a + x.amountPaise, 0) > amountPaise && !r.has("amount")) r.fail("allocations", "You've allocated more than the amount paid.");
+  if (!r.ok) return { ok: false, errors: r.errors };
+  return { ok: true, values: { supplierId: supplierId!, paymentDate: paymentDate!, amountPaise, ...common, allocations } };
+}

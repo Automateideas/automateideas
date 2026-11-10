@@ -10,8 +10,9 @@ import { slugOf } from "../_shared";
 
 type Ctx = RouteContext<"/api/business-billing/documents/[type]">;
 
-// GET /api/business-billing/documents/:type?q=&status=&customerId=&page= (billing.view).
-// :type is invoices, quotations, sales-orders, credit-notes or debit-notes.
+// GET /api/business-billing/documents/:type?q=&status=&customerId=|supplierId=&page= (billing.view).
+// :type is invoices, quotations, sales-orders, credit-notes, debit-notes,
+// purchase-orders, purchase-bills or purchase-returns.
 // status also accepts "open", "overdue" (invoices) and "expired" (quotations).
 export const GET = route(async (request: Request, { params }: Ctx) => {
   const slug = slugOf((await params).type);
@@ -20,7 +21,7 @@ export const GET = route(async (request: Request, { params }: Ctx) => {
   const list = await listDocuments(ctx.organizationId, slug, {
     ...parseListQuery(request.url),
     status: sp.get("status"),
-    customerId: sp.get("customerId"),
+    partyId: sp.get("customerId") ?? sp.get("supplierId"),
   });
   return Response.json({ ...list, ...editAccess(ctx, DOCUMENT_TYPES[slug].permission) });
 });

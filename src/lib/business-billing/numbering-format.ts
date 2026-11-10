@@ -14,6 +14,8 @@ export const NUMBERED_DOCUMENTS = [
   { type: "refund", label: "Refunds", prefix: "RF" },
   { type: "purchase_order", label: "Purchase orders", prefix: "PO" },
   { type: "purchase_bill", label: "Purchase bills", prefix: "PB" },
+  { type: "purchase_return", label: "Purchase returns", prefix: "PR" },
+  { type: "supplier_payment", label: "Supplier payments", prefix: "PAY" },
 ] as const;
 export type NumberedDocument = (typeof NUMBERED_DOCUMENTS)[number]["type"];
 

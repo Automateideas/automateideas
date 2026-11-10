@@ -14,7 +14,7 @@ describe("validateDocument", () => {
   it("reads lines in paise and keeps entered values", () => {
     const r = validateDocument("invoices", { ...base, extraDate: "2026-11-25", invoiceDiscount: { type: "percent", value: "5" }, charges: [{ label: "Freight", amount: "100", taxRate: "18" }] });
     expect(r.ok && r.values).toMatchObject({
-      customerId: "c1",
+      partyId: "c1",
       extraDate: "2026-11-25",
       invoiceDiscount: { type: "percent", percent: "5" },
       charges: [{ label: "Freight", amountPaise: 10000, taxRate: "18" }],
@@ -32,7 +32,7 @@ describe("validateDocument", () => {
     const r = validateDocument("credit-notes", base);
     expect(!r.ok && Object.keys(r.errors).sort()).toEqual(["invoiceId", "reason"]);
     const q = validateDocument("quotations", { ...base, invoiceId: "x", reason: "y" });
-    expect(q.ok && q.values).toMatchObject({ invoiceId: null, reason: null });
+    expect(q.ok && q.values).toMatchObject({ sourceId: null, reason: null });
   });
 
   it("reports line problems by position", () => {
@@ -46,9 +46,34 @@ describe("validateDocument", () => {
   });
 });
 
+describe("purchase documents", () => {
+  const bill = { supplierId: "s1", issueDate: "2026-11-10", placeOfSupply: "27", partyReference: "SUP/123", lines: base.lines };
+
+  it("bills need a supplier and the supplier's bill number", () => {
+    const r = validateDocument("purchase-bills", bill);
+    expect(r.ok && r.values).toMatchObject({ partyId: "s1", partyReference: "SUP/123" });
+    const e = validateDocument("purchase-bills", { ...bill, supplierId: "", partyReference: "" });
+    expect(!e.ok && Object.keys(e.errors).sort()).toEqual(["partyReference", "supplierId"]);
+    // A customer id doesn't count for a purchase.
+    expect(validateDocument("purchase-bills", { ...bill, supplierId: undefined, customerId: "c1" }).ok).toBe(false);
+  });
+
+  it("returns need the bill (billId) and a reason", () => {
+    const e = validateDocument("purchase-returns", { supplierId: "s1", issueDate: "2026-11-10", lines: base.lines });
+    expect(!e.ok && Object.keys(e.errors).sort()).toEqual(["billId", "reason"]);
+    const ok = validateDocument("purchase-returns", { supplierId: "s1", issueDate: "2026-11-10", billId: "b1", reason: "Damaged", lines: base.lines });
+    expect(ok.ok && ok.values).toMatchObject({ sourceId: "b1", reason: "Damaged" });
+  });
+
+  it("purchase orders have no bill number field", () => {
+    const r = validateDocument("purchase-orders", { ...bill, partyReference: "x" });
+    expect(r.ok && r.values.partyReference).toBeNull();
+  });
+});
+
 describe("document types", () => {
   it("each type has a distinct numbering series and an issue action", () => {
-    expect(new Set(DOCUMENT_SLUGS.map((s) => DOCUMENT_TYPES[s].numbering)).size).toBe(5);
+    expect(new Set(DOCUMENT_SLUGS.map((s) => DOCUMENT_TYPES[s].numbering)).size).toBe(DOCUMENT_SLUGS.length);
     for (const s of DOCUMENT_SLUGS) expect(DOCUMENT_TYPES[s].statuses).toContain(DOCUMENT_TYPES[s].issuedStatus);
   });
 

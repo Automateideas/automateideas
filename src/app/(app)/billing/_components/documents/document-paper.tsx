@@ -80,6 +80,8 @@ export type PaperDocument = {
   zeroRated: string | null;
   pricesIncludeTax: boolean;
   reason: string | null;
+  /** Purchase bills: the supplier's own bill number. */
+  partyReference?: string | null;
   subtotalPaise: number;
   discountPaise: number;
   taxablePaise: number;
@@ -122,6 +124,7 @@ function AddressLines({ a }: { a: Address }) {
 }
 
 function title(doc: PaperDocument) {
+  if (DOCUMENT_TYPES[doc.slug].group === "purchases") return DOCUMENT_TYPES[doc.slug].singular;
   if (doc.slug !== "invoices") return DOCUMENT_TYPES[doc.slug].singular;
   if (!doc.seller?.gstin && doc.status === "draft") return "Invoice";
   if (!doc.seller?.gstin) return "Invoice";
@@ -158,7 +161,9 @@ export function DocumentPaper({ doc, company, logoUrl, look = DEFAULT_LOOK, clas
   const intra = doc.supplyType === "intra_state";
   const pos = doc.placeOfSupply === "96" ? "Outside India (96)" : stateByCode(doc.placeOfSupply) ? `${stateByCode(doc.placeOfSupply)!.name} (${doc.placeOfSupply})` : "—";
   const extra = DOCUMENT_TYPES[doc.slug].extraDate;
-  const source = doc.related.find((r) => r.slug === "invoices" && DOCUMENT_TYPES[doc.slug].needsInvoice);
+  const docType = DOCUMENT_TYPES[doc.slug];
+  const purchase = docType.group === "purchases";
+  const source = docType.source ? doc.related.find((r) => r.slug === docType.source) : undefined;
   const rates = byRate(doc);
   const showCess = doc.cessPaise > 0;
   const showDiscount = doc.items.some((i) => i.discountPaise > 0);
@@ -214,9 +219,15 @@ export function DocumentPaper({ doc, company, logoUrl, look = DEFAULT_LOOK, clas
                 <dd>{fmtDate(doc.extraDate)}</dd>
               </>
             ) : null}
+            {doc.partyReference ? (
+              <>
+                <dt className="text-neutral-600">Supplier&apos;s bill no.</dt>
+                <dd className="font-mono">{doc.partyReference}</dd>
+              </>
+            ) : null}
             {source ? (
               <>
-                <dt className="text-neutral-600">Against invoice</dt>
+                <dt className="text-neutral-600">Against {DOCUMENT_TYPES[source.slug].singular.toLowerCase()}</dt>
                 <dd className="font-mono">{source.number}</dd>
               </>
             ) : null}
@@ -226,7 +237,7 @@ export function DocumentPaper({ doc, company, logoUrl, look = DEFAULT_LOOK, clas
 
       <section className="relative grid gap-5 border-b border-neutral-300 py-5 sm:grid-cols-3">
         <div>
-          <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase">Bill to</p>
+          <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase">{purchase ? "Supplier" : "Bill to"}</p>
           <p className="mt-1 font-semibold">{doc.partyName}</p>
           <p className="text-neutral-700">
             <AddressLines a={doc.billingAddress} />
@@ -234,9 +245,15 @@ export function DocumentPaper({ doc, company, logoUrl, look = DEFAULT_LOOK, clas
           {doc.partyGstin ? <p className="mt-1">GSTIN: <span className="font-mono">{doc.partyGstin}</span></p> : <p className="mt-1 text-neutral-500">Unregistered</p>}
         </div>
         <div>
-          <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase">Ship to</p>
+          <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase">{purchase ? "Deliver to" : "Ship to"}</p>
           <p className="mt-1 text-neutral-700">
-            {doc.shippingAddress ? <AddressLines a={doc.shippingAddress} /> : "Same as billing"}
+            {purchase ? (
+              seller ? <AddressLines a={{ ...seller, stateCode: seller.stateCode ?? null }} /> : "Your address"
+            ) : doc.shippingAddress ? (
+              <AddressLines a={doc.shippingAddress} />
+            ) : (
+              "Same as billing"
+            )}
           </p>
         </div>
         <dl className="grid grid-cols-[auto_1fr] content-start gap-x-3 gap-y-0.5">

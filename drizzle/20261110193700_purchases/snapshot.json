@@ -1,0 +1,2535 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "324ae558-8b0f-4177-9d93-a037d2edd5ff",
+  "prevIds": [
+    "d037f347-dcb2-4554-b2e9-618724c5233c"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|tbl|public.purchase_return_items",
+        "n|tbl|public.purchase_return_items",
+        "e|tbl|public.purchase_return_items",
+        "n|rel|public.purchase_return_items",
+        "n|type|public.purchase_return_items",
+        "n|rel|public.purchase_return_items_pkey",
+        "n|rel|public.purchase_return_items_line_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|tbl|public.purchase_returns",
+        "n|tbl|public.purchase_returns",
+        "e|tbl|public.purchase_returns",
+        "n|rel|public.purchase_returns",
+        "n|type|public.purchase_returns",
+        "n|rel|public.purchase_returns_pkey",
+        "n|rel|public.purchase_returns_org_id_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "party_name"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.party_name",
+        "n|col|public.purchase_bills.party_name",
+        "e|col|public.purchase_bills.party_name"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "party_gstin"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.party_gstin",
+        "n|col|public.purchase_bills.party_gstin",
+        "e|col|public.purchase_bills.party_gstin"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "billing_address"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.billing_address",
+        "n|col|public.purchase_bills.billing_address",
+        "e|col|public.purchase_bills.billing_address"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "shipping_address"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.shipping_address",
+        "n|col|public.purchase_bills.shipping_address",
+        "e|col|public.purchase_bills.shipping_address"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "party_name"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.party_name",
+        "n|col|public.purchase_orders.party_name",
+        "e|col|public.purchase_orders.party_name"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "party_gstin"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.party_gstin",
+        "n|col|public.purchase_orders.party_gstin",
+        "e|col|public.purchase_orders.party_gstin"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "billing_address"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.billing_address",
+        "n|col|public.purchase_orders.billing_address",
+        "e|col|public.purchase_orders.billing_address"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_orders",
+        "shipping_address"
+      ],
+      "writes": [
+        "s|col|public.purchase_orders.shipping_address",
+        "n|col|public.purchase_orders.shipping_address",
+        "e|col|public.purchase_orders.shipping_address"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_orders",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_return_items",
+        "purchase_return_items_parent_idx"
+      ],
+      "writes": [
+        "s|idx|public.purchase_return_items_parent_idx",
+        "n|idx|public.purchase_return_items_parent_idx",
+        "e|idx|public.purchase_return_items_parent_idx",
+        "n|rel|public.purchase_return_items_parent_idx"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.organization_id",
+        "n|col|public.purchase_return_items.purchase_return_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_return_items",
+        "purchase_return_items_product_idx"
+      ],
+      "writes": [
+        "s|idx|public.purchase_return_items_product_idx",
+        "n|idx|public.purchase_return_items_product_idx",
+        "e|idx|public.purchase_return_items_product_idx",
+        "n|rel|public.purchase_return_items_product_idx"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.organization_id",
+        "n|col|public.purchase_return_items.product_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_returns",
+        "purchase_returns_number_uq"
+      ],
+      "writes": [
+        "s|idx|public.purchase_returns_number_uq",
+        "n|idx|public.purchase_returns_number_uq",
+        "e|idx|public.purchase_returns_number_uq",
+        "n|rel|public.purchase_returns_number_uq"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.number"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_returns",
+        "purchase_returns_date_idx"
+      ],
+      "writes": [
+        "s|idx|public.purchase_returns_date_idx",
+        "n|idx|public.purchase_returns_date_idx",
+        "e|idx|public.purchase_returns_date_idx",
+        "n|rel|public.purchase_returns_date_idx"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.issue_date"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_returns",
+        "purchase_returns_status_idx"
+      ],
+      "writes": [
+        "s|idx|public.purchase_returns_status_idx",
+        "n|idx|public.purchase_returns_status_idx",
+        "e|idx|public.purchase_returns_status_idx",
+        "n|rel|public.purchase_returns_status_idx"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.status"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_returns",
+        "purchase_returns_party_idx"
+      ],
+      "writes": [
+        "s|idx|public.purchase_returns_party_idx",
+        "n|idx|public.purchase_returns_party_idx",
+        "e|idx|public.purchase_returns_party_idx",
+        "n|rel|public.purchase_returns_party_idx"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.supplier_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "purchase_returns",
+        "purchase_returns_bill_idx"
+      ],
+      "writes": [
+        "s|idx|public.purchase_returns_bill_idx",
+        "n|idx|public.purchase_returns_bill_idx",
+        "e|idx|public.purchase_returns_bill_idx",
+        "n|rel|public.purchase_returns_bill_idx"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.purchase_bill_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|fk|public.purchase_return_items.purchase_return_items_organization_id_organization_id_fkey",
+        "n|fk|public.purchase_return_items.purchase_return_items_organization_id_organization_id_fkey",
+        "e|fk|public.purchase_return_items.purchase_return_items_organization_id_organization_id_fkey",
+        "n|con|public.purchase_return_items.purchase_return_items_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|fk|public.purchase_return_items.purchase_return_items_created_by_user_id_fkey",
+        "n|fk|public.purchase_return_items.purchase_return_items_created_by_user_id_fkey",
+        "e|fk|public.purchase_return_items.purchase_return_items_created_by_user_id_fkey",
+        "n|con|public.purchase_return_items.purchase_return_items_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|fk|public.purchase_return_items.purchase_return_items_updated_by_user_id_fkey",
+        "n|fk|public.purchase_return_items.purchase_return_items_updated_by_user_id_fkey",
+        "e|fk|public.purchase_return_items.purchase_return_items_updated_by_user_id_fkey",
+        "n|con|public.purchase_return_items.purchase_return_items_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|fk|public.purchase_return_items.purchase_return_items_parent_fk",
+        "n|fk|public.purchase_return_items.purchase_return_items_parent_fk",
+        "e|fk|public.purchase_return_items.purchase_return_items_parent_fk",
+        "n|con|public.purchase_return_items.purchase_return_items_parent_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.organization_id",
+        "n|col|public.purchase_return_items.purchase_return_id",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.id",
+        "e|uniqueness|public.purchase_returns.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|fk|public.purchase_return_items.purchase_return_items_product_fk",
+        "n|fk|public.purchase_return_items.purchase_return_items_product_fk",
+        "e|fk|public.purchase_return_items.purchase_return_items_product_fk",
+        "n|con|public.purchase_return_items.purchase_return_items_product_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.organization_id",
+        "n|col|public.purchase_return_items.product_id",
+        "n|col|public.products.organization_id",
+        "n|col|public.products.id",
+        "e|uniqueness|public.products.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_return_items"
+      ],
+      "writes": [
+        "s|fk|public.purchase_return_items.purchase_return_items_service_fk",
+        "n|fk|public.purchase_return_items.purchase_return_items_service_fk",
+        "e|fk|public.purchase_return_items.purchase_return_items_service_fk",
+        "n|con|public.purchase_return_items.purchase_return_items_service_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_return_items",
+        "n|sch|public",
+        "n|tbl|public.services",
+        "n|sch|public",
+        "n|col|public.purchase_return_items.organization_id",
+        "n|col|public.purchase_return_items.service_id",
+        "n|col|public.services.organization_id",
+        "n|col|public.services.id",
+        "e|uniqueness|public.services.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_organization_id_organization_id_fkey",
+        "n|fk|public.purchase_returns.purchase_returns_organization_id_organization_id_fkey",
+        "e|fk|public.purchase_returns.purchase_returns_organization_id_organization_id_fkey",
+        "n|con|public.purchase_returns.purchase_returns_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_created_by_user_id_fkey",
+        "n|fk|public.purchase_returns.purchase_returns_created_by_user_id_fkey",
+        "e|fk|public.purchase_returns.purchase_returns_created_by_user_id_fkey",
+        "n|con|public.purchase_returns.purchase_returns_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.purchase_returns.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_updated_by_user_id_fkey",
+        "n|fk|public.purchase_returns.purchase_returns_updated_by_user_id_fkey",
+        "e|fk|public.purchase_returns.purchase_returns_updated_by_user_id_fkey",
+        "n|con|public.purchase_returns.purchase_returns_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.purchase_returns.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_branch_fk",
+        "n|fk|public.purchase_returns.purchase_returns_branch_fk",
+        "e|fk|public.purchase_returns.purchase_returns_branch_fk",
+        "n|con|public.purchase_returns.purchase_returns_branch_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.company_branches",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.branch_id",
+        "n|col|public.company_branches.organization_id",
+        "n|col|public.company_branches.id",
+        "e|uniqueness|public.company_branches.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_party_fk",
+        "n|fk|public.purchase_returns.purchase_returns_party_fk",
+        "e|fk|public.purchase_returns.purchase_returns_party_fk",
+        "n|con|public.purchase_returns.purchase_returns_party_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.suppliers",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.supplier_id",
+        "n|col|public.suppliers.organization_id",
+        "n|col|public.suppliers.id",
+        "e|uniqueness|public.suppliers.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_bill_fk",
+        "n|fk|public.purchase_returns.purchase_returns_bill_fk",
+        "e|fk|public.purchase_returns.purchase_returns_bill_fk",
+        "n|con|public.purchase_returns.purchase_returns_bill_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.purchase_bills",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.purchase_bill_id",
+        "n|col|public.purchase_bills.organization_id",
+        "n|col|public.purchase_bills.id",
+        "e|uniqueness|public.purchase_bills.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "alter_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "invoice_sequences"
+      ],
+      "writes": [
+        "s|ck|public.invoice_sequences.invoice_sequences_type_check"
+      ],
+      "reads": [
+        "n|tbl|public.invoice_sequences",
+        "n|sch|public",
+        "n|col|public.invoice_sequences.document_type",
+        "e|col|public.invoice_sequences.document_type"
+      ],
+      "sqlHash": "8c04bc206c271759"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "purchase_return_items",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "purchase_returns",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "party_name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "party_gstin",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "billing_address",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "shipping_address",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "party_name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "party_gstin",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "billing_address",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_orders",
+        "name": "shipping_address",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "line_no",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "product_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "service_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "description",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "hsn_sac",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "quantity",
+        "type": "numeric(15,3)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'1'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "unit_code",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "rate_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "gross_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "invoice_discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "tax_category",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'taxable'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "tax_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "cess_rate",
+        "type": "numeric(7,4)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'0'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "total_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "branch_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "number",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "issue_date",
+        "type": "date",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "status",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "place_of_supply",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "currency",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'INR'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "subtotal_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "discount_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "tax_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "round_off_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "total_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "prices_include_tax",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "reverse_charge",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "zero_rated",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "supply_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "invoice_discount",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "charges",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'[]'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "taxable_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "cgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "sgst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "igst_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "cess_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "seller",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "financial_year",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "sequence_number",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "issued_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "notes",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "terms",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "voided_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "void_reason",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "supplier_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "party_name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "party_gstin",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "billing_address",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "shipping_address",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_bill_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "reason",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_parent_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "purchase_return_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_product_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "product_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_number_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "number",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"number\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_date_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "issue_date",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_status_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "status",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_party_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "supplier_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_bill_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "purchase_bill_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_parent_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "purchase_return_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "purchase_returns",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_product_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "product_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "products",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_service_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "service_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "services",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_branch_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "branch_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "company_branches",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_party_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "supplier_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "suppliers",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_bill_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "purchase_bill_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "purchase_bills",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_line_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "purchase_return_id",
+          "line_no"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_one_item_check",
+        "value": "num_nonnulls(\"product_id\", \"service_id\") <= 1",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_line_no_check",
+        "value": "\"line_no\" >= 1",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_quantity_check",
+        "value": "\"quantity\" >= 0",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_amounts_check",
+        "value": "\"rate_paise\" >= 0 and \"discount_paise\" >= 0 and \"total_paise\" >= 0",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_return_items",
+        "name": "purchase_return_items_tax_rate_check",
+        "value": "\"tax_rate\" between 0 and 100",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_status_check",
+        "value": "\"status\" in ('draft', 'issued', 'void')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_amounts_check",
+        "value": "\"subtotal_paise\" >= 0 and \"discount_paise\" >= 0 and \"tax_paise\" >= 0 and \"total_paise\" >= 0",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "checks\u0000[\"public\",\"invoice_sequences\",\"invoice_sequences_type_check\"]",
+      "set": {
+        "value": "\"document_type\" in ('invoice', 'quotation', 'sales_order', 'credit_note', 'debit_note', 'payment', 'refund', 'purchase_order', 'purchase_bill', 'journal_entry', 'purchase_return', 'supplier_payment')"
+      }
+    }
+  ]
+}

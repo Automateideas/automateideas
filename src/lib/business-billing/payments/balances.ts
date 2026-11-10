@@ -115,3 +115,99 @@ export async function refreshInvoiceStatus(tx: TenantTx, organizationId: string,
     await tx.execute(sql`update business_invoices set status = ${next}, updated_at = now() where organization_id = ${organizationId} and id = ${invoiceId}`);
   }
 }
+
+/* ---------------- Purchase bills (what you owe suppliers) ---------------- */
+//
+//   balance = bill total
+//           − issued purchase returns against it
+//           − amounts allocated to it from recorded supplier payments
+
+export type BillBalance = {
+  id: string;
+  number: string | null;
+  supplierBillNumber: string | null;
+  status: string;
+  supplierId: string;
+  issueDate: string;
+  dueDate: string | null;
+  totalPaise: number;
+  returnedPaise: number;
+  paidPaise: number;
+  balancePaise: number;
+};
+
+const billSelect = (organizationId: string) => sql`
+  select b.id, b.number, b.supplier_bill_number, b.status, b.supplier_id, b.issue_date::text as issue_date, b.due_date::text as due_date, b.total_paise,
+    coalesce((select sum(pr.total_paise) from purchase_returns pr
+      where pr.organization_id = ${organizationId} and pr.purchase_bill_id = b.id and pr.status = 'issued'), 0) as returned,
+    coalesce((select sum(a.amount_paise) from payment_allocations a
+      join business_payments p on p.organization_id = a.organization_id and p.id = a.payment_id
+      where a.organization_id = ${organizationId} and a.purchase_bill_id = b.id and p.status = 'recorded'), 0) as paid
+  from purchase_bills b
+  where b.organization_id = ${organizationId}`;
+
+type BillRow = {
+  id: string;
+  number: string | null;
+  supplier_bill_number: string | null;
+  status: string;
+  supplier_id: string;
+  issue_date: string;
+  due_date: string | null;
+  total_paise: string | number;
+  returned: string | number;
+  paid: string | number;
+};
+
+function toBillBalance(r: BillRow): BillBalance {
+  const total = Number(r.total_paise);
+  const returned = Number(r.returned);
+  const paid = Number(r.paid);
+  return {
+    id: r.id,
+    number: r.number,
+    supplierBillNumber: r.supplier_bill_number,
+    status: r.status,
+    supplierId: r.supplier_id,
+    issueDate: r.issue_date,
+    dueDate: r.due_date,
+    totalPaise: total,
+    returnedPaise: returned,
+    paidPaise: paid,
+    balancePaise: total - returned - paid,
+  };
+}
+
+export async function billBalances(tx: TenantTx, organizationId: string, ids: string[]): Promise<Map<string, BillBalance>> {
+  if (!ids.length) return new Map();
+  const { rows } = await tx.execute<BillRow>(sql`${billSelect(organizationId)} and b.id in (${sql.join(ids.map((id) => sql`${id}`), sql`, `)})`);
+  return new Map(rows.map((r) => [r.id, toBillBalance(r)]));
+}
+
+/** Recorded bills of a supplier (or all) that still owe something, oldest first. */
+export async function openBills(tx: TenantTx, organizationId: string, supplierId?: string | null): Promise<BillBalance[]> {
+  const { rows } = await tx.execute<BillRow>(sql`
+    select * from (${billSelect(organizationId)}
+      and b.status in ('recorded', 'partially_paid', 'paid')
+      ${supplierId ? sql`and b.supplier_id = ${supplierId}` : sql``}) x
+    where x.total_paise - x.returned - x.paid > 0
+    order by x.issue_date, x.number`);
+  return rows.map(toBillBalance);
+}
+
+export function billStatusFor(b: BillBalance): string {
+  if (b.balancePaise <= 0) return "paid";
+  if (b.paidPaise > 0 || b.returnedPaise > 0) return "partially_paid";
+  return "recorded";
+}
+
+/** Recomputes and stores a recorded bill's payment status (drafts and voids are left alone). */
+export async function refreshBillStatus(tx: TenantTx, organizationId: string, billId: string | null | undefined) {
+  if (!billId) return;
+  const b = (await billBalances(tx, organizationId, [billId])).get(billId);
+  if (!b || !["recorded", "partially_paid", "paid"].includes(b.status)) return;
+  const next = billStatusFor(b);
+  if (next !== b.status) {
+    await tx.execute(sql`update purchase_bills set status = ${next}, updated_at = now() where organization_id = ${organizationId} and id = ${billId}`);
+  }
+}

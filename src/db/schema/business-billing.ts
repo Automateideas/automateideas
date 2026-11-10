@@ -165,6 +165,8 @@ export const DOCUMENT_TYPES = [
   "purchase_order",
   "purchase_bill",
   "journal_entry",
+  "purchase_return",
+  "supplier_payment",
 ] as const;
 
 /** One counter per document type, financial year and (optional) branch. */
@@ -728,6 +730,7 @@ export const purchaseOrders = pgTable(
   {
     ...documentColumns(),
     supplierId: text("supplier_id").notNull(),
+    ...partySnapshot(),
     expectedDate: date("expected_date"),
   },
   (t) => [...documentConstraints("purchase_orders", t, t.supplierId, suppliers, PURCHASE_ORDER_STATUSES)],
@@ -738,6 +741,7 @@ export const purchaseBills = pgTable(
   {
     ...documentColumns(),
     supplierId: text("supplier_id").notNull(),
+    ...partySnapshot(),
     // The supplier's own bill number, as printed on their bill.
     supplierBillNumber: text("supplier_bill_number"),
     dueDate: date("due_date"),
@@ -759,6 +763,27 @@ export const purchaseOrderItems = pgTable("purchase_order_items", { ...itemColum
 ]);
 export const purchaseBillItems = pgTable("purchase_bill_items", { ...itemColumns(), purchaseBillId: text("purchase_bill_id").notNull() }, (t) => [
   ...itemConstraints("purchase_bill_items", t, t.purchaseBillId, purchaseBills),
+]);
+
+/** Goods sent back to a supplier (a debit note to the supplier), against one of their bills. */
+export const purchaseReturns = pgTable(
+  "purchase_returns",
+  {
+    ...documentColumns(),
+    supplierId: text("supplier_id").notNull(),
+    ...partySnapshot(),
+    purchaseBillId: text("purchase_bill_id"),
+    reason: text("reason"),
+  },
+  (t) => [
+    ...documentConstraints("purchase_returns", t, t.supplierId, suppliers, NOTE_STATUSES),
+    tenantFk("purchase_returns_bill_fk", t.organizationId, t.purchaseBillId, purchaseBills),
+    index("purchase_returns_bill_idx").on(t.organizationId, t.purchaseBillId),
+  ],
+);
+
+export const purchaseReturnItems = pgTable("purchase_return_items", { ...itemColumns(), purchaseReturnId: text("purchase_return_id").notNull() }, (t) => [
+  ...itemConstraints("purchase_return_items", t, t.purchaseReturnId, purchaseReturns),
 ]);
 
 /* ---------------- Payments ---------------- */
@@ -1019,6 +1044,8 @@ export const BUSINESS_BILLING_TABLES = [
   "purchase_bills",
   "purchase_order_items",
   "purchase_bill_items",
+  "purchase_returns",
+  "purchase_return_items",
   "business_payments",
   "payment_allocations",
   "refunds",

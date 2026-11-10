@@ -1,10 +1,10 @@
-// The five sales documents, described once. Pure (shared with the browser).
+// Sales and purchase documents, described once. Pure (shared with the browser).
 
 import type { BusinessBillingPermission } from "@/lib/roles";
 
 import type { NumberedDocument } from "../numbering-format";
 
-export const DOCUMENT_SLUGS = ["invoices", "quotations", "sales-orders", "credit-notes", "debit-notes"] as const;
+export const DOCUMENT_SLUGS = ["invoices", "quotations", "sales-orders", "credit-notes", "debit-notes", "purchase-orders", "purchase-bills", "purchase-returns"] as const;
 export type DocumentSlug = (typeof DOCUMENT_SLUGS)[number];
 
 export type DocumentTypeConfig = {
@@ -21,8 +21,14 @@ export type DocumentTypeConfig = {
   statuses: readonly string[];
   /** Optional second date on the document. */
   extraDate: { key: "dueDate" | "validUntil" | "expectedDate"; label: string } | null;
-  /** Credit and debit notes must point at an issued invoice. */
+  /** Sales documents are with customers; purchase documents with suppliers. */
+  group: "sales" | "purchases";
+  party: "customer" | "supplier";
+  /** Notes and returns must point at an issued document of this type (invoice or bill). */
   needsInvoice: boolean;
+  source: DocumentSlug | null;
+  /** The other side's own number for this document (a supplier's bill number). */
+  partyReference: { label: string } | null;
   /** What this document can be turned into, as a new draft. */
   convertsTo: readonly DocumentSlug[];
 };
@@ -30,6 +36,10 @@ export type DocumentTypeConfig = {
 export const DOCUMENT_TYPES: Record<DocumentSlug, DocumentTypeConfig> = {
   invoices: {
     slug: "invoices",
+    group: "sales",
+    party: "customer",
+    source: null,
+    partyReference: null,
     numbering: "invoice",
     singular: "Invoice",
     plural: "Invoices",
@@ -43,6 +53,10 @@ export const DOCUMENT_TYPES: Record<DocumentSlug, DocumentTypeConfig> = {
   },
   quotations: {
     slug: "quotations",
+    group: "sales",
+    party: "customer",
+    source: null,
+    partyReference: null,
     numbering: "quotation",
     singular: "Quotation",
     plural: "Quotations",
@@ -56,6 +70,10 @@ export const DOCUMENT_TYPES: Record<DocumentSlug, DocumentTypeConfig> = {
   },
   "sales-orders": {
     slug: "sales-orders",
+    group: "sales",
+    party: "customer",
+    source: null,
+    partyReference: null,
     numbering: "sales_order",
     singular: "Sales order",
     plural: "Sales orders",
@@ -69,6 +87,10 @@ export const DOCUMENT_TYPES: Record<DocumentSlug, DocumentTypeConfig> = {
   },
   "credit-notes": {
     slug: "credit-notes",
+    group: "sales",
+    party: "customer",
+    source: "invoices",
+    partyReference: null,
     numbering: "credit_note",
     singular: "Credit note",
     plural: "Credit notes",
@@ -82,6 +104,10 @@ export const DOCUMENT_TYPES: Record<DocumentSlug, DocumentTypeConfig> = {
   },
   "debit-notes": {
     slug: "debit-notes",
+    group: "sales",
+    party: "customer",
+    source: "invoices",
+    partyReference: null,
     numbering: "debit_note",
     singular: "Debit note",
     plural: "Debit notes",
@@ -93,7 +119,63 @@ export const DOCUMENT_TYPES: Record<DocumentSlug, DocumentTypeConfig> = {
     needsInvoice: true,
     convertsTo: [],
   },
+  // Purchases: the supplier is the seller; your state is the place of supply.
+  "purchase-orders": {
+    slug: "purchase-orders",
+    group: "purchases",
+    party: "supplier",
+    source: null,
+    partyReference: null,
+    numbering: "purchase_order",
+    singular: "Purchase order",
+    plural: "Purchase orders",
+    permission: "billing.purchases.manage",
+    issuedStatus: "sent",
+    issueLabel: "Finalise purchase order",
+    statuses: ["draft", "sent", "received", "billed", "void"],
+    extraDate: { key: "expectedDate", label: "Expected delivery" },
+    needsInvoice: false,
+    convertsTo: ["purchase-bills"],
+  },
+  "purchase-bills": {
+    slug: "purchase-bills",
+    group: "purchases",
+    party: "supplier",
+    source: null,
+    partyReference: { label: "Supplier's bill number" },
+    numbering: "purchase_bill",
+    singular: "Purchase bill",
+    plural: "Purchase bills",
+    permission: "billing.purchases.manage",
+    issuedStatus: "recorded",
+    issueLabel: "Record bill",
+    statuses: ["draft", "recorded", "partially_paid", "paid", "void"],
+    extraDate: { key: "dueDate", label: "Due date" },
+    needsInvoice: false,
+    convertsTo: ["purchase-returns"],
+  },
+  "purchase-returns": {
+    slug: "purchase-returns",
+    group: "purchases",
+    party: "supplier",
+    source: "purchase-bills",
+    partyReference: null,
+    numbering: "purchase_return",
+    singular: "Purchase return",
+    plural: "Purchase returns",
+    permission: "billing.purchases.manage",
+    issuedStatus: "issued",
+    issueLabel: "Issue purchase return",
+    statuses: ["draft", "issued", "void"],
+    extraDate: null,
+    needsInvoice: true,
+    convertsTo: [],
+  },
 };
+
+
+export const SALES_SLUGS = DOCUMENT_SLUGS.filter((s) => DOCUMENT_TYPES[s].group === "sales");
+export const PURCHASE_SLUGS = DOCUMENT_SLUGS.filter((s) => DOCUMENT_TYPES[s].group === "purchases");
 
 export const isDocumentSlug = (s: string): s is DocumentSlug => (DOCUMENT_SLUGS as readonly string[]).includes(s);
 
@@ -111,6 +193,9 @@ export const STATUS_LABELS: Record<string, string> = {
   confirmed: "Confirmed",
   fulfilled: "Fulfilled",
   invoiced: "Invoiced",
+  recorded: "Recorded",
+  billed: "Billed",
+  received: "Received",
   overdue: "Overdue",
 };
 
@@ -123,6 +208,7 @@ export const QUOTATION_RESPONSES = ["accepted", "declined"] as const;
  */
 export function displayStatus(slug: DocumentSlug, status: string, extraDate: string | null, today: string): string {
   if (slug === "invoices" && (status === "issued" || status === "partially_paid") && extraDate && extraDate < today) return "overdue";
+  if (slug === "purchase-bills" && (status === "recorded" || status === "partially_paid") && extraDate && extraDate < today) return "overdue";
   if (slug === "quotations" && status === "sent" && extraDate && extraDate < today) return "expired";
   return status;
 }

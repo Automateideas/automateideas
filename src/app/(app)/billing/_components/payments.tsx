@@ -38,16 +38,16 @@ import { StatusBadge, fmtDate, useDocumentContext } from "./documents/documents-
 import { BackLink, EmptyList, type Errors, ListSkeleton, ListToolbar, MoneyField, Pager, ReadOnlyNote, SelectField, TextField, focusFirstError, saveError, useRecordList } from "./records-ui";
 
 const BASE = "/api/business-billing";
-const newKey = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+export const newKey = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
 
 /** Rupee string → paise, or null (for live totals; the server re-checks everything). */
-function toPaise(v: string): number | null {
+export function toPaise(v: string): number | null {
   const m = /^(\d{1,13})(?:\.(\d{1,2}))?$/.exec(v.replace(/[,\s₹]/g, ""));
   return m ? Number(m[1]) * 100 + Number((m[2] ?? "").padEnd(2, "0")) : null;
 }
 
 /** POST with an idempotency key, so a double click or retry can't record twice. */
-async function postOnce<T>(path: string, key: string, json: unknown) {
+export async function postOnce<T>(path: string, key: string, json: unknown) {
   return api<T>(path, { method: "POST", json, headers: { "Idempotency-Key": key } });
 }
 
@@ -135,7 +135,7 @@ export function PaymentsList() {
 /* ---------------- Record a payment ---------------- */
 
 type CustomerOption = { id: string; name: string; gstin: string | null };
-type OpenInvoice = { id: string; number: string | null; issueDate: string; dueDate: string | null; totalPaise: number; balancePaise: number };
+export type OpenInvoice = { id: string; number: string | null; issueDate: string; dueDate: string | null; totalPaise: number; balancePaise: number };
 type OpenItems = { invoices: OpenInvoice[]; creditNotes: { id: string; number: string | null; refundablePaise: number }[] };
 
 function CustomerPicker({ value, onChange, error, disabled }: { value: CustomerOption | null; onChange: (c: CustomerOption | null) => void; error?: string; disabled?: boolean }) {
@@ -171,15 +171,15 @@ function CustomerPicker({ value, onChange, error, disabled }: { value: CustomerO
   );
 }
 
-/** Allocation table: how much of the money goes to each open invoice. */
-function AllocationTable({ invoices, amounts, onAmount, errors }: { invoices: OpenInvoice[]; amounts: Record<string, string>; onAmount: (id: string, v: string) => void; errors: Errors }) {
-  if (!invoices.length) return <p className="text-sm text-muted-foreground">No unpaid invoices. The whole amount is kept as an advance.</p>;
+/** Allocation table: how much of the money goes to each open invoice (or bill). */
+export function AllocationTable({ invoices, amounts, onAmount, errors, label = "Invoice" }: { invoices: OpenInvoice[]; amounts: Record<string, string>; onAmount: (id: string, v: string) => void; errors: Errors; label?: string }) {
+  if (!invoices.length) return <p className="text-sm text-muted-foreground">No unpaid {label.toLowerCase()}s. The whole amount is kept as an advance.</p>;
   return (
     <div className="rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Invoice</TableHead>
+            <TableHead>{label}</TableHead>
             <TableHead className="hidden sm:table-cell">Due</TableHead>
             <TableHead className="hidden md:table-cell text-right">Total</TableHead>
             <TableHead className="text-right">Owes</TableHead>
@@ -217,7 +217,7 @@ function AllocationTable({ invoices, amounts, onAmount, errors }: { invoices: Op
 }
 
 /** Fills invoices oldest first until the money runs out. */
-function autoApply(invoices: OpenInvoice[], totalPaise: number) {
+export function autoApply(invoices: OpenInvoice[], totalPaise: number) {
   let left = totalPaise;
   const out: Record<string, string> = {};
   for (const inv of invoices) {
@@ -594,7 +594,7 @@ function ApplyAdvanceDialog({ payment, onClose, onDone }: { payment: PaymentDeta
   );
 }
 
-function VoidDialog({ title, description, path, placeholder, onClose, onDone }: { title: string; description: string; path: string; placeholder: string; onClose: () => void; onDone: () => void }) {
+export function VoidDialog({ title, description, path, placeholder, onClose, onDone }: { title: string; description: string; path: string; placeholder: string; onClose: () => void; onDone: () => void }) {
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -760,13 +760,13 @@ export function RefundsList() {
 
 /* ---------------- Outstanding ---------------- */
 
-type Ageing = { current: number; d1_30: number; d31_60: number; d61_90: number; d90_plus: number };
+export type Ageing = { current: number; d1_30: number; d31_60: number; d61_90: number; d90_plus: number };
 type Outstanding = {
   today: string;
   totals: { invoices: number; totalPaise: number; overduePaise: number; ageing: Ageing };
   customers: { customerId: string; customerName: string; invoices: number; totalPaise: number; overduePaise: number; ageing: Ageing; oldestDue: string | null }[];
 };
-const BUCKETS: [keyof Ageing, string][] = [
+export const BUCKETS: [keyof Ageing, string][] = [
   ["current", "Not due"],
   ["d1_30", "1–30 days"],
   ["d31_60", "31–60"],

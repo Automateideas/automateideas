@@ -45,6 +45,8 @@ export type PdfDocument = {
   reverseCharge: boolean;
   zeroRated: string | null;
   reason: string | null;
+  /** Purchase bills: the supplier's own bill number. */
+  partyReference?: string | null;
   subtotalPaise: number;
   discountPaise: number;
   taxablePaise: number;
@@ -96,6 +98,7 @@ function styles(t: DocumentTemplate) {
 const COLS = { no: "5%", item: "33%", hsn: "10%", qty: "9%", rate: "11%", disc: "8%", taxable: "12%", gst: "6%", amount: "13%" } as const;
 
 function title(doc: PdfDocument) {
+  if (DOCUMENT_TYPES[doc.slug].group === "purchases") return DOCUMENT_TYPES[doc.slug].singular;
   if (doc.slug !== "invoices") return DOCUMENT_TYPES[doc.slug].singular;
   if (!doc.seller?.gstin) return "Invoice";
   return doc.items.some((i) => i.taxCategory === "taxable") ? "Tax Invoice" : "Bill of Supply";
@@ -103,7 +106,8 @@ function title(doc: PdfDocument) {
 
 function Header({ doc, seller, a, s }: { doc: PdfDocument; seller: Seller | null; a: DocumentAssets; s: ReturnType<typeof styles> }) {
   const extra = DOCUMENT_TYPES[doc.slug].extraDate;
-  const against = DOCUMENT_TYPES[doc.slug].needsInvoice ? doc.related.find((r) => r.slug === "invoices") : null;
+  const sourceSlug = DOCUMENT_TYPES[doc.slug].source;
+  const against = sourceSlug ? doc.related.find((r) => r.slug === sourceSlug) : null;
   return (
     <View style={[s.band, s.between]}>
       <View style={[s.row, { gap: 10, maxWidth: "60%" }]}>
@@ -123,18 +127,20 @@ function Header({ doc, seller, a, s }: { doc: PdfDocument; seller: Seller | null
         <Text style={s.bold}>{doc.number ?? "DRAFT"}</Text>
         <Text>Date: {fmtDate(doc.issueDate)}</Text>
         {extra && doc.extraDate ? <Text>{extra.label}: {fmtDate(doc.extraDate)}</Text> : null}
-        {against ? <Text>Against invoice: {against.number}</Text> : null}
+        {doc.partyReference ? <Text>Supplier&apos;s bill no.: {doc.partyReference}</Text> : null}
+        {against && sourceSlug ? <Text>Against {DOCUMENT_TYPES[sourceSlug].singular.toLowerCase()}: {against.number}</Text> : null}
       </View>
     </View>
   );
 }
 
-function Parties({ doc, s }: { doc: PdfDocument; s: ReturnType<typeof styles> }) {
+function Parties({ doc, company, s }: { doc: PdfDocument; company: Seller | null; s: ReturnType<typeof styles> }) {
+  const purchase = DOCUMENT_TYPES[doc.slug].group === "purchases";
   const pos = doc.placeOfSupply === "96" ? "Outside India (96)" : stateByCode(doc.placeOfSupply) ? `${stateByCode(doc.placeOfSupply)!.name} (${doc.placeOfSupply})` : "—";
   return (
     <View style={[s.row, { gap: 12, marginBottom: 10 }]} wrap={false}>
       <View style={{ flex: 1 }}>
-        <Text style={s.label}>Bill to</Text>
+        <Text style={s.label}>{purchase ? "Supplier" : "Bill to"}</Text>
         <Text style={s.bold}>{doc.partyName}</Text>
         {lines(doc.billingAddress).map((l, i) => (
           <Text key={i}>{l}</Text>
@@ -142,8 +148,14 @@ function Parties({ doc, s }: { doc: PdfDocument; s: ReturnType<typeof styles> })
         <Text>{doc.partyGstin ? `GSTIN: ${doc.partyGstin}` : "Unregistered"}</Text>
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={s.label}>Ship to</Text>
-        {doc.shippingAddress ? lines(doc.shippingAddress).map((l, i) => <Text key={i}>{l}</Text>) : <Text>Same as billing</Text>}
+        <Text style={s.label}>{purchase ? "Deliver to" : "Ship to"}</Text>
+        {purchase ? (
+          [company?.legalName ?? "", ...lines(company)].filter(Boolean).map((l, i) => <Text key={i}>{l}</Text>)
+        ) : doc.shippingAddress ? (
+          lines(doc.shippingAddress).map((l, i) => <Text key={i}>{l}</Text>)
+        ) : (
+          <Text>Same as billing</Text>
+        )}
       </View>
       <View style={{ flex: 1 }}>
         <Text style={s.label}>Supply</Text>
@@ -298,7 +310,7 @@ async function DocumentBody({ doc, seller, assets }: { doc: PdfDocument; seller:
       <Page size="A4" style={s.page}>
         {doc.status === "draft" || doc.status === "void" ? <Text style={s.watermark} fixed>{doc.status}</Text> : null}
         <Header doc={doc} seller={seller} a={assets} s={s} />
-        <Parties doc={doc} s={s} />
+        <Parties doc={doc} company={seller} s={s} />
         <Items doc={doc} s={s} />
         <View style={[s.between, { marginTop: 10, gap: 14 }]}>
           <View style={{ flex: 1 }}>

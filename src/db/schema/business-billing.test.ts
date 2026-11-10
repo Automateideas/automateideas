@@ -30,6 +30,8 @@ describe("business billing schema", () => {
     const added = [
       "price_list_items", "quotation_items", "sales_order_items", "credit_note_items", "debit_note_items",
       "purchase_order_items", "purchase_bill_items",
+      // Stage 10: purchase returns (debit notes to suppliers).
+      "purchase_returns", "purchase_return_items",
     ];
     expect([...requested, ...added].sort()).toEqual([...bb.BUSINESS_BILLING_TABLES].sort());
   });
@@ -64,12 +66,18 @@ describe("business billing schema", () => {
     }
   });
 
-  it("puts every table under row-level security in the RLS migration", () => {
+  it("puts every table under row-level security in an RLS migration", () => {
     const dir = path.resolve(__dirname, "../../../drizzle");
     const folder = readdirSync(dir).find((d) => d.endsWith("_business_billing_rls"));
     expect(folder).toBeDefined();
     const migration = readFileSync(path.join(dir, folder!, "migration.sql"), "utf8");
-    for (const name of bb.BUSINESS_BILLING_TABLES) expect(migration, name).toContain(`'${name}'`);
+    // Tables added later get RLS in their own migration (e.g. *_purchases_rls_and_locks).
+    const later = readdirSync(dir)
+      .filter((d) => d.endsWith("_rls_and_locks"))
+      .map((d) => readFileSync(path.join(dir, d, "migration.sql"), "utf8"))
+      .join("\n");
+    for (const name of bb.BUSINESS_BILLING_TABLES) expect(migration + later, name).toContain(`'${name}'`);
+    expect(later).toContain("FORCE ROW LEVEL SECURITY");
     expect(migration).toContain("FORCE ROW LEVEL SECURITY");
     expect(migration).toContain("REVOKE UPDATE, DELETE ON TABLE audit_logs");
   });

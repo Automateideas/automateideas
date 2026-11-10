@@ -24,6 +24,9 @@ export function actionsFor(ctx: Ctx, doc: DocumentDetail) {
     invoices: ["issued", "partially_paid", "paid"],
     "credit-notes": [],
     "debit-notes": [],
+    "purchase-orders": ["sent", "received"],
+    "purchase-bills": ["recorded", "partially_paid", "paid"],
+    "purchase-returns": [],
   };
   return {
     canEdit,
@@ -31,7 +34,8 @@ export function actionsFor(ctx: Ctx, doc: DocumentDetail) {
     edit: canEdit && s === "draft",
     delete: canEdit && s === "draft",
     issue: canEdit && s === "draft",
-    void: canEdit && s !== "draft" && s !== "void" && !(doc.slug === "quotations" && s === "converted") && !(doc.slug === "sales-orders" && s === "invoiced"),
+    void: canEdit && s !== "draft" && s !== "void" && !(doc.slug === "quotations" && s === "converted") && !(doc.slug === "sales-orders" && s === "invoiced") && !(doc.slug === "purchase-orders" && s === "billed"),
+    markReceived: canEdit && doc.slug === "purchase-orders" && s === "sent",
     respond: canEdit && doc.slug === "quotations" && ["sent", "accepted", "declined"].includes(s),
     convertTo: canEdit && convertFrom[doc.slug].includes(s) ? type.convertsTo.filter((t) => hasBillingPermission(ctx.roles, DOCUMENT_TYPES[t].permission)) : [],
   };

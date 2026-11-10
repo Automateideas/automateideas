@@ -55,8 +55,13 @@ async function readSupplier(tx: TenantTx, organizationId: string, id: string) {
   delete rest.organizationId;
   delete rest.createdBy;
   delete rest.updatedBy;
-  // Until purchases and payments exist, what's owed is the opening balance.
-  return { ...(rest as Omit<typeof s, "organizationId" | "createdBy" | "updatedBy">), outstandingPaise: s.openingBalancePaise };
+  // Owed to the supplier = opening + recorded bills − issued returns − payments made.
+  const { rows: owed } = await tx.execute<{ n: string | number }>(sql`
+    select
+      coalesce((select sum(b.total_paise) from purchase_bills b where b.organization_id = ${organizationId} and b.supplier_id = ${id} and b.status in ('recorded', 'partially_paid', 'paid')), 0)
+      - coalesce((select sum(pr.total_paise) from purchase_returns pr where pr.organization_id = ${organizationId} and pr.supplier_id = ${id} and pr.status = 'issued'), 0)
+      - coalesce((select sum(p.amount_paise) from business_payments p where p.organization_id = ${organizationId} and p.supplier_id = ${id} and p.direction = 'made' and p.status = 'recorded'), 0) as n`);
+  return { ...(rest as Omit<typeof s, "organizationId" | "createdBy" | "updatedBy">), outstandingPaise: s.openingBalancePaise + Number(owed[0]?.n ?? 0) };
 }
 
 export type SupplierDetail = Awaited<ReturnType<typeof readSupplier>>;

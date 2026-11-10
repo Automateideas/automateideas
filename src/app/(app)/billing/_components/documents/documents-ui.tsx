@@ -23,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError, api, useApiQuery } from "@/lib/api";
-import { DOCUMENT_TYPES, type DocumentSlug, STATUS_LABELS } from "@/lib/business-billing/documents/types";
+import { DOCUMENT_TYPES, type DocumentSlug, SALES_SLUGS, STATUS_LABELS } from "@/lib/business-billing/documents/types";
 import { formatPaise } from "@/lib/business-billing/fields";
 import type { DocumentTemplate } from "@/lib/business-billing/template";
 
@@ -31,14 +31,33 @@ import { LoadError } from "../../../_components/page-parts";
 import { SectionNav } from "../../../_components/section-nav";
 import { BackLink, EmptyList, ListSkeleton, ListToolbar, Pager, ReadOnlyNote, SelectField, TextField, useRecordList } from "../records-ui";
 import { InvoicePaymentPanel, type InvoicePayment } from "../payments";
+import { BillPaymentPanel } from "../supplier-payments";
 import { DocumentPaper, type PaperDocument, type PaperLook, type Seller } from "./document-paper";
 
 const BASE = "/api/business-billing/documents";
 
 /** Invoices · Quotations · Sales orders · Credit notes · Debit notes. */
 export function SalesNav() {
-  return <SectionNav label="Sales documents" links={Object.values(DOCUMENT_TYPES).map((t) => ({ href: `/billing/${t.slug}`, label: t.plural, matchNested: true }))} />;
+  return <SectionNav label="Sales documents" links={SALES_SLUGS.map((s) => ({ href: `/billing/${s}`, label: DOCUMENT_TYPES[s].plural, matchNested: true }))} />;
 }
+
+/** Bills · Purchase orders · Returns · Supplier payments · Payables. */
+export function PurchasesNav() {
+  return (
+    <SectionNav
+      label="Purchases"
+      links={[
+        { href: "/billing/purchase-bills", label: "Bills", matchNested: true },
+        { href: "/billing/purchase-orders", label: "Purchase orders", matchNested: true },
+        { href: "/billing/purchase-returns", label: "Returns", matchNested: true },
+        { href: "/billing/supplier-payments", label: "Supplier payments", matchNested: true },
+        { href: "/billing/payables", label: "Payables" },
+      ]}
+    />
+  );
+}
+
+const GroupNav = ({ slug }: { slug: DocumentSlug }) => (DOCUMENT_TYPES[slug].group === "purchases" ? <PurchasesNav /> : <SalesNav />);
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   draft: "secondary",
@@ -57,7 +76,7 @@ export const fmtDate = (d: string | null) => (d ? dateFmt.format(new Date(`${d}T
 
 /* ---------------- List ---------------- */
 
-type Row = { id: string; number: string | null; status: string; displayStatus: string; issueDate: string; extraDate: string | null; partyName: string | null; totalPaise: number };
+type Row = { id: string; number: string | null; status: string; displayStatus: string; issueDate: string; extraDate: string | null; partyName: string | null; partyReference: string | null; totalPaise: number };
 
 export function DocumentsList({ slug }: { slug: DocumentSlug }) {
   const type = DOCUMENT_TYPES[slug];
@@ -67,7 +86,7 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
   const canEdit = query.data?.canEdit ?? false;
   const statusOptions = [
     { value: "open", label: "All issued" },
-    ...(slug === "invoices" ? [{ value: "overdue", label: "Overdue" }] : []),
+    ...(slug === "invoices" || slug === "purchase-bills" ? [{ value: "overdue", label: "Overdue" }] : []),
     ...(slug === "quotations" ? [{ value: "expired", label: "Expired" }] : []),
     ...type.statuses.map((s) => ({ value: s, label: STATUS_LABELS[s] ?? s })),
   ];
@@ -80,8 +99,8 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <SalesNav />
-      <ListToolbar search={list.search} onSearch={list.setSearch} placeholder="Search number or customer">
+      <GroupNav slug={slug} />
+      <ListToolbar search={list.search} onSearch={list.setSearch} placeholder={type.partyReference ? "Search number, supplier or their bill no." : `Search number or ${type.party}`}>
         <SelectField
           id="doc-status"
           label="Status"
@@ -98,7 +117,7 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
       </ListToolbar>
       {type.needsInvoice ? (
         <p className="text-sm text-muted-foreground">
-          To raise a {type.singular.toLowerCase()}, open the issued invoice it adjusts and choose “Create {type.singular.toLowerCase()}”.
+          To raise a {type.singular.toLowerCase()}, open the {type.source ? DOCUMENT_TYPES[type.source].singular.toLowerCase() : "document"} it adjusts and choose “Create {type.singular.toLowerCase()}”.
         </p>
       ) : null}
       {query.data && !query.data.canEdit ? <ReadOnlyNote reason={query.data.readOnlyReason} /> : null}
@@ -110,7 +129,7 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
         <EmptyList
           Icon={FileTextIcon}
           title={`No ${type.plural.toLowerCase()} yet`}
-          description={type.needsInvoice ? "They're created from issued invoices." : `Create a ${type.singular.toLowerCase()} for one of your customers.`}
+          description={type.needsInvoice ? `They're created from ${type.source ? DOCUMENT_TYPES[type.source].plural.toLowerCase() : "issued documents"}.` : `Create a ${type.singular.toLowerCase()} for one of your ${type.party}s.`}
           filtered={list.filtered || !!status}
           action={canEdit ? add ?? undefined : undefined}
         />
@@ -121,7 +140,8 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Number</TableHead>
-                  <TableHead>Customer</TableHead>
+                  <TableHead>{type.party === "customer" ? "Customer" : "Supplier"}</TableHead>
+                  {type.partyReference ? <TableHead className="hidden md:table-cell">{type.partyReference.label}</TableHead> : null}
                   <TableHead className="hidden sm:table-cell">Date</TableHead>
                   {type.extraDate ? <TableHead className="hidden lg:table-cell">{type.extraDate.label}</TableHead> : null}
                   <TableHead>Status</TableHead>
@@ -137,6 +157,7 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
                       </Link>
                     </TableCell>
                     <TableCell className="max-w-48 truncate">{d.partyName}</TableCell>
+                    {type.partyReference ? <TableCell className="hidden font-mono text-xs md:table-cell">{d.partyReference ?? "—"}</TableCell> : null}
                     <TableCell className="hidden sm:table-cell">{fmtDate(d.issueDate)}</TableCell>
                     {type.extraDate ? <TableCell className="hidden lg:table-cell">{fmtDate(d.extraDate)}</TableCell> : null}
                     <TableCell>
@@ -157,10 +178,12 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
 
 /* ---------------- Detail ---------------- */
 
-type Actions = { canEdit: boolean; readOnlyReason: string | null; edit: boolean; delete: boolean; issue: boolean; void: boolean; respond: boolean; convertTo: DocumentSlug[] };
+type Actions = { canEdit: boolean; readOnlyReason: string | null; edit: boolean; delete: boolean; issue: boolean; void: boolean; respond: boolean; markReceived: boolean; convertTo: DocumentSlug[] };
 type Detail = Omit<PaperDocument, "related"> & {
   id: string;
-  customerId: string;
+  partyId: string;
+  customerId: string | null;
+  supplierId: string | null;
   payment: InvoicePayment | null;
   displayStatus: string;
   related: { slug: DocumentSlug; id: string; number: string | null; status: string; totalPaise: number }[];
@@ -236,7 +259,8 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
             <StatusBadge status={doc.displayStatus} />
           </h2>
           <p className="text-sm text-muted-foreground">
-            {doc.partyName} · {formatPaise(doc.totalPaise)}
+            <Link href={`/billing/${type.party === "customer" ? "customers" : "suppliers"}/${doc.partyId}`} className="hover:underline">{doc.partyName}</Link>
+            {doc.partyReference ? <> · their no. <span className="font-mono">{doc.partyReference}</span></> : null} · {formatPaise(doc.totalPaise)}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -267,6 +291,12 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
                 </Button>
               ) : null}
             </>
+          ) : null}
+          {a.markReceived ? (
+            <Button variant="outline" onClick={() => run(() => api(`${BASE}/${slug}/${id}/received`, { method: "POST" }))} disabled={pending}>
+              <CheckIcon data-icon="inline-start" />
+              Mark received
+            </Button>
           ) : null}
           {a.convertTo.map((to) => (
             <Button
@@ -349,10 +379,13 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
         </Card>
       ) : null}
 
-      {doc.payment ? (
+      {doc.payment && slug === "purchase-bills" ? (
+        <BillPaymentPanel billId={doc.id} supplierId={doc.partyId} status={doc.status} payment={doc.payment} canRecord={a.canEdit} />
+      ) : null}
+      {doc.payment && slug === "invoices" ? (
         <InvoicePaymentPanel
           invoiceId={doc.id}
-          customerId={doc.customerId}
+          customerId={doc.partyId}
           status={doc.status}
           payment={doc.payment}
           canRecord={a.canEdit}
@@ -371,7 +404,7 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
             <AlertDialogTitle>{type.issueLabel}?</AlertDialogTitle>
             <AlertDialogDescription>
               It gets the next {type.singular.toLowerCase()} number and is then locked: it can&apos;t be edited or deleted, only voided
-              {slug === "invoices" ? " or corrected with a credit or debit note" : ""}. GST is recalculated with your current tax settings.
+              {slug === "invoices" ? " or corrected with a credit or debit note" : slug === "purchase-bills" ? " or adjusted with a purchase return" : ""}. GST is recalculated with your current tax settings.
             </AlertDialogDescription>
           </AlertDialogHeader>
           {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}

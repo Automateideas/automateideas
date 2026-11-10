@@ -23,11 +23,15 @@ export type DocumentLineValues = {
 };
 
 export type DocumentValues = {
-  customerId: string;
+  /** The customer (sales) or supplier (purchases). API field: customerId / supplierId. */
+  partyId: string;
   issueDate: string;
   /** dueDate / validUntil / expectedDate, depending on the type. */
   extraDate: string | null;
-  invoiceId: string | null;
+  /** What a note or return adjusts: an invoice (API field invoiceId) or a purchase bill (billId). */
+  sourceId: string | null;
+  /** The supplier's own bill number (purchase bills). */
+  partyReference: string | null;
   reason: string | null;
   placeOfSupply: string | null;
   pricesIncludeTax: boolean;
@@ -61,12 +65,17 @@ export function validateDocument(slug: DocumentSlug, raw: Record<string, unknown
   const r = new FieldReader(raw);
   const errors = r.errors;
 
-  const customerId = r.id("customerId", "Choose a customer.");
+  const partyField = type.party === "customer" ? "customerId" : "supplierId";
+  const partyId = r.id(partyField, type.party === "customer" ? "Choose a customer." : "Choose a supplier.");
+  const sourceField = type.source === "purchase-bills" ? "billId" : "invoiceId";
   const issueDate = readDate(r, "issueDate", "Enter the date.");
   const extraDate = type.extraDate ? readDate(r, "extraDate") : null;
   if (issueDate && extraDate && extraDate < issueDate) r.fail("extraDate", `${type.extraDate!.label} can't be before the document date.`);
-  const invoiceId = type.needsInvoice ? r.id("invoiceId", "Choose the invoice this note adjusts.") : null;
+  const sourceId = type.needsInvoice ? r.id(sourceField, type.source === "purchase-bills" ? "Choose the bill this return adjusts." : "Choose the invoice this note adjusts.") : null;
   const reason = type.needsInvoice ? r.text("reason", 200, "Give a reason, e.g. Goods returned.") : null;
+  // GST rule 46 numbers: letters, digits, - and /, up to 16 characters.
+  const partyReference = type.partyReference ? r.text("partyReference", 30, `Enter the ${type.partyReference.label.toLowerCase()}.`) : null;
+  if (partyReference && !/^[A-Za-z0-9/_.-]+(?: [A-Za-z0-9/_.-]+)*$/.test(partyReference)) r.fail("partyReference", "Use letters, numbers, dashes or slashes.");
 
   const pos = r.text("placeOfSupply", 2);
   if (pos && pos !== OUTSIDE_INDIA && !stateByCode(pos)) r.fail("placeOfSupply", "Choose the place of supply.");
@@ -111,10 +120,11 @@ export function validateDocument(slug: DocumentSlug, raw: Record<string, unknown
   return {
     ok: true,
     values: {
-      customerId: customerId!,
+      partyId: partyId!,
       issueDate: issueDate!,
       extraDate,
-      invoiceId,
+      sourceId,
+      partyReference,
       reason,
       placeOfSupply: pos,
       pricesIncludeTax: tax.input.pricesIncludeTax,

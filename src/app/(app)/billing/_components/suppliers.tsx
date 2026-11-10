@@ -20,6 +20,7 @@ import { type Country, countries, formatPhone, parsePhone } from "@/lib/countrie
 
 import { LoadError } from "../../_components/page-parts";
 import { AddressFields, Stat, formatAddress } from "./customers";
+import { SupplierAccount } from "./supplier-payments";
 import {
   ArchiveButton,
   ArchivedBadge,
@@ -486,12 +487,7 @@ export function SupplierDetailView({ id }: { id: string }) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Purchases and payments</CardTitle>
-          <CardDescription>Bills, payments and the supplier ledger appear here once purchases are available.</CardDescription>
-        </CardHeader>
-      </Card>
+      <SupplierAccount supplierId={s.id} canRecord={s.canEdit} />
     </div>
   );
 }

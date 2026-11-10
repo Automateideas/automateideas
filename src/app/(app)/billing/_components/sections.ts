@@ -90,7 +90,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     Icon: ShoppingCartIcon,
     summary: "Bills from your suppliers.",
     tone: "amber",
-    empty: { title: "No purchases yet", description: "Recording purchases is coming soon." },
+    empty: { title: "No purchases yet", description: "Record bills from your suppliers." },
   },
   {
     slug: "reports",
@@ -112,7 +112,10 @@ export const billingSection = (slug: string) => {
 export const CATALOGUE_EXTRA_PATHS = ["/billing/categories", "/billing/units", "/billing/price-lists"] as const;
 
 /** Sections whose pages are built (no "Coming soon" placeholder). */
-export const BUILT_SECTIONS = ["invoices", "quotations", "customers", "suppliers", "products", "services", "payments"] as const;
+export const BUILT_SECTIONS = ["invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases"] as const;
+
+/** Purchase pages outside the section list; the Purchases tab stays active on them. */
+export const PURCHASE_EXTRA_PATHS = ["/billing/purchase-bills", "/billing/purchase-orders", "/billing/purchase-returns", "/billing/supplier-payments", "/billing/payables"] as const;
 
 /** Payment pages outside the section list; the Payments tab stays active on them. */
 export const PAYMENT_EXTRA_PATHS = ["/billing/refunds", "/billing/outstanding"] as const;
@@ -130,6 +133,7 @@ export const BILLING_NAV = [
     ...(s.slug === "products" ? { alsoActiveOn: CATALOGUE_EXTRA_PATHS } : {}),
     ...(s.slug === "invoices" ? { alsoActiveOn: SALES_EXTRA_PATHS } : {}),
     ...(s.slug === "payments" ? { alsoActiveOn: PAYMENT_EXTRA_PATHS } : {}),
+    ...(s.slug === "purchases" ? { alsoActiveOn: PURCHASE_EXTRA_PATHS } : {}),
   })),
   { href: "/billing/settings", label: "Settings", matchNested: true },
 ];

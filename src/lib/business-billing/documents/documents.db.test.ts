@@ -199,13 +199,13 @@ describe("issuing and locking", () => {
   });
 
   it("lists drafts first and filters by status", async () => {
-    const all = await listDocuments(A, "invoices", { q: null, page: 1, pageSize: 100, status: null, customerId: null });
+    const all = await listDocuments(A, "invoices", { q: null, page: 1, pageSize: 100, status: null, partyId: null });
     expect(all.items[0].status).toBe("draft");
-    const voided = await listDocuments(A, "invoices", { q: null, page: 1, pageSize: 100, status: "void", customerId: null });
+    const voided = await listDocuments(A, "invoices", { q: null, page: 1, pageSize: 100, status: "void", partyId: null });
     expect(voided.items.every((d) => d.status === "void")).toBe(true);
     // An invoice from 2025 due in 2025 is overdue whatever today is.
     const old = await issueDocument(A, USER, "invoices", (await createDraft(A, USER, "invoices", values("invoices", { issueDate: "2025-06-01", extraDate: "2025-06-15" }))).id);
-    const overdue = await listDocuments(A, "invoices", { q: null, page: 1, pageSize: 100, status: "overdue", customerId: null });
+    const overdue = await listDocuments(A, "invoices", { q: null, page: 1, pageSize: 100, status: "overdue", partyId: null });
     expect(overdue.items.map((d) => d.id)).toContain(old.id);
     expect(overdue.items.find((d) => d.id === old.id)?.displayStatus).toBe("overdue");
   });
