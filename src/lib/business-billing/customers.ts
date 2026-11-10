@@ -85,6 +85,14 @@ async function readCustomer(tx: TenantTx, organizationId: string, id: string) {
     .where(and(eq(customerAddresses.organizationId, organizationId), eq(customerAddresses.customerId, id), eq(customerAddresses.isDefault, true)));
 
   const c = row.customer;
+  // Owed = opening + invoices + debit notes − credit notes − payments + refunds (issued/recorded only).
+  const { rows: owed } = await tx.execute<{ n: string | number }>(sql`
+    select
+      coalesce((select sum(i.total_paise) from business_invoices i where i.organization_id = ${organizationId} and i.customer_id = ${id} and i.status in ('issued', 'partially_paid', 'paid')), 0)
+      + coalesce((select sum(d.total_paise) from debit_notes d where d.organization_id = ${organizationId} and d.customer_id = ${id} and d.status = 'issued'), 0)
+      - coalesce((select sum(cn.total_paise) from credit_notes cn where cn.organization_id = ${organizationId} and cn.customer_id = ${id} and cn.status = 'issued'), 0)
+      - coalesce((select sum(p.amount_paise) from business_payments p where p.organization_id = ${organizationId} and p.customer_id = ${id} and p.status = 'recorded'), 0)
+      + coalesce((select sum(r.amount_paise) from refunds r where r.organization_id = ${organizationId} and r.customer_id = ${id} and r.status = 'recorded'), 0) as n`);
   const billingAddress = toAddress(addresses.find((a) => a.type === "billing"));
   const shippingAddress = toAddress(addresses.find((a) => a.type === "shipping"));
   return {
@@ -111,8 +119,8 @@ async function readCustomer(tx: TenantTx, organizationId: string, id: string) {
     archivedAt: c.archivedAt,
     createdAt: c.createdAt,
     updatedAt: c.updatedAt,
-    // Until invoicing and payments exist, what's owed is the opening balance.
-    outstandingPaise: c.openingBalancePaise,
+    // Positive: they owe you. Negative: you hold their advance or credit.
+    outstandingPaise: c.openingBalancePaise + Number(owed[0]?.n ?? 0),
   };
 }
 

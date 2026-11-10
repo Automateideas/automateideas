@@ -113,6 +113,11 @@ export const billingSettings = pgTable(
     documentNumbering: jsonb("document_numbering").default({}).notNull(),
     // Whether documents show the workspace logo (organization.logo, uploaded via /api/organization/logo).
     showLogo: boolean("show_logo").default(false).notNull(),
+    // Design, colour, bank/UPI details, default terms… See lib/business-billing/template.ts.
+    documentTemplate: jsonb("document_template").default({}).notNull(),
+    // Storage keys (lib/storage.ts) of the signature and stamp images, like organization.logo.
+    signatureKey: text("signature_key"),
+    stampKey: text("stamp_key"),
     updatedBy: text("updated_by").references(() => user.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -780,10 +785,13 @@ export const businessPayments = pgTable(
     status: text("status").default("recorded").notNull(),
     voidedAt: timestamp("voided_at"),
     voidReason: text("void_reason"),
+    // Sent by the client with each submit, so a retried request records nothing twice.
+    idempotencyKey: text("idempotency_key"),
     ...audit(),
   },
   (t) => [
     tenantKey("business_payments", t),
+    uniqueIndex("business_payments_idempotency_uq").on(t.organizationId, t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
     uniqueIndex("business_payments_number_uq").on(t.organizationId, t.number).where(sql`${t.number} is not null`),
     tenantFk("business_payments_customer_fk", t.organizationId, t.customerId, customers),
     tenantFk("business_payments_supplier_fk", t.organizationId, t.supplierId, suppliers),
@@ -849,6 +857,9 @@ export const refunds = pgTable(
     notes: text("notes"),
     status: text("status").default("recorded").notNull(),
     voidedAt: timestamp("voided_at"),
+    voidReason: text("void_reason"),
+    // Sent by the client with each submit, so a retried request records nothing twice.
+    idempotencyKey: text("idempotency_key"),
     ...audit(),
   },
   (t) => [
@@ -863,6 +874,9 @@ export const refunds = pgTable(
     check("refunds_status_check", inList(t.status, ["recorded", "void"])),
     index("refunds_customer_idx").on(t.organizationId, t.customerId),
     index("refunds_date_idx").on(t.organizationId, t.refundDate),
+    uniqueIndex("refunds_idempotency_uq").on(t.organizationId, t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
+    index("refunds_payment_idx").on(t.organizationId, t.paymentId),
+    index("refunds_credit_note_idx").on(t.organizationId, t.creditNoteId),
   ],
 );
 

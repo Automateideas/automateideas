@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SubscriptionOverview } from "./_components/subscription-view";
 
 export const metadata: Metadata = {
-  title: "Subscription",
+  title: "Plan & seats",
 };
 
 export default function Page() {

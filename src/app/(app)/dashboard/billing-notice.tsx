@@ -17,7 +17,7 @@ export function BillingNotice() {
         <AlertTitle>Payment received</AlertTitle>
         <AlertDescription>
           We&apos;re confirming it with PayU. Your new seats show up on the{" "}
-          <Link href="/subscription" className="underline underline-offset-4">Subscription</Link> page in a minute or two.
+          <Link href="/subscription" className="underline underline-offset-4">Plan &amp; seats</Link> page in a minute or two.
         </AlertDescription>
       </Alert>
     );
@@ -30,7 +30,7 @@ export function BillingNotice() {
         <AlertTitle>Payment didn&apos;t go through</AlertTitle>
         <AlertDescription>
           You haven&apos;t been charged and your seats are unchanged.{" "}
-          <Link href="/subscription/plans" className="underline underline-offset-4">Try again from Subscription</Link>.
+          <Link href="/subscription/plans" className="underline underline-offset-4">Try again from Plan &amp; seats</Link>.
         </AlertDescription>
       </Alert>
     );

@@ -1,0 +1,323 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "6a861ebe-6bf6-45cf-bd37-a14dc58ec9f1",
+  "prevIds": [
+    "416a969c-c040-4b89-b8a2-1b02f0a0638a"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_payments",
+        "idempotency_key"
+      ],
+      "writes": [
+        "s|col|public.business_payments.idempotency_key",
+        "n|col|public.business_payments.idempotency_key",
+        "e|col|public.business_payments.idempotency_key"
+      ],
+      "reads": [
+        "n|tbl|public.business_payments",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "refunds",
+        "void_reason"
+      ],
+      "writes": [
+        "s|col|public.refunds.void_reason",
+        "n|col|public.refunds.void_reason",
+        "e|col|public.refunds.void_reason"
+      ],
+      "reads": [
+        "n|tbl|public.refunds",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "refunds",
+        "idempotency_key"
+      ],
+      "writes": [
+        "s|col|public.refunds.idempotency_key",
+        "n|col|public.refunds.idempotency_key",
+        "e|col|public.refunds.idempotency_key"
+      ],
+      "reads": [
+        "n|tbl|public.refunds",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "business_payments",
+        "business_payments_idempotency_uq"
+      ],
+      "writes": [
+        "s|idx|public.business_payments_idempotency_uq",
+        "n|idx|public.business_payments_idempotency_uq",
+        "e|idx|public.business_payments_idempotency_uq",
+        "n|rel|public.business_payments_idempotency_uq"
+      ],
+      "reads": [
+        "n|tbl|public.business_payments",
+        "n|sch|public",
+        "n|col|public.business_payments.organization_id",
+        "n|col|public.business_payments.idempotency_key"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "refunds",
+        "refunds_idempotency_uq"
+      ],
+      "writes": [
+        "s|idx|public.refunds_idempotency_uq",
+        "n|idx|public.refunds_idempotency_uq",
+        "e|idx|public.refunds_idempotency_uq",
+        "n|rel|public.refunds_idempotency_uq"
+      ],
+      "reads": [
+        "n|tbl|public.refunds",
+        "n|sch|public",
+        "n|col|public.refunds.organization_id",
+        "n|col|public.refunds.idempotency_key"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "refunds",
+        "refunds_payment_idx"
+      ],
+      "writes": [
+        "s|idx|public.refunds_payment_idx",
+        "n|idx|public.refunds_payment_idx",
+        "e|idx|public.refunds_payment_idx",
+        "n|rel|public.refunds_payment_idx"
+      ],
+      "reads": [
+        "n|tbl|public.refunds",
+        "n|sch|public",
+        "n|col|public.refunds.organization_id",
+        "n|col|public.refunds.payment_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "refunds",
+        "refunds_credit_note_idx"
+      ],
+      "writes": [
+        "s|idx|public.refunds_credit_note_idx",
+        "n|idx|public.refunds_credit_note_idx",
+        "e|idx|public.refunds_credit_note_idx",
+        "n|rel|public.refunds_credit_note_idx"
+      ],
+      "reads": [
+        "n|tbl|public.refunds",
+        "n|sch|public",
+        "n|col|public.refunds.organization_id",
+        "n|col|public.refunds.credit_note_id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_payments",
+        "name": "idempotency_key",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "refunds",
+        "name": "void_reason",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "refunds",
+        "name": "idempotency_key",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_payments",
+        "name": "business_payments_idempotency_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "idempotency_key",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"idempotency_key\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "refunds",
+        "name": "refunds_idempotency_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "idempotency_key",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"idempotency_key\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "refunds",
+        "name": "refunds_payment_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "payment_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "refunds",
+        "name": "refunds_credit_note_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "credit_note_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

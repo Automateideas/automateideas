@@ -14,5 +14,5 @@ export const SUBSCRIPTION_SECTIONS = [
 
 /** Section tabs for /subscription/*. */
 export function SubscriptionNav() {
-  return <SectionNav label="Subscription" links={SUBSCRIPTION_SECTIONS} />;
+  return <SectionNav label="Plan and seats" links={SUBSCRIPTION_SECTIONS} />;
 }

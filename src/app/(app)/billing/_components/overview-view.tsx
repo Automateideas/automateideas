@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiQuery } from "@/lib/api";
+import { BRAND_TONES } from "@/lib/brand-tones";
+import { cn } from "@/lib/utils";
 
 import { LoadError } from "../../_components/page-parts";
 import { BILLING_SECTIONS, BUILT_SECTIONS } from "./sections";
@@ -58,7 +60,7 @@ export function BillingOverview() {
       )}
 
       <ul className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {BILLING_SECTIONS.map(({ slug, label, Icon, summary }) => (
+        {BILLING_SECTIONS.map(({ slug, label, Icon, summary, tone }) => (
           <li key={slug}>
             <Link
               href={`/billing/${slug}`}
@@ -67,7 +69,7 @@ export function BillingOverview() {
               <Card className="h-full transition-colors group-hover:bg-muted/50">
                 <CardHeader>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="flex size-9 items-center justify-center rounded-lg bg-muted text-foreground">
+                    <span className={cn("flex size-9 items-center justify-center rounded-lg", BRAND_TONES[tone])}>
                       <Icon className="size-4" aria-hidden="true" />
                     </span>
                     {(BUILT_SECTIONS as readonly string[]).includes(slug) ? null : (

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRightLeftIcon, BanIcon, CheckIcon, FileTextIcon, PencilIcon, PlusIcon, PrinterIcon, SendIcon, Trash2Icon, XIcon } from "lucide-react";
+import { ArrowRightLeftIcon, BanIcon, DownloadIcon, CheckIcon, FileTextIcon, PencilIcon, PlusIcon, PrinterIcon, SendIcon, Trash2Icon, XIcon } from "lucide-react";
 
 import {
   AlertDialog,
@@ -25,11 +25,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ApiError, api, useApiQuery } from "@/lib/api";
 import { DOCUMENT_TYPES, type DocumentSlug, STATUS_LABELS } from "@/lib/business-billing/documents/types";
 import { formatPaise } from "@/lib/business-billing/fields";
+import type { DocumentTemplate } from "@/lib/business-billing/template";
 
 import { LoadError } from "../../../_components/page-parts";
 import { SectionNav } from "../../../_components/section-nav";
 import { BackLink, EmptyList, ListSkeleton, ListToolbar, Pager, ReadOnlyNote, SelectField, TextField, useRecordList } from "../records-ui";
-import { DocumentPaper, type PaperDocument, type Seller } from "./document-paper";
+import { InvoicePaymentPanel, type InvoicePayment } from "../payments";
+import { DocumentPaper, type PaperDocument, type PaperLook, type Seller } from "./document-paper";
 
 const BASE = "/api/business-billing/documents";
 
@@ -158,21 +160,27 @@ export function DocumentsList({ slug }: { slug: DocumentSlug }) {
 type Actions = { canEdit: boolean; readOnlyReason: string | null; edit: boolean; delete: boolean; issue: boolean; void: boolean; respond: boolean; convertTo: DocumentSlug[] };
 type Detail = Omit<PaperDocument, "related"> & {
   id: string;
+  customerId: string;
+  payment: InvoicePayment | null;
   displayStatus: string;
   related: { slug: DocumentSlug; id: string; number: string | null; status: string; totalPaise: number }[];
   voidedAt: string | null;
   actions: Actions;
 };
 type Branding = { logoOnDocuments: boolean; logoUrl: string | null };
+type TemplateInfo = { template: DocumentTemplate; signatureUrl: string | null; stampUrl: string | null };
 
 /** Company details for drafts (issued documents carry their own copy). */
 export function useDocumentContext() {
   const company = useApiQuery<Seller & { configured: boolean }>("/api/business-billing/settings");
   const branding = useApiQuery<Branding>("/api/business-billing/branding");
+  const template = useApiQuery<TemplateInfo>("/api/business-billing/template");
+  const look: PaperLook | undefined = template.data ? { template: template.data.template, signatureUrl: template.data.signatureUrl, stampUrl: template.data.stampUrl } : undefined;
   return {
     company: company.data?.configured ? company.data : null,
     logoUrl: branding.data?.logoOnDocuments ? branding.data.logoUrl : null,
-    ready: company.status !== "loading" && branding.status !== "loading",
+    look,
+    ready: company.status !== "loading" && branding.status !== "loading" && template.status !== "loading",
   };
 }
 
@@ -279,9 +287,13 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
               Create {DOCUMENT_TYPES[to].singular.toLowerCase()}
             </Button>
           ))}
+          <Button variant="outline" render={<a href={`/api/business-billing/documents/${slug}/${id}/pdf?download=1`} />} nativeButton={false}>
+            <DownloadIcon data-icon="inline-start" />
+            Download PDF
+          </Button>
           <Button variant="outline" render={<Link href={`/billing/print/${slug}/${id}`} target="_blank" />} nativeButton={false}>
             <PrinterIcon data-icon="inline-start" />
-            Print / PDF
+            Print
           </Button>
           {a.void ? (
             <Button variant="outline" onClick={() => setDialog("void")} disabled={pending}>
@@ -337,8 +349,20 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
         </Card>
       ) : null}
 
+      {doc.payment ? (
+        <InvoicePaymentPanel
+          invoiceId={doc.id}
+          customerId={doc.customerId}
+          status={doc.status}
+          payment={doc.payment}
+          canRecord={a.canEdit}
+          creditNotes={doc.related.filter((r) => r.slug === "credit-notes" && r.status === "issued")}
+          onChanged={query.reload}
+        />
+      ) : null}
+
       <div className="overflow-x-auto rounded-xl bg-muted/40 p-2 sm:p-6">
-        <DocumentPaper doc={doc} company={ctx.company} logoUrl={ctx.logoUrl} />
+        <DocumentPaper doc={doc} company={ctx.company} logoUrl={ctx.logoUrl} look={ctx.look} />
       </div>
 
       <AlertDialog open={dialog === "issue"} onOpenChange={(o: boolean) => !o && setDialog(null)}>
@@ -407,12 +431,16 @@ export function PrintView({ slug, id }: { slug: DocumentSlug; id: string }) {
   return (
     <div className="min-h-dvh bg-neutral-100 py-6 print:bg-white print:py-0">
       <div className="mx-auto mb-4 flex max-w-[210mm] justify-end gap-2 px-4 print:hidden">
+        <Button variant="outline" render={<a href={`/api/business-billing/documents/${slug}/${id}/pdf?download=1`} />} nativeButton={false}>
+          <DownloadIcon data-icon="inline-start" />
+          Download PDF
+        </Button>
         <Button onClick={() => window.print()}>
           <PrinterIcon data-icon="inline-start" />
           Print or save as PDF
         </Button>
       </div>
-      <DocumentPaper doc={query.data} company={ctx.company} logoUrl={ctx.logoUrl} />
+      <DocumentPaper doc={query.data} company={ctx.company} logoUrl={ctx.logoUrl} look={ctx.look} />
     </div>
   );
 }

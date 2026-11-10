@@ -242,36 +242,41 @@ function PlanCard({ data }: { data: SubscriptionData }) {
   const trialing = data.planStatus === "trialing";
   const trialEnded = !free && trialing && data.trialEndsAt && new Date(data.trialEndsAt) < new Date();
   const per = perCycle(data.billingCycle);
+  const tryingOther = trialing && data.effectivePlan.id !== data.plan.id && !trialEnded;
 
+  // Early access (payments off) gets one status, in the title. With payments on,
+  // the badge and the Status row show the real state (trial, active, failed...).
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex flex-wrap items-center gap-2">
           {data.plan.name} plan
-          {trialing && data.effectivePlan.id !== data.plan.id && !trialEnded ? (
+          {free ? (
+            <Badge>Free in early access</Badge>
+          ) : tryingOther ? (
             <Badge variant="secondary">Trying {data.effectivePlan.name}</Badge>
           ) : null}
         </CardTitle>
         <CardDescription>
           {free
-            ? `Free during early access. Later, ${inr.format(data.periodPricePerSeatInr)} per seat, per ${per}.`
+            ? `You pay nothing until payments start${tryingOther ? `, and ${data.effectivePlan.name} features are included` : ""}. Then it's ${inr.format(data.periodPricePerSeatInr)} per seat, per ${per}.`
             : `${inr.format(data.periodPricePerSeatInr)} per seat, per ${per}.`}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
         <dl className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex flex-col gap-1">
-            <dt className="text-muted-foreground">Status</dt>
-            <dd>
-              {free ? (
-                <Badge variant="secondary">Early access</Badge>
-              ) : data.cancelAtPeriodEnd ? (
-                <Badge variant="outline">Ends at period end</Badge>
-              ) : (
-                <Badge variant={trialEnded ? "destructive" : badge.variant}>{trialEnded ? "Trial ended" : badge.label}</Badge>
-              )}
-            </dd>
-          </div>
+          {free ? null : (
+            <div className="flex flex-col gap-1">
+              <dt className="text-muted-foreground">Status</dt>
+              <dd>
+                {data.cancelAtPeriodEnd ? (
+                  <Badge variant="outline">Ends at period end</Badge>
+                ) : (
+                  <Badge variant={trialEnded ? "destructive" : badge.variant}>{trialEnded ? "Trial ended" : badge.label}</Badge>
+                )}
+              </dd>
+            </div>
+          )}
           <div className="flex flex-col gap-1">
             <dt className="text-muted-foreground">Billing</dt>
             <dd className="font-medium">{cycleLabel(data.billingCycle)}</dd>
@@ -295,8 +300,12 @@ function PlanCard({ data }: { data: SubscriptionData }) {
             </dd>
           </div>
           <div className="flex flex-col gap-1">
-            <dt className="text-muted-foreground">{data.billingCycle === "yearly" ? "Yearly total" : "Monthly total"}</dt>
-            <dd className="font-medium tabular-nums">{free ? inr.format(0) : inr.format(data.periodTotalInr)}</dd>
+            {/* In early access, show what it will cost rather than a ₹0 that contradicts the seat picker. */}
+            <dt className="text-muted-foreground">{free ? "After early access" : data.billingCycle === "yearly" ? "Yearly total" : "Monthly total"}</dt>
+            <dd className="font-medium tabular-nums">
+              {inr.format(data.periodTotalInr)}
+              {free ? <span className="font-normal text-muted-foreground">/{per}</span> : null}
+            </dd>
           </div>
         </dl>
         <p className="text-xs text-muted-foreground">
@@ -421,15 +430,13 @@ function SeatsCard({ data, onApplied }: { data: SubscriptionData; onApplied: (se
         <div className="flex items-baseline justify-between gap-4">
           <span className="text-sm text-muted-foreground tabular-nums">
             {valid ? seats : 0} × {inr.format(data.periodPricePerSeatInr)}
+            {free ? " after early access" : ""}
           </span>
           <span className="text-2xl font-semibold tracking-tight tabular-nums">
             {inr.format(total)}
             <span className="text-sm font-normal text-muted-foreground">/{perCycle(data.billingCycle)}</span>
           </span>
         </div>
-        {free ? (
-          <p className="-mt-3 text-xs text-muted-foreground">You pay nothing during early access. This is the price once payments start.</p>
-        ) : null}
 
         {error ? <FieldError>{error}</FieldError> : null}
       </CardContent>

@@ -19,7 +19,8 @@ import {
 
 export type Viewer = {
   user: { id: string; name: string; email: string; image: string | null; phone: string | null };
-  organization: { id: string; name: string } | null;
+  /** hasLogo: a logo is stored (read it from /api/organization/logo). */
+  organization: { id: string; name: string; hasLogo: boolean } | null;
   role: OrgRole | null;
   /** Every role the user holds in this org, e.g. ["admin"]. */
   roles: string[];
@@ -43,6 +44,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
       organizationId: member.organizationId,
       role: member.role,
       organizationName: organization.name,
+      organizationLogo: organization.logo,
     })
     .from(member)
     .innerJoin(organization, eq(member.organizationId, organization.id))
@@ -62,7 +64,9 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
       image: session.user.image ?? null,
       phone: session.user.phone ?? null,
     },
-    organization: current ? { id: current.organizationId, name: current.organizationName } : null,
+    organization: current
+      ? { id: current.organizationId, name: current.organizationName, hasLogo: Boolean(current.organizationLogo) }
+      : null,
     role: ORG_ROLES.find((r) => roles.includes(r)) ?? null,
     roles,
     canManageTeam: has(TEAM_MANAGER_ROLES),

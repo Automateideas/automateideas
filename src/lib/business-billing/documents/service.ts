@@ -5,6 +5,7 @@ import {
   billingSettings,
   businessInvoiceItems,
   businessInvoices,
+  businessPayments,
   creditNoteItems,
   creditNotes,
   customerAddresses,
@@ -12,6 +13,7 @@ import {
   debitNoteItems,
   debitNotes,
   organization,
+  paymentAllocations,
   products,
   quotationItems,
   quotations,
@@ -22,6 +24,7 @@ import {
 
 import { type AddressValues, stateByCode } from "../fields";
 import { allocateDocumentNumber } from "../numbering";
+import { invoiceBalances, refreshInvoiceStatus } from "../payments/balances";
 import { type ListQuery, conflict, invalid, notFound, paged, searchFilter } from "../records";
 import { type DocumentTaxInput, type DocumentTaxResult, OUTSIDE_INDIA, TaxInputError, calculateGst } from "../tax/gst";
 import { type SellerTaxProfile, sellerTaxProfile } from "../tax-settings";
@@ -152,6 +155,11 @@ async function sellerSnapshot(tx: TenantTx, organizationId: string) {
 
 export type SellerSnapshot = NonNullable<Awaited<ReturnType<typeof sellerSnapshot>>>;
 
+/** The company's current details (what drafts show; issued documents keep their own copy). */
+export async function currentSeller(organizationId: string) {
+  return withTenant(organizationId, (tx) => sellerSnapshot(tx, organizationId));
+}
+
 async function requireSeller(tx: TenantTx, organizationId: string): Promise<SellerTaxProfile> {
   const seller = await sellerTaxProfile(tx, organizationId);
   if (!seller.configured) {
@@ -265,6 +273,7 @@ async function readDocument(tx: TenantTx, organizationId: string, slug: Document
 
   const extraDate = r.extraKey ? ((row[r.extraKey] as string | null) ?? null) : null;
   const related = await relatedDocuments(tx, organizationId, slug, row);
+  const payment = slug === "invoices" ? await invoicePayments(tx, organizationId, doc.id) : null;
   return {
     slug,
     id: doc.id,
@@ -333,6 +342,34 @@ async function readDocument(tx: TenantTx, organizationId: string, slug: Document
       totalPaise: i.totalPaise,
     })),
     related,
+    /** Invoices only: what has been paid, credited and is still due. */
+    payment,
+  };
+}
+
+/** Payments allocated to an invoice, and its balance. */
+async function invoicePayments(tx: TenantTx, organizationId: string, invoiceId: string) {
+  const b = (await invoiceBalances(tx, organizationId, [invoiceId])).get(invoiceId);
+  const rows = await tx
+    .select({
+      paymentId: businessPayments.id,
+      number: businessPayments.number,
+      paymentDate: businessPayments.paymentDate,
+      method: businessPayments.method,
+      status: businessPayments.status,
+      amountPaise: paymentAllocations.amountPaise,
+    })
+    .from(paymentAllocations)
+    .innerJoin(businessPayments, and(eq(businessPayments.organizationId, paymentAllocations.organizationId), eq(businessPayments.id, paymentAllocations.paymentId)))
+    .where(and(eq(paymentAllocations.organizationId, organizationId), eq(paymentAllocations.invoiceId, invoiceId)))
+    .orderBy(asc(businessPayments.paymentDate));
+  return {
+    paidPaise: b?.paidPaise ?? 0,
+    creditedPaise: b?.creditedPaise ?? 0,
+    debitedPaise: b?.debitedPaise ?? 0,
+    creditRefundedPaise: b?.creditRefundedPaise ?? 0,
+    balancePaise: b?.balancePaise ?? 0,
+    payments: rows,
   };
 }
 
@@ -651,6 +688,8 @@ export async function issueDocument(organizationId: string, userId: string, slug
             .set({ status: "invoiced", updatedBy: userId })
             .where(and(eq(salesOrders.organizationId, organizationId), eq(salesOrders.id, src.salesOrderId as string), inArray(salesOrders.status, ["confirmed", "fulfilled"])));
         }
+        // A credit or debit note changes what its invoice still owes.
+        if (type.needsInvoice) await refreshInvoiceStatus(tx, organizationId, values.invoiceId);
         return readDocument(tx, organizationId, slug, id);
       }),
     type.singular,
@@ -669,7 +708,12 @@ export async function voidDocument(organizationId: string, userId: string, slug:
         if (current.status === "draft") conflict("NOT_ISSUED", "Drafts aren't records yet: delete it instead.");
         if (current.status === "void") conflict("ALREADY_VOID", `This ${type.singular.toLowerCase()} is already void.`);
         if (slug === "invoices") {
-          if (current.status === "partially_paid" || current.status === "paid") conflict("HAS_PAYMENTS", "This invoice has payments. Refund or remove them first, or raise a credit note.");
+          const [paid] = await tx
+            .select({ n: count() })
+            .from(paymentAllocations)
+            .innerJoin(businessPayments, and(eq(businessPayments.organizationId, paymentAllocations.organizationId), eq(businessPayments.id, paymentAllocations.paymentId)))
+            .where(and(eq(paymentAllocations.organizationId, organizationId), eq(paymentAllocations.invoiceId, id), eq(businessPayments.status, "recorded")));
+          if (paid.n > 0) conflict("HAS_PAYMENTS", "This invoice has payments recorded against it. Void those payments first, or raise a credit note.");
           const [cn] = await tx
             .select({ n: count() })
             .from(creditNotes)
@@ -686,6 +730,7 @@ export async function voidDocument(organizationId: string, userId: string, slug:
           .update(r.table)
           .set({ status: "void", voidedAt: new Date(), voidReason: reason, updatedBy: userId })
           .where(and(eq(r.table.organizationId, organizationId), eq(r.table.id, id)));
+        if (type.needsInvoice) await refreshInvoiceStatus(tx, organizationId, (current as Record<string, unknown>).invoiceId as string | null);
         return readDocument(tx, organizationId, slug, id);
       }),
     type.singular,

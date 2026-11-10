@@ -167,9 +167,9 @@ function SeatsFullAlert({
 /* ---------------- Invite form ---------------- */
 
 const ROLE_HELP: Record<InvitableRole, string> = {
-  member: "Employees use the app but can't manage the team or the subscription.",
-  manager: "Managers can invite and remove employees, but can't manage the subscription.",
-  admin: "Admins can invite and remove anyone except the owner, and manage the subscription.",
+  member: "Employees use the app but can't manage the team or change your plan.",
+  manager: "Managers can invite and remove employees, but can't change your plan or seats.",
+  admin: "Admins can invite and remove anyone except the owner, and change your plan and seats.",
 };
 
 // Least access first, so the default is the safest choice.
@@ -303,7 +303,6 @@ function MembersCard({
     <Card>
       <CardHeader>
         <CardTitle>Members</CardTitle>
-        <CardDescription>People who have joined your workspace.</CardDescription>
       </CardHeader>
       <CardContent>
         {members.length === 0 ? (

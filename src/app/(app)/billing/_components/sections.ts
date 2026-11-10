@@ -11,6 +11,8 @@ import {
   WrenchIcon,
 } from "lucide-react";
 
+import type { BrandTone } from "@/lib/brand-tones";
+
 export type BillingSection = {
   /** Path segment under /billing. */
   slug: string;
@@ -18,6 +20,8 @@ export type BillingSection = {
   Icon: LucideIcon;
   /** One line for the overview card. */
   summary: string;
+  /** Icon chip colour on the overview (lib/brand-tones.ts). */
+  tone: BrandTone;
   /** Empty state shown until the feature is built. */
   empty: { title: string; description: string };
 };
@@ -29,6 +33,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Invoices",
     Icon: ReceiptTextIcon,
     summary: "Bill your customers and track what's due.",
+    tone: "green",
     empty: { title: "No invoices yet", description: "Create an invoice for one of your customers." },
   },
   {
@@ -36,6 +41,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Quotations",
     Icon: FileTextIcon,
     summary: "Send estimates and turn them into invoices.",
+    tone: "green",
     empty: { title: "No quotations yet", description: "Send estimates and turn them into orders or invoices." },
   },
   {
@@ -43,6 +49,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Customers",
     Icon: UsersIcon,
     summary: "The people and businesses you bill.",
+    tone: "green",
     empty: { title: "No customers yet", description: "Add the people and businesses you bill." },
   },
   {
@@ -50,6 +57,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Suppliers",
     Icon: TruckIcon,
     summary: "The businesses you buy from.",
+    tone: "amber",
     empty: { title: "No suppliers yet", description: "Add the businesses you buy from." },
   },
   {
@@ -57,6 +65,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Products",
     Icon: BoxIcon,
     summary: "Goods you sell, with prices and tax rates.",
+    tone: "red",
     empty: { title: "No products yet", description: "Add the goods you sell, with prices and GST rates." },
   },
   {
@@ -64,6 +73,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Services",
     Icon: WrenchIcon,
     summary: "Work you bill for, by the hour or per job.",
+    tone: "red",
     empty: { title: "No services yet", description: "Add the work you bill for, with rates and SAC codes." },
   },
   {
@@ -71,13 +81,15 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Payments",
     Icon: WalletIcon,
     summary: "Money received from customers.",
-    empty: { title: "No payments yet", description: "Recording customer payments is coming soon." },
+    tone: "green",
+    empty: { title: "No payments yet", description: "Record money received from customers." },
   },
   {
     slug: "purchases",
     label: "Purchases",
     Icon: ShoppingCartIcon,
     summary: "Bills from your suppliers.",
+    tone: "amber",
     empty: { title: "No purchases yet", description: "Recording purchases is coming soon." },
   },
   {
@@ -85,6 +97,7 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     label: "Reports",
     Icon: BarChart3Icon,
     summary: "Sales, purchases, tax and payments at a glance.",
+    tone: "ink",
     empty: { title: "No reports yet", description: "Reports appear once you have invoices and payments." },
   },
 ];
@@ -99,7 +112,10 @@ export const billingSection = (slug: string) => {
 export const CATALOGUE_EXTRA_PATHS = ["/billing/categories", "/billing/units", "/billing/price-lists"] as const;
 
 /** Sections whose pages are built (no "Coming soon" placeholder). */
-export const BUILT_SECTIONS = ["invoices", "quotations", "customers", "suppliers", "products", "services"] as const;
+export const BUILT_SECTIONS = ["invoices", "quotations", "customers", "suppliers", "products", "services", "payments"] as const;
+
+/** Payment pages outside the section list; the Payments tab stays active on them. */
+export const PAYMENT_EXTRA_PATHS = ["/billing/refunds", "/billing/outstanding"] as const;
 
 /** Sales pages outside the section list; the Invoices tab stays active on them. */
 export const SALES_EXTRA_PATHS = ["/billing/sales-orders", "/billing/credit-notes", "/billing/debit-notes"] as const;
@@ -113,6 +129,7 @@ export const BILLING_NAV = [
     matchNested: true,
     ...(s.slug === "products" ? { alsoActiveOn: CATALOGUE_EXTRA_PATHS } : {}),
     ...(s.slug === "invoices" ? { alsoActiveOn: SALES_EXTRA_PATHS } : {}),
+    ...(s.slug === "payments" ? { alsoActiveOn: PAYMENT_EXTRA_PATHS } : {}),
   })),
   { href: "/billing/settings", label: "Settings", matchNested: true },
 ];

@@ -12,7 +12,7 @@ import { SubscriptionNav } from "./_components/subscription-nav";
 export default function SubscriptionLayout({ children }: LayoutProps<"/subscription">) {
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Subscription" description="Your Automate Ideas plan, seats and payments." />
+      <PageHeader title="Plan & seats" description="What your workspace pays Automate Ideas: plan, seats and payments." />
       <SubscriptionNav />
       <Suspense fallback={<Skeleton className="h-72 max-w-2xl rounded-xl" aria-label="Loading" />}>
         <SubscriptionGate>{children}</SubscriptionGate>

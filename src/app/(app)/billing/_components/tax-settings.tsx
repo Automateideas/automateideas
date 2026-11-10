@@ -29,7 +29,7 @@ import { type Errors, MoneyField, ReadOnlyNote, STATE_OPTIONS, SelectField, TaxR
 
 const BASE = "/api/business-billing";
 
-/** Company · Tax · Invoice numbering · Branding. */
+/** Company · Tax · Invoice numbering · Branding · Templates. */
 export function SettingsNav() {
   return (
     <SectionNav
@@ -39,6 +39,7 @@ export function SettingsNav() {
         { href: "/billing/settings/tax", label: "Tax" },
         { href: "/billing/settings/invoices", label: "Invoice numbering" },
         { href: "/billing/settings/branding", label: "Branding" },
+        { href: "/billing/settings/templates", label: "Templates" },
       ]}
     />
   );

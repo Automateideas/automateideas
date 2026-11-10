@@ -179,7 +179,14 @@ function toPayload(f: FormState) {
 /* ---------------- Page ---------------- */
 
 export function DocumentEditorPage({ slug, id }: { slug: DocumentSlug; id?: string }) {
-  return id ? <EditExisting slug={slug} id={id} /> : <DocumentEditor slug={slug} initial={null} />;
+  return id ? <EditExisting slug={slug} id={id} /> : <NewDocument slug={slug} />;
+}
+
+/** New documents start with the template's default terms and notes. */
+function NewDocument({ slug }: { slug: DocumentSlug }) {
+  const t = useApiQuery<{ template: { defaultTerms: string | null; defaultNotes: string | null } }>(`${BASE}/template`);
+  if (t.status === "loading") return <Skeleton className="h-160 max-w-5xl rounded-xl" aria-label="Loading" />;
+  return <DocumentEditor slug={slug} initial={null} defaults={{ terms: t.data?.template.defaultTerms ?? "", notes: t.data?.template.defaultNotes ?? "" }} />;
 }
 
 function EditExisting({ slug, id }: { slug: DocumentSlug; id: string }) {
@@ -197,10 +204,13 @@ function EditExisting({ slug, id }: { slug: DocumentSlug; id: string }) {
   return <DocumentEditor slug={slug} initial={q.data} />;
 }
 
-function DocumentEditor({ slug, initial }: { slug: DocumentSlug; initial: StoredDoc | null }) {
+function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initial: StoredDoc | null; defaults?: { terms: string; notes: string } }) {
   const type = DOCUMENT_TYPES[slug];
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(() => toForm(initial));
+  const [form, setForm] = useState<FormState>(() => {
+    const f = toForm(initial);
+    return initial || !defaults ? f : { ...f, terms: defaults.terms, notes: defaults.notes };
+  });
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, start] = useTransition();

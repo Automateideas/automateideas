@@ -66,6 +66,10 @@ describe("business billing routes", () => {
       expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
     }
     expect(existsSync(path.join(billingDir, "settings/branding/page.tsx"))).toBe(true);
+    expect(existsSync(path.join(billingDir, "settings/templates/page.tsx"))).toBe(true);
+    for (const r2 of ["documents/[type]/[id]/pdf", "payments/[id]/pdf", "template", "template/images/[kind]"]) {
+      expect(existsSync(path.join(api, r2, "route.ts")), r2).toBe(true);
+    }
     expect(existsSync(path.resolve(billingDir, "../../(print)/billing/print/[type]/[id]/page.tsx"))).toBe(true);
   });
 });

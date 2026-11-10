@@ -5,8 +5,15 @@
 
 import { formatPaise, stateByCode } from "@/lib/business-billing/fields";
 import { DOCUMENT_TYPES, type DocumentSlug, amountInWords } from "@/lib/business-billing/documents/types";
+import { type DocumentTemplate, DEFAULT_TEMPLATE, tint } from "@/lib/business-billing/template";
 import { countries } from "@/lib/countries";
 import { cn } from "@/lib/utils";
+
+import { UpiQr } from "./upi-qr";
+
+/** How documents look: the template plus the signature and stamp images. */
+export type PaperLook = { template: DocumentTemplate; signatureUrl: string | null; stampUrl: string | null };
+const DEFAULT_LOOK: PaperLook = { template: DEFAULT_TEMPLATE, signatureUrl: null, stampUrl: null };
 
 export type Address = {
   addressLine1: string | null;
@@ -89,6 +96,8 @@ export type PaperDocument = {
   items: DocItem[];
   related: { slug: DocumentSlug; number: string | null }[];
   voidReason: string | null;
+  /** Invoices: what is still due (drives the UPI QR). */
+  payment?: { balancePaise: number } | null;
 };
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
@@ -138,8 +147,14 @@ function byRate(doc: PaperDocument) {
   return [...rows.values()].sort((a, b) => Number(a.rate) - Number(b.rate));
 }
 
-export function DocumentPaper({ doc, company, logoUrl, className }: { doc: PaperDocument; company: Seller | null; logoUrl: string | null; className?: string }) {
+export function DocumentPaper({ doc, company, logoUrl, look = DEFAULT_LOOK, className }: { doc: PaperDocument; company: Seller | null; logoUrl: string | null; look?: PaperLook; className?: string }) {
   const seller = doc.seller ?? company;
+  const t = look.template;
+  const modern = t.design === "modern";
+  const due = doc.slug === "invoices" && doc.payment && !["draft", "void"].includes(doc.status) ? doc.payment.balancePaise : 0;
+  const bank = t.showBankDetails && t.bank && ["invoices", "debit-notes", "quotations", "sales-orders"].includes(doc.slug) ? t.bank : null;
+  const signature = t.showSignature ? look.signatureUrl : null;
+  const stamp = t.showStamp ? look.stampUrl : null;
   const intra = doc.supplyType === "intra_state";
   const pos = doc.placeOfSupply === "96" ? "Outside India (96)" : stateByCode(doc.placeOfSupply) ? `${stateByCode(doc.placeOfSupply)!.name} (${doc.placeOfSupply})` : "—";
   const extra = DOCUMENT_TYPES[doc.slug].extraDate;
@@ -151,9 +166,11 @@ export function DocumentPaper({ doc, company, logoUrl, className }: { doc: Paper
   return (
     <article
       className={cn(
-        "relative mx-auto w-full max-w-[210mm] bg-white p-6 text-[13px] leading-snug text-neutral-900 shadow-sm ring-1 ring-neutral-200 sm:p-10 print:max-w-none print:p-0 print:shadow-none print:ring-0",
+        "relative mx-auto w-full max-w-[210mm] overflow-hidden bg-white p-6 leading-snug text-neutral-900 shadow-sm ring-1 ring-neutral-200 sm:p-10 print:max-w-none print:p-0 print:shadow-none print:ring-0",
+        t.design === "compact" ? "text-[12px] [&_td]:py-1" : "text-[13px]",
         className,
       )}
+      style={{ "--brand": t.color, "--brand-tint": tint(t.color, 0.9) } as React.CSSProperties}
       aria-label={`${title(doc)} ${doc.number ?? "draft"}`}
     >
       {doc.status === "draft" || doc.status === "void" ? (
@@ -162,7 +179,12 @@ export function DocumentPaper({ doc, company, logoUrl, className }: { doc: Paper
         </div>
       ) : null}
 
-      <header className="relative flex flex-col gap-6 border-b border-neutral-300 pb-5 sm:flex-row sm:items-start sm:justify-between">
+      <header
+        className={cn(
+          "relative flex flex-col gap-6 pb-5 sm:flex-row sm:items-start sm:justify-between",
+          modern ? "-mx-6 -mt-6 bg-(--brand) px-6 pt-6 text-white sm:-mx-10 sm:-mt-10 sm:px-10 sm:pt-10 print:mx-0 print:mt-0 print:px-4 print:pt-4 [&_.text-neutral-600]:text-white/80" : "border-b-2 border-(--brand)",
+        )}
+      >
         <div className="flex items-start gap-4">
           {logoUrl ? (
             // The signed logo URL changes; next/image can't optimise it.
@@ -342,7 +364,7 @@ export function DocumentPaper({ doc, company, logoUrl, className }: { doc: Paper
             </div>
           ) : null}
         </div>
-        <dl className="flex flex-col gap-1">
+        <dl className={cn("flex flex-col gap-1", modern && "rounded-lg bg-(--brand-tint) p-3")}>
           {[
             ["Subtotal", doc.subtotalPaise],
             ["Discount", -doc.discountPaise],
@@ -367,11 +389,35 @@ export function DocumentPaper({ doc, company, logoUrl, className }: { doc: Paper
         </dl>
       </section>
 
-      <footer className="relative mt-10 flex flex-col gap-6 break-inside-avoid sm:flex-row sm:items-end sm:justify-between">
-        <p className="text-xs text-neutral-500">This is a computer-generated document.</p>
+      <footer className="relative mt-8 flex flex-col gap-6 break-inside-avoid sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3">
+          {bank ? (
+            <div>
+              <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase">Bank details</p>
+              <p>{bank.accountName}</p>
+              <p>
+                {bank.bankName}
+                {bank.branch ? `, ${bank.branch}` : ""}
+              </p>
+              <p>
+                A/c <span className="font-mono">{bank.accountNumber}</span> · IFSC <span className="font-mono">{bank.ifsc}</span>
+              </p>
+            </div>
+          ) : null}
+          <p className="text-xs text-neutral-500">{t.footer ?? "This is a computer-generated document."}</p>
+        </div>
+        {t.showUpiQr && t.upiId && due > 0 ? (
+          <UpiQr upiId={t.upiId} payeeName={seller?.tradeName || seller?.legalName || ""} amountPaise={due} note={doc.number ?? "Invoice"} />
+        ) : null}
         <div className="text-right">
           <p className="font-medium">For {seller?.tradeName || seller?.legalName || "your company"}</p>
-          <div className="h-12" />
+          <div className="flex h-14 items-center justify-end gap-2">
+            {/* Signed storage URLs behind redirects; next/image can't optimise them. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {stamp ? <img src={stamp} alt="" className="h-14 w-14 object-contain" /> : null}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {signature ? <img src={signature} alt="" className="h-11 max-w-32 object-contain" /> : null}
+          </div>
           <p className="border-t border-neutral-400 pt-1 text-xs text-neutral-600">Authorised signatory</p>
         </div>
       </footer>

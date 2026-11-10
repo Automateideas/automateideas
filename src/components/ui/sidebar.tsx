@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext, useEffect, useId, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
@@ -97,6 +97,11 @@ export const DesktopSidebar = ({
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
+        // Keyboard users get the labels too: open while focus is inside the rail.
+        onFocus={() => setOpen(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
+        }}
         {...props}
       >
         {children}
@@ -111,6 +116,26 @@ export const MobileSidebar = ({
   ...props
 }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
+  const menuId = useId();
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // While the menu is open: focus its close button and let Escape close it.
+  // Focus goes back to the menu button when it closes.
+  useEffect(() => {
+    if (!open) return;
+    const opener = openButtonRef.current;
+    closeButtonRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener?.focus();
+    };
+  }, [open, setOpen]);
+
   return (
     <>
       <div
@@ -120,14 +145,25 @@ export const MobileSidebar = ({
         {...props}
       >
         <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-neutral-800 dark:text-neutral-200"
+          <button
+            ref={openButtonRef}
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={open}
+            aria-controls={menuId}
             onClick={() => setOpen(!open)}
-          />
+            className="-m-2 rounded-md p-2 text-neutral-800 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-neutral-200"
+          >
+            <IconMenu2 aria-hidden="true" />
+          </button>
         </div>
         <AnimatePresence>
           {open && (
             <motion.div
+              id={menuId}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu"
               initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
@@ -140,12 +176,15 @@ export const MobileSidebar = ({
                 className
               )}
             >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
-                onClick={() => setOpen(!open)}
+              <button
+                ref={closeButtonRef}
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setOpen(false)}
+                className="absolute right-8 top-8 z-50 rounded-md p-2 text-neutral-800 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-neutral-200"
               >
-                <IconX />
-              </div>
+                <IconX aria-hidden="true" />
+              </button>
               {children}
             </motion.div>
           )}

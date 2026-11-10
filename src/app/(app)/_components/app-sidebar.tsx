@@ -6,14 +6,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import {
-  IconAddressBook,
   IconArrowLeft,
-  IconChartBar,
   IconCreditCard,
   IconFileInvoice,
   IconLayoutDashboard,
   IconSettings,
-  IconTrendingUp,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -34,18 +31,16 @@ type NavItem = {
   requires?: "team" | "subscription" | "billing";
 };
 
-// TODO: replace the placeholder modules (Customers, Sales, Reports) with the real ones as they're built.
+// Only modules that exist. Add new ones here as they're built; customers and
+// reports live inside Billing for now, so they don't get their own entries.
 const navLinks: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", Icon: IconLayoutDashboard },
   // Everyone sees Team: employees get a read-only list, managers and up can manage it.
   { label: "Team", href: "/team", Icon: IconUsers },
-  { label: "Customers", href: "/customers", Icon: IconAddressBook },
-  { label: "Sales", href: "/sales", Icon: IconTrendingUp },
-  { label: "Reports", href: "/reports", Icon: IconChartBar },
   // Business Billing: the tenant's own invoices, customers and payments.
   { label: "Billing", href: "/billing", Icon: IconFileInvoice, requires: "billing" },
-  // SaaS subscription: what this workspace pays Automate Ideas.
-  { label: "Subscription", href: "/subscription", Icon: IconCreditCard, requires: "subscription" },
+  // What this workspace pays Automate Ideas (route stays /subscription).
+  { label: "Plan & seats", href: "/subscription", Icon: IconCreditCard, requires: "subscription" },
   { label: "Settings", href: "/settings", Icon: IconSettings },
 ];
 
@@ -100,7 +95,8 @@ export function AppSidebar({ viewer }: { viewer: SidebarViewer }) {
                   className={cn(
                     linkClass,
                     active
-                      ? "bg-white shadow-xs dark:bg-neutral-900"
+                      // Grey on the white mobile menu, white on the grey desktop rail.
+                      ? "bg-neutral-100 dark:bg-neutral-800 md:bg-white md:shadow-xs md:dark:bg-neutral-900"
                       : "hover:bg-neutral-200/70 dark:hover:bg-neutral-700/60",
                   )}
                   link={{

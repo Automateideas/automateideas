@@ -22,6 +22,7 @@ import { type AddressValues, formatPaise, paiseToRupees, stateByCode } from "@/l
 import { type Country, countries, formatPhone, parsePhone } from "@/lib/countries";
 
 import { LoadError } from "../../_components/page-parts";
+import { CustomerAccount } from "./payments";
 import {
   ArchiveButton,
   ArchivedBadge,
@@ -708,12 +709,7 @@ export function CustomerDetailView({ id }: { id: string }) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Transactions</CardTitle>
-          <CardDescription>Invoices, payments and the customer ledger appear here once invoicing is available.</CardDescription>
-        </CardHeader>
-      </Card>
+      <CustomerAccount customerId={c.id} canRecord={c.canEdit} />
     </div>
   );
 }

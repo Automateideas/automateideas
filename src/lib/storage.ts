@@ -63,6 +63,13 @@ export async function deleteFile(key: string) {
   await s3().send(new DeleteObjectCommand({ Bucket: bucket(), Key: key }));
 }
 
+/** The file's bytes and type, for server-side use (e.g. embedding images in PDFs). */
+export async function getFileBytes(key: string) {
+  const res = await s3().send(new GetObjectCommand({ Bucket: bucket(), Key: key }));
+  const bytes = await res.Body!.transformToByteArray();
+  return { bytes, contentType: res.ContentType ?? null };
+}
+
 /** A URL that can read the file for `expiresIn` seconds. */
 export function signedFileUrl(key: string, expiresIn = 60 * 60) {
   return getSignedUrl(s3(), new GetObjectCommand({ Bucket: bucket(), Key: key }), { expiresIn });

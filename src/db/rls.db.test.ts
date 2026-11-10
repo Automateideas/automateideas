@@ -52,13 +52,14 @@ beforeAll(async () => {
 afterAll(async () => {
   // As the superuser owner (bypasses RLS), children first: org rows are RESTRICT.
   const orgs = [A, B];
-  // Issued invoices are locked by triggers (Stage 07); this test's own rows are
-  // removed with triggers off. These invoices have no lines.
+  // Issued invoices and payments are locked by triggers (Stages 07 and 08);
+  // this test's own rows are removed with triggers off. They have no lines or allocations.
   await db.transaction(async (tx) => {
     await tx.execute(sql`set local session_replication_role = replica`);
     await tx.delete(businessInvoices).where(inArray(businessInvoices.organizationId, orgs));
+    // Payments are locked too (Stage 08).
+    await tx.delete(businessPayments).where(inArray(businessPayments.organizationId, orgs));
   });
-  await db.delete(businessPayments).where(inArray(businessPayments.organizationId, orgs));
   await db.delete(customers).where(inArray(customers.organizationId, orgs));
   await db.delete(auditLogs).where(inArray(auditLogs.organizationId, orgs));
   await db.delete(billingSettings).where(inArray(billingSettings.organizationId, orgs));
