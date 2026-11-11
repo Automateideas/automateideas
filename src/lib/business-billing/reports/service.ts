@@ -6,6 +6,7 @@ import { todayInIndia } from "../documents/types";
 import { billBalances, invoiceBalances } from "../payments/balances";
 import { payablesReport } from "../payments/supplier-payments";
 import { outstandingReport } from "../payments/service";
+import { listWarehouses, type StockStatus, stockSummary } from "../inventory/service";
 import { methodLabel } from "../payments/validation";
 import { invalid } from "../records";
 import { getBillingSettings } from "../settings";
@@ -634,6 +635,115 @@ async function hsnSummary(organizationId: string, p: ReportParams): Promise<Repo
   });
 }
 
+/* ---------------- Inventory ---------------- */
+
+const STATUS_TEXT: Record<StockStatus, string> = { ok: "In stock", low: "Low", out: "Out of stock", negative: "Below zero" };
+const KIND_TEXT: Record<string, string> = {
+  purchase: "Purchase",
+  purchase_return: "Purchase return",
+  sale: "Sale",
+  sales_return: "Sales return",
+  adjustment: "Adjustment",
+  transfer_out: "Transfer out",
+  transfer_in: "Transfer in",
+};
+
+async function warehouseName(organizationId: string, warehouseId: string | null) {
+  if (!warehouseId) return "All warehouses";
+  const w = (await listWarehouses(organizationId, { includeArchived: true })).find((x) => x.id === warehouseId);
+  return w?.name ?? "Unknown warehouse";
+}
+
+async function stockSummaryTable(organizationId: string, p: ReportParams, lowOnly = false): Promise<ReportTable> {
+  const s = await stockSummary(organizationId, { q: null, warehouseId: p.warehouseId, asOf: lowOnly ? null : p.asOf, status: lowOnly ? "attention" : "all", page: 1, pageSize: ROW_CAP });
+  const rows: ReportRow[] = s.items.map((i) => ({
+    _href: `/billing/stock/${i.id}`,
+    product: i.name,
+    sku: i.sku,
+    unit: i.unit,
+    qty: i.onHandMilli / 1000,
+    min: i.minStockMilli === null ? null : i.minStockMilli / 1000,
+    avgCost: Math.round(i.avgCostPaise),
+    value: i.valuePaise,
+    status: STATUS_TEXT[i.status],
+  }));
+  const where = await warehouseName(organizationId, p.warehouseId);
+  return {
+    title: lowOnly ? "Low stock" : "Stock summary and valuation",
+    subtitle: await heading(organizationId, lowOnly ? `${where} · today` : `${where} · as of ${fmtDay(p.asOf)}`),
+    columns: [
+      { key: "product", label: "Product", type: "text" },
+      { key: "sku", label: "SKU", type: "text", secondary: true },
+      { key: "qty", label: "On hand", type: "number" },
+      { key: "unit", label: "Unit", type: "text", secondary: true },
+      { key: "min", label: "Minimum", type: "number", secondary: true },
+      money("avgCost", "Average cost", true),
+      money("value", "Stock value"),
+      { key: "status", label: "Status", type: "text" },
+    ],
+    rows,
+    totals: lowOnly ? null : sumRows(rows, ["value"], { product: `Total (${rows.length} products)` }),
+    note: lowOnly
+      ? "Products that track stock and are below their minimum, out of stock or below zero (across all warehouses)."
+      : "Weighted average cost: what you paid (before GST) spread over the quantity bought. One warehouse's value uses the company-wide average.",
+  };
+}
+
+async function stockMovementsTable(organizationId: string, p: ReportParams): Promise<ReportTable> {
+  return withTenant(organizationId, async (tx) => {
+    const { rows } = await tx.execute<Record<string, unknown>>(sql`
+      select m.movement_date, m.kind, m.quantity, m.value_paise, m.reverses_movement_id, m.source_type, m.source_id, m.product_id,
+        p.name as product, w.name as warehouse,
+        coalesce(i.number, cn.number, pb.number, pr.number, sa.number) as source_number
+      from stock_movements m
+      join products p on p.organization_id = m.organization_id and p.id = m.product_id
+      join warehouses w on w.organization_id = m.organization_id and w.id = m.warehouse_id
+      left join business_invoices i on m.source_type = 'document:invoices' and i.organization_id = m.organization_id and i.id = m.source_id
+      left join credit_notes cn on m.source_type = 'document:credit-notes' and cn.organization_id = m.organization_id and cn.id = m.source_id
+      left join purchase_bills pb on m.source_type = 'document:purchase-bills' and pb.organization_id = m.organization_id and pb.id = m.source_id
+      left join purchase_returns pr on m.source_type = 'document:purchase-returns' and pr.organization_id = m.organization_id and pr.id = m.source_id
+      left join stock_adjustments sa on m.source_type = 'stock_adjustment' and sa.organization_id = m.organization_id and sa.id = m.source_id
+      where m.organization_id = ${organizationId} and m.movement_date between ${p.from} and ${p.to}
+        ${p.warehouseId ? sql`and m.warehouse_id = ${p.warehouseId}` : sql``}
+        ${p.productId ? sql`and m.product_id = ${p.productId}` : sql``}
+      order by m.movement_date, m.created_at, m.id
+      limit ${ROW_CAP + 1}`);
+    const href = (type: string, id: string) => (type === "stock_adjustment" ? `/billing/stock-adjustments/${id}` : type.startsWith("document:") ? `/billing/${type.slice(9)}/${id}` : null);
+    const out: ReportRow[] = rows.slice(0, ROW_CAP).map((r) => {
+      const q = Number(r.quantity);
+      return {
+        _href: href(String(r.source_type), String(r.source_id)),
+        reference: (r.source_number as string) ?? "—",
+        date: iso(r.movement_date),
+        product: String(r.product),
+        warehouse: String(r.warehouse),
+        kind: `${KIND_TEXT[String(r.kind)] ?? String(r.kind)}${r.reverses_movement_id ? " (void)" : ""}`,
+        in: q > 0 ? q : null,
+        out: q < 0 ? -q : null,
+        value: n(r.value_paise),
+      };
+    });
+    return {
+      title: "Stock movements",
+      subtitle: await heading(organizationId, `${await warehouseName(organizationId, p.warehouseId)} · ${periodText(p)}`),
+      columns: [
+        { key: "reference", label: "Reference", type: "text" },
+        { key: "date", label: "Date", type: "date" },
+        { key: "product", label: "Product", type: "text" },
+        { key: "warehouse", label: "Warehouse", type: "text", secondary: true },
+        { key: "kind", label: "Type", type: "text" },
+        { key: "in", label: "In", type: "number" },
+        { key: "out", label: "Out", type: "number" },
+        money("value", "Value change", true),
+      ],
+      rows: out,
+      totals: p.productId ? sumRows(out, ["in", "out", "value"], { reference: "Total" }) : sumRows(out, ["value"], { reference: `Total (${out.length})` }),
+      truncated: rows.length > ROW_CAP,
+      note: "Voids show as a separate movement marked (void); the original stays.",
+    };
+  });
+}
+
 /* ---------------- Accounting statements (exports) ---------------- */
 
 async function trialBalanceTable(organizationId: string, p: ReportParams): Promise<ReportTable> {
@@ -705,6 +815,9 @@ const BUILDERS: Record<string, (organizationId: string, p: ReportParams) => Prom
   "cash-flow": cashFlow,
   "gst-summary": gstSummary,
   "hsn-summary": hsnSummary,
+  "stock-summary": (o, p) => stockSummaryTable(o, p),
+  "stock-movements": stockMovementsTable,
+  "low-stock": (o, p) => stockSummaryTable(o, p, true),
   "trial-balance": trialBalanceTable,
   "profit-loss": profitLossTable,
   "balance-sheet": balanceSheetTable,

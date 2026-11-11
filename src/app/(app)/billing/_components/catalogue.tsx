@@ -403,8 +403,15 @@ function ProductForm({ initial, onSaved }: { initial: Product | null; onSaved?: 
                   onValue={(v) => set("minStockQty", v.replace(/[^\d.]/g, ""))}
                   error={errors.minStockQty}
                   className="sm:max-w-48"
-                  hint="Stock levels arrive with the inventory module."
+                  hint="Shown as low stock when the total across warehouses falls below this."
                 />
+              ) : null}
+              {initial?.trackInventory ? (
+                <Link href={`/billing/stock/${initial.id}`} className="text-sm underline underline-offset-2">
+                  View stock and history
+                </Link>
+              ) : form.trackInventory ? (
+                <p className="text-sm text-muted-foreground">After saving, purchases, sales and returns of this product move its stock. Enter what you have now as opening stock under Inventory.</p>
               ) : null}
             </FieldGroup>
           </CardContent>

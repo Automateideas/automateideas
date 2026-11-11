@@ -106,6 +106,15 @@ describe("checks", () => {
   });
 
   it("monthBounds covers the calendar month", () => {
-    expect(monthBounds(new Date("2026-12-15T00:00:00Z"))).toEqual({ start: "2026-12-01", end: "2027-01-01" });
+    expect(monthBounds(new Date("2026-12-15T00:00:00Z"))).toMatchObject({ start: "2026-12-01", end: "2027-01-01", label: "December 2026" });
+  });
+
+  it("monthBounds uses India's calendar: 00:30 IST on 1 Dec is December", () => {
+    const b = monthBounds(new Date("2026-11-30T19:00:00Z"));
+    expect(b).toMatchObject({ start: "2026-12-01", end: "2027-01-01" });
+    // As instants: midnight IST = 18:30 UTC the day before.
+    expect(b.from.toISOString()).toBe("2026-11-30T18:30:00.000Z");
+    expect(b.to.toISOString()).toBe("2026-12-31T18:30:00.000Z");
+    expect(monthBounds(new Date("2026-11-30T18:29:59Z")).start).toBe("2026-11-01");
   });
 });

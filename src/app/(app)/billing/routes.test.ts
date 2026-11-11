@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { BILLING_NAV, BILLING_SECTIONS } from "./_components/sections";
 
 const billingDir = __dirname;
-const REQUIRED = ["", "invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases", "accounting", "reports", "settings"];
+const REQUIRED = ["", "invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases", "stock", "accounting", "reports", "settings"];
 
 describe("business billing routes", () => {
   it.each(REQUIRED)("/billing/%s has a page", (segment) => {
@@ -79,6 +79,39 @@ describe("business billing routes", () => {
     }
     const api = path.resolve(billingDir, "../../api/business-billing");
     for (const r of ["supplier-payments", "supplier-payments/[id]", "supplier-payments/[id]/allocate", "supplier-payments/[id]/void", "supplier-payments/open-items", "suppliers/[id]/account", "payables", "documents/[type]/[id]/received"]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
+  });
+
+  it("has email, sharing and reminder pages and APIs", () => {
+    expect(existsSync(path.join(billingDir, "settings/communication/page.tsx"))).toBe(true);
+    const api = path.resolve(billingDir, "../../api");
+    for (const r of [
+      "business-billing/documents/[type]/[id]/email",
+      "business-billing/documents/[type]/[id]/share",
+      "business-billing/documents/[type]/[id]/messages",
+      "business-billing/documents/[type]/[id]/remind",
+      "business-billing/payments/[id]/email",
+      "business-billing/payments/[id]/share",
+      "business-billing/payments/[id]/messages",
+      "business-billing/communication-settings",
+      "cron/reminders",
+      "share/[token]",
+    ]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
+    // The public share page lives outside the app shell and the login proxy.
+    expect(existsSync(path.resolve(billingDir, "../../share/[token]/page.tsx"))).toBe(true);
+    const proxy = readFileSync(path.resolve(billingDir, "../../../proxy.ts"), "utf8");
+    expect(proxy).not.toContain('"/share');
+  });
+
+  it("has the inventory pages and APIs", () => {
+    for (const seg of ["stock", "stock/[productId]", "warehouses", "stock-adjustments", "stock-adjustments/create", "stock-adjustments/[id]", "settings/inventory", "reports/inventory"]) {
+      expect(existsSync(path.join(billingDir, seg, "page.tsx")), seg).toBe(true);
+    }
+    const api = path.resolve(billingDir, "../../api/business-billing");
+    for (const r of ["warehouses", "warehouses/[id]", "warehouses/[id]/archive", "warehouses/[id]/default", "stock", "stock/[productId]", "stock/available", "stock-adjustments", "stock-adjustments/[id]", "stock-adjustments/[id]/void", "inventory-settings"]) {
       expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
     }
   });

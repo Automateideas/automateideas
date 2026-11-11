@@ -82,6 +82,7 @@ type CustomerDetail = {
   priceListId: string | null;
   priceListName: string | null;
   notes: string | null;
+  sendReminders: boolean;
   billingAddress: AddressValues | null;
   shippingAddress: AddressValues | null;
   archivedAt: string | null;
@@ -205,6 +206,7 @@ type FormState = {
   openingBalance: string;
   priceListId: string;
   notes: string;
+  sendReminders: boolean;
   billing: AddressForm;
   sameShipping: boolean;
   shipping: AddressForm;
@@ -243,6 +245,7 @@ function toForm(c: CustomerDetail | null): FormState {
     openingBalance: c?.openingBalancePaise ? paiseToRupees(c.openingBalancePaise) : "",
     priceListId: c?.priceListId ?? "",
     notes: c?.notes ?? "",
+    sendReminders: c?.sendReminders ?? true,
     billing: addressForm(c?.billingAddress ?? null),
     sameShipping: !c?.shippingAddress,
     shipping: addressForm(c?.shippingAddress ?? null),
@@ -276,6 +279,7 @@ function toPayload(f: FormState) {
     openingBalance: f.openingBalance,
     priceListId: f.priceListId || null,
     notes: f.notes,
+    sendReminders: f.sendReminders,
     billingAddress: addressPayload(f.billing),
     shippingAddress: f.sameShipping ? null : addressPayload(f.shipping),
   };
@@ -523,6 +527,12 @@ function CustomerForm({ initial }: { initial: CustomerDetail | null }) {
               <Textarea id="c-notes" value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} aria-invalid={!!errors.notes} />
               <FieldDescription>Only your team sees these.</FieldDescription>
               <FieldError>{errors.notes}</FieldError>
+            </Field>
+            <Field orientation="horizontal">
+              <Checkbox id="c-reminders" checked={form.sendReminders} onCheckedChange={(c) => set("sendReminders", c === true)} />
+              <FieldLabel htmlFor="c-reminders" className="font-normal">
+                Send automatic payment reminders to this customer
+              </FieldLabel>
             </Field>
           </FieldGroup>
         </CardContent>

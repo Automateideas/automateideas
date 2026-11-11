@@ -39,6 +39,10 @@ export type DocumentValues = {
   zeroRated: "lut" | "with_payment" | null;
   invoiceDiscount: Discount | null;
   charges: ChargeInput[];
+  /** Invoices, credit notes, purchase bills and returns: where stock goes from or to (null = the default warehouse). */
+  warehouseId: string | null;
+  /** Credit notes: the goods came back, so stock goes up (off for price-only notes). */
+  restock: boolean;
   notes: string | null;
   terms: string | null;
   lines: DocumentLineValues[];
@@ -79,6 +83,8 @@ export function validateDocument(slug: DocumentSlug, raw: Record<string, unknown
 
   const pos = r.text("placeOfSupply", 2);
   if (pos && pos !== OUTSIDE_INDIA && !stateByCode(pos)) r.fail("placeOfSupply", "Choose the place of supply.");
+  const warehouseId = ["invoices", "credit-notes", "purchase-bills", "purchase-returns"].includes(slug) ? r.id("warehouseId") : null;
+  const restock = slug === "credit-notes" ? r.bool("restock", true) : true;
   const notes = r.text("notes", 2000);
   const terms = r.text("terms", 4000);
 
@@ -135,6 +141,8 @@ export function validateDocument(slug: DocumentSlug, raw: Record<string, unknown
       notes,
       terms,
       lines,
+      warehouseId,
+      restock,
     },
   };
 }

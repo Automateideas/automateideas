@@ -1,5 +1,8 @@
+import { after } from "next/server";
+
 import { route } from "@/lib/access";
 import { requireBillingPermission } from "@/lib/business-billing/access";
+import { autoSendReceipt } from "@/lib/business-billing/communication/service";
 import { listPayments, recordPayment } from "@/lib/business-billing/payments/service";
 import { readIdempotencyKey, validatePayment } from "@/lib/business-billing/payments/validation";
 import { parseListQuery } from "@/lib/business-billing/records";
@@ -21,5 +24,7 @@ export const POST = route(async (request: Request) => {
   const { organizationId, user } = await requireBillingPermission("billing.payments.manage");
   const values = valuesOrThrow(validatePayment(await body(request)));
   const payment = await recordPayment(organizationId, user.id, values, readIdempotencyKey(request.headers.get("idempotency-key")));
+  // Emails the receipt after responding, when the company turned automatic receipts on.
+  if (!payment.replayed) after(() => autoSendReceipt(organizationId, user.id, payment.id));
   return Response.json(payment, { status: payment.replayed ? 200 : 201 });
 });

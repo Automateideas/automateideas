@@ -116,6 +116,7 @@ async function readCustomer(tx: TenantTx, organizationId: string, id: string) {
     priceListId: c.priceListId,
     priceListName: row.priceListName,
     notes: c.notes,
+    sendReminders: c.sendReminders,
     billingAddress,
     shippingAddress,
     archivedAt: c.archivedAt,

@@ -24,6 +24,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ApiError, api, useApiQuery } from "@/lib/api";
 import { DOCUMENT_TYPES, type DocumentSlug, SALES_SLUGS, STATUS_LABELS } from "@/lib/business-billing/documents/types";
+import { SENDABLE_DOCUMENTS } from "@/lib/business-billing/communication/settings";
 import { formatPaise } from "@/lib/business-billing/fields";
 import type { DocumentTemplate } from "@/lib/business-billing/template";
 
@@ -32,6 +33,7 @@ import { SectionNav } from "../../../_components/section-nav";
 import { BackLink, EmptyList, ListSkeleton, ListToolbar, Pager, ReadOnlyNote, SelectField, TextField, useRecordList } from "../records-ui";
 import { InvoicePaymentPanel, type InvoicePayment } from "../payments";
 import { BillPaymentPanel } from "../supplier-payments";
+import { SendCard } from "../communication-ui";
 import { DocumentPaper, type PaperDocument, type PaperLook, type Seller } from "./document-paper";
 
 const BASE = "/api/business-billing/documents";
@@ -188,6 +190,8 @@ type Detail = Omit<PaperDocument, "related"> & {
   displayStatus: string;
   related: { slug: DocumentSlug; id: string; number: string | null; status: string; totalPaise: number }[];
   voidedAt: string | null;
+  warehouseName?: string | null;
+  restock?: boolean;
   actions: Actions;
 };
 type Branding = { logoOnDocuments: boolean; logoUrl: string | null };
@@ -353,6 +357,13 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
           <AlertDescription>{doc.voidReason}. The number stays used; this document no longer counts.</AlertDescription>
         </Alert>
       ) : null}
+      {doc.status !== "draft" && doc.warehouseName ? (
+        <p className="text-sm text-muted-foreground">
+          {slug === "credit-notes" && doc.restock === false
+            ? "Price-only credit note: stock wasn't changed."
+            : `Stock for tracked products ${slug === "invoices" || slug === "purchase-returns" ? "left" : "went into"} ${doc.warehouseName}${doc.status === "void" ? " (reversed when voided)" : ""}.`}
+        </p>
+      ) : null}
       {doc.status === "draft" ? (
         <p className="text-sm text-muted-foreground">Draft: no number yet, and you can still change everything. Issuing gives it a number and locks it.</p>
       ) : null}
@@ -377,6 +388,15 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
             </ul>
           </CardContent>
         </Card>
+      ) : null}
+
+      {doc.status !== "draft" && doc.status !== "void" && (SENDABLE_DOCUMENTS as readonly string[]).includes(slug) ? (
+        <SendCard
+          base={`${BASE}/${slug}/${doc.id}`}
+          title={DOCUMENT_TYPES[slug].party === "supplier" ? "Send to supplier" : "Send to customer"}
+          canSend={a.canEdit}
+          reminder={slug === "invoices" && (doc.payment?.balancePaise ?? 0) > 0}
+        />
       ) : null}
 
       {doc.payment && slug === "purchase-bills" ? (

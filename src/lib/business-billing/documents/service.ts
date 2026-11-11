@@ -27,9 +27,11 @@ import {
   salesOrders,
   services,
   suppliers,
+  warehouses,
 } from "@/db/schema";
 
 import { assertOpenPeriod, documentSource, isPostedDocument, postDocument, reverseSource } from "../accounting/posting";
+import { documentWarehouse, isStockDocument, postDocumentStock, reverseStock, stockSource } from "../inventory/service";
 import { type AddressValues, stateByCode } from "../fields";
 import { allocateDocumentNumber } from "../numbering";
 import { billBalances, invoiceBalances, refreshBillStatus, refreshInvoiceStatus } from "../payments/balances";
@@ -366,6 +368,8 @@ async function readDocument(tx: TenantTx, organizationId: string, slug: Document
   const extraDate = r.extraKey ? ((row[r.extraKey] as string | null) ?? null) : null;
   const related = await relatedDocuments(tx, organizationId, slug, row);
   const payment = slug === "invoices" ? await invoicePayments(tx, organizationId, doc.id) : slug === "purchase-bills" ? await billPayments(tx, organizationId, doc.id) : null;
+  const warehouseId = (row.warehouseId as string | null) ?? null;
+  const [wh] = warehouseId ? await tx.select({ name: warehouses.name }).from(warehouses).where(and(eq(warehouses.organizationId, organizationId), eq(warehouses.id, warehouseId))) : [];
   const partyId = row[r.partyKey] as string;
   return {
     slug,
@@ -390,6 +394,10 @@ async function readDocument(tx: TenantTx, organizationId: string, slug: Document
     salesOrderId: (row.salesOrderId as string | null) ?? null,
     purchaseOrderId: (row.purchaseOrderId as string | null) ?? null,
     reason: (row.reason as string | null) ?? null,
+    /** Where stock moves (invoices, credit notes, bills, returns); null until issued = default warehouse. */
+    warehouseId,
+    warehouseName: wh?.name ?? null,
+    restock: (row.restock as boolean | undefined) ?? true,
     placeOfSupply: doc.placeOfSupply,
     supplyType: doc.supplyType,
     pricesIncludeTax: doc.pricesIncludeTax,
@@ -617,6 +625,7 @@ async function prepare(tx: TenantTx, organizationId: string, slug: DocumentSlug,
   if (party.archivedAt) invalid({ [type.party === "customer" ? "customerId" : "supplierId"]: `This ${type.party} is archived. Restore them first.` });
   await checkCatalogueIds(tx, organizationId, v.lines);
   if (type.needsInvoice && v.sourceId) await checkSource(tx, organizationId, slug, v.sourceId, v.partyId);
+  if (isStockDocument(slug) && v.warehouseId) await documentWarehouse(tx, organizationId, v.warehouseId);
   if (!v.lines.length) invalid({ lines: "Add at least one item." });
 
   const values: DocumentValues = { ...v, placeOfSupply: v.placeOfSupply ?? defaultPlaceOfSupply(slug, party, company) };
@@ -638,6 +647,8 @@ function headerValues(slug: DocumentSlug, v: DocumentValues, r: DocumentTaxResul
     ...(extraKey ? { [extraKey]: v.extraDate } : {}),
     ...(sourceKey ? { [sourceKey]: v.sourceId, reason: v.reason } : {}),
     ...(slug === "purchase-bills" ? { supplierBillNumber: v.partyReference } : {}),
+    ...(isStockDocument(slug) ? { warehouseId: v.warehouseId } : {}),
+    ...(slug === "credit-notes" ? { restock: v.restock } : {}),
     placeOfSupply: v.placeOfSupply,
     pricesIncludeTax: v.pricesIncludeTax,
     reverseCharge: v.reverseCharge,
@@ -733,6 +744,8 @@ function valuesFromStored(doc: DocumentDetail): DocumentValues {
     zeroRated: doc.zeroRated,
     invoiceDiscount: doc.invoiceDiscount,
     charges: (doc.charges ?? []).map((c) => ({ label: c.label, amountPaise: c.amountPaise, taxRate: c.appliedTaxRate })),
+    warehouseId: doc.warehouseId,
+    restock: doc.restock,
     notes: doc.notes,
     terms: doc.terms,
     lines: doc.items.map((i) => ({
@@ -756,7 +769,7 @@ function valuesFromStored(doc: DocumentDetail): DocumentValues {
  * takes the next number, copies company and party details, and locks it.
  * `beforeIssue` runs inside the transaction (e.g. the plan's invoice limit).
  */
-export async function issueDocument(organizationId: string, userId: string, slug: DocumentSlug, id: string, beforeIssue?: () => Promise<void>) {
+export async function issueDocument(organizationId: string, userId: string, slug: DocumentSlug, id: string, beforeIssue?: (tx: TenantTx) => Promise<void>) {
   const r = reg(slug);
   const type = DOCUMENT_TYPES[slug];
   return guardLock(
@@ -786,9 +799,12 @@ export async function issueDocument(organizationId: string, userId: string, slug
             invalid({ lines: `${what} for ${src.number} can't exceed its total. ${((src.totalPaise - done) / 100).toFixed(2)} rupees is left.` }, `This is more than what's left on ${src.number}.`);
           }
         }
-        if (beforeIssue) await beforeIssue();
+        if (beforeIssue) await beforeIssue(tx);
         // Documents that reach the books can't be dated inside a closed period.
         if (isPostedDocument(slug)) await assertOpenPeriod(tx, organizationId, values.issueDate, "issueDate");
+
+        // Stock documents record where the goods go (the default warehouse unless one was chosen).
+        if (isStockDocument(slug)) values.warehouseId = await documentWarehouse(tx, organizationId, values.warehouseId);
 
         const seller = await sellerSnapshot(tx, organizationId);
         const n = await allocateDocumentNumber(tx, organizationId, { documentType: type.numbering, date: new Date(`${values.issueDate}T00:00:00Z`) });
@@ -857,6 +873,8 @@ export async function issueDocument(organizationId: string, userId: string, slug
             { userId },
           );
         }
+        // Stock for products that track it, in this same transaction.
+        if (isStockDocument(slug)) await postDocumentStock(tx, organizationId, slug, { id, date: values.issueDate, warehouseId: values.warehouseId!, restock: values.restock }, userId);
         return readDocument(tx, organizationId, slug, id);
       }),
     type.singular,
@@ -916,6 +934,7 @@ export async function voidDocument(organizationId: string, userId: string, slug:
         if (type.source === "purchase-bills") await refreshBillStatus(tx, organizationId, sourceId);
         // The books get a reversing entry dated today; the original stays.
         if (isPostedDocument(slug)) await reverseSource(tx, organizationId, documentSource(slug), id, todayInIndia(), `Void ${current.number ?? ""}: ${reason}`, userId);
+        if (isStockDocument(slug)) await reverseStock(tx, organizationId, stockSource(slug), id, todayInIndia(), userId, `Void ${current.number ?? ""}: ${reason}`);
         return readDocument(tx, organizationId, slug, id);
       }),
     type.singular,

@@ -51,6 +51,8 @@ type SubscriptionData = {
   cancelAtPeriodEnd: boolean;
   access: Access;
   limits: { maxSeats: number; maxInvoicesPerMonth: number | null };
+  /** Invoices issued this calendar month against the plan's cap (null = no cap). */
+  invoiceUsage: { used: number; cap: number | null; month: string };
 };
 
 type CatalogPlan = {
@@ -299,6 +301,8 @@ function PlanCard({ data }: { data: SubscriptionData }) {
               {data.seatsUsed} of {data.seatLimit} used
             </dd>
           </div>
+          <InvoiceUsage usage={data.invoiceUsage} />
+
           <div className="flex flex-col gap-1">
             {/* In early access, show what it will cost rather than a ₹0 that contradicts the seat picker. */}
             <dt className="text-muted-foreground">{free ? "After early access" : data.billingCycle === "yearly" ? "Yearly total" : "Monthly total"}</dt>
@@ -645,6 +649,30 @@ function CardsSkeleton({ cards }: { cards: 1 | 2 }) {
     >
       <Skeleton className="h-72 rounded-xl" />
       {cards === 2 ? <Skeleton className="h-80 rounded-xl" /> : null}
+    </div>
+  );
+}
+
+/** "Invoices this month: 120 of 500", with a note near and at the cap. */
+function InvoiceUsage({ usage }: { usage: SubscriptionData["invoiceUsage"] }) {
+  const { used, cap, month } = usage;
+  const share = cap ? used / cap : 0;
+  return (
+    <div className="flex flex-col gap-1">
+      <dt className="text-muted-foreground">Invoices in {month}</dt>
+      <dd className="font-medium tabular-nums">
+        {cap === null ? `${used.toLocaleString("en-IN")} (no limit)` : `${used.toLocaleString("en-IN")} of ${cap.toLocaleString("en-IN")}`}
+        {cap !== null ? (
+          <span className="mt-1.5 block h-1.5 rounded-full bg-muted" aria-hidden="true">
+            <span className={cn("block h-full rounded-full", share >= 1 ? "bg-destructive" : "bg-primary")} style={{ width: `${Math.min(100, share * 100)}%` }} />
+          </span>
+        ) : null}
+        {cap !== null && share >= 1 ? (
+          <span className="mt-1 block text-xs font-normal text-destructive">Limit reached: new invoices can be issued next month, or upgrade now.</span>
+        ) : cap !== null && share >= 0.8 ? (
+          <span className="mt-1 block text-xs font-normal text-muted-foreground">Nearly at your monthly limit.</span>
+        ) : null}
+      </dd>
     </div>
   );
 }

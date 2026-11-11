@@ -1,5 +1,5 @@
 import { SUBSCRIPTION_ROLES, requireOrgRole, route } from "@/lib/access";
-import { getEntitlements } from "@/lib/subscription-billing/entitlements";
+import { getEntitlements, invoiceUsage } from "@/lib/subscription-billing/entitlements";
 import { paymentsEnabled } from "@/lib/subscription-billing/mode";
 import { periodTotalInr, planFor, pricePerSeatInr } from "@/lib/subscription-billing/plans";
 import { getSeatUsage, planBlockReason } from "@/lib/subscription-billing/seats";
@@ -34,5 +34,7 @@ export const GET = route(async () => {
     cancelAtPeriodEnd: e.cancelAtPeriodEnd,
     access: e.access,
     limits: e.limits,
+    // Invoices issued this calendar month (India) against the plan's cap (null = no cap).
+    invoiceUsage: await invoiceUsage(organizationId, e),
   });
 });

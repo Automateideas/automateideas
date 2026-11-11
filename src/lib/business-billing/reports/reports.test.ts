@@ -73,7 +73,7 @@ describe("catalogue and params", () => {
 
   it("defaults to this financial year to date and ignores junk", () => {
     const p = readReportParams(new URLSearchParams({ groupBy: "hour", status: "drop table", customerId: "a b" }), "2026-11-11", 4);
-    expect(p).toEqual({ from: "2026-04-01", to: "2026-11-11", asOf: "2026-11-11", groupBy: "month", customerId: null, supplierId: null, status: null });
+    expect(p).toEqual({ from: "2026-04-01", to: "2026-11-11", asOf: "2026-11-11", groupBy: "month", customerId: null, supplierId: null, warehouseId: null, productId: null, status: null });
     expect(readReportParams(new URLSearchParams(), "2026-02-15", 4).from).toBe("2025-04-01");
     expect(readReportParams(new URLSearchParams({ from: "2026-10-31", to: "2026-10-01", status: "overdue", groupBy: "week" }), "2026-11-11", 4)).toMatchObject({ from: "2026-10-01", to: "2026-10-31", status: "overdue", groupBy: "week" });
   });

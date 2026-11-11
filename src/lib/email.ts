@@ -7,6 +7,12 @@ function resend() {
   return client;
 }
 
+/** The Resend client for other senders (e.g. Business Billing's customer emails). */
+export const emailClient = () => resend();
+
+/** EMAIL_FROM, or Resend's test sender. */
+export const defaultFrom = () => process.env.EMAIL_FROM ?? "Automate Ideas <onboarding@resend.dev>";
+
 const escape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 

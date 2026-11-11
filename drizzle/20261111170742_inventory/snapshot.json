@@ -1,0 +1,2968 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "808edfdf-25c1-4d6f-ab83-112f888222ab",
+  "prevIds": [
+    "48961829-cadb-4cd6-a4f3-784ac1fdda8d"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustment_items"
+      ],
+      "writes": [
+        "s|tbl|public.stock_adjustment_items",
+        "n|tbl|public.stock_adjustment_items",
+        "e|tbl|public.stock_adjustment_items",
+        "n|rel|public.stock_adjustment_items",
+        "n|type|public.stock_adjustment_items",
+        "n|rel|public.stock_adjustment_items_pkey",
+        "n|rel|public.stock_adjustment_items_org_id_uq",
+        "n|rel|public.stock_adjustment_items_line_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustments"
+      ],
+      "writes": [
+        "s|tbl|public.stock_adjustments",
+        "n|tbl|public.stock_adjustments",
+        "e|tbl|public.stock_adjustments",
+        "n|rel|public.stock_adjustments",
+        "n|type|public.stock_adjustments",
+        "n|rel|public.stock_adjustments_pkey",
+        "n|rel|public.stock_adjustments_org_id_uq",
+        "n|rel|public.stock_adjustments_number_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|tbl|public.stock_movements",
+        "n|tbl|public.stock_movements",
+        "e|tbl|public.stock_movements",
+        "n|rel|public.stock_movements",
+        "n|type|public.stock_movements",
+        "n|rel|public.stock_movements_pkey",
+        "n|rel|public.stock_movements_org_id_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "warehouses"
+      ],
+      "writes": [
+        "s|tbl|public.warehouses",
+        "n|tbl|public.warehouses",
+        "e|tbl|public.warehouses",
+        "n|rel|public.warehouses",
+        "n|type|public.warehouses",
+        "n|rel|public.warehouses_pkey",
+        "n|rel|public.warehouses_org_id_uq",
+        "n|rel|public.warehouses_code_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "allow_negative_stock"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.allow_negative_stock",
+        "n|col|public.billing_settings.allow_negative_stock",
+        "e|col|public.billing_settings.allow_negative_stock"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "business_invoices",
+        "warehouse_id"
+      ],
+      "writes": [
+        "s|col|public.business_invoices.warehouse_id",
+        "n|col|public.business_invoices.warehouse_id",
+        "e|col|public.business_invoices.warehouse_id"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "restock"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.restock",
+        "n|col|public.credit_notes.restock",
+        "e|col|public.credit_notes.restock"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "credit_notes",
+        "warehouse_id"
+      ],
+      "writes": [
+        "s|col|public.credit_notes.warehouse_id",
+        "n|col|public.credit_notes.warehouse_id",
+        "e|col|public.credit_notes.warehouse_id"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_bills",
+        "warehouse_id"
+      ],
+      "writes": [
+        "s|col|public.purchase_bills.warehouse_id",
+        "n|col|public.purchase_bills.warehouse_id",
+        "e|col|public.purchase_bills.warehouse_id"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "purchase_returns",
+        "warehouse_id"
+      ],
+      "writes": [
+        "s|col|public.purchase_returns.warehouse_id",
+        "n|col|public.purchase_returns.warehouse_id",
+        "e|col|public.purchase_returns.warehouse_id"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "stock_adjustments",
+        "stock_adjustments_idempotency_uq"
+      ],
+      "writes": [
+        "s|idx|public.stock_adjustments_idempotency_uq",
+        "n|idx|public.stock_adjustments_idempotency_uq",
+        "e|idx|public.stock_adjustments_idempotency_uq",
+        "n|rel|public.stock_adjustments_idempotency_uq"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.organization_id",
+        "n|col|public.stock_adjustments.idempotency_key"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "stock_adjustments",
+        "stock_adjustments_date_idx"
+      ],
+      "writes": [
+        "s|idx|public.stock_adjustments_date_idx",
+        "n|idx|public.stock_adjustments_date_idx",
+        "e|idx|public.stock_adjustments_date_idx",
+        "n|rel|public.stock_adjustments_date_idx"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.organization_id",
+        "n|col|public.stock_adjustments.adjustment_date"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "stock_movements",
+        "stock_movements_one_reversal_uq"
+      ],
+      "writes": [
+        "s|idx|public.stock_movements_one_reversal_uq",
+        "n|idx|public.stock_movements_one_reversal_uq",
+        "e|idx|public.stock_movements_one_reversal_uq",
+        "n|rel|public.stock_movements_one_reversal_uq"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.reverses_movement_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "stock_movements",
+        "stock_movements_product_idx"
+      ],
+      "writes": [
+        "s|idx|public.stock_movements_product_idx",
+        "n|idx|public.stock_movements_product_idx",
+        "e|idx|public.stock_movements_product_idx",
+        "n|rel|public.stock_movements_product_idx"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.product_id",
+        "n|col|public.stock_movements.warehouse_id",
+        "n|col|public.stock_movements.movement_date"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "stock_movements",
+        "stock_movements_source_idx"
+      ],
+      "writes": [
+        "s|idx|public.stock_movements_source_idx",
+        "n|idx|public.stock_movements_source_idx",
+        "e|idx|public.stock_movements_source_idx",
+        "n|rel|public.stock_movements_source_idx"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.source_type",
+        "n|col|public.stock_movements.source_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "warehouses",
+        "warehouses_one_default_uq"
+      ],
+      "writes": [
+        "s|idx|public.warehouses_one_default_uq",
+        "n|idx|public.warehouses_one_default_uq",
+        "e|idx|public.warehouses_one_default_uq",
+        "n|rel|public.warehouses_one_default_uq"
+      ],
+      "reads": [
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.warehouses.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "business_invoices"
+      ],
+      "writes": [
+        "s|fk|public.business_invoices.business_invoices_warehouse_fk",
+        "n|fk|public.business_invoices.business_invoices_warehouse_fk",
+        "e|fk|public.business_invoices.business_invoices_warehouse_fk",
+        "n|con|public.business_invoices.business_invoices_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.business_invoices",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.business_invoices.organization_id",
+        "n|col|public.business_invoices.warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "credit_notes"
+      ],
+      "writes": [
+        "s|fk|public.credit_notes.credit_notes_warehouse_fk",
+        "n|fk|public.credit_notes.credit_notes_warehouse_fk",
+        "e|fk|public.credit_notes.credit_notes_warehouse_fk",
+        "n|con|public.credit_notes.credit_notes_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.credit_notes",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.credit_notes.organization_id",
+        "n|col|public.credit_notes.warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_bills"
+      ],
+      "writes": [
+        "s|fk|public.purchase_bills.purchase_bills_warehouse_fk",
+        "n|fk|public.purchase_bills.purchase_bills_warehouse_fk",
+        "e|fk|public.purchase_bills.purchase_bills_warehouse_fk",
+        "n|con|public.purchase_bills.purchase_bills_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_bills",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.purchase_bills.organization_id",
+        "n|col|public.purchase_bills.warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "purchase_returns"
+      ],
+      "writes": [
+        "s|fk|public.purchase_returns.purchase_returns_warehouse_fk",
+        "n|fk|public.purchase_returns.purchase_returns_warehouse_fk",
+        "e|fk|public.purchase_returns.purchase_returns_warehouse_fk",
+        "n|con|public.purchase_returns.purchase_returns_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.purchase_returns",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.purchase_returns.organization_id",
+        "n|col|public.purchase_returns.warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustment_items"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustment_items.stock_adjustment_items_organization_id_organization_id_fkey",
+        "n|fk|public.stock_adjustment_items.stock_adjustment_items_organization_id_organization_id_fkey",
+        "e|fk|public.stock_adjustment_items.stock_adjustment_items_organization_id_organization_id_fkey",
+        "n|con|public.stock_adjustment_items.stock_adjustment_items_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustment_items",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.stock_adjustment_items.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustment_items"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustment_items.stock_adjustment_items_created_by_user_id_fkey",
+        "n|fk|public.stock_adjustment_items.stock_adjustment_items_created_by_user_id_fkey",
+        "e|fk|public.stock_adjustment_items.stock_adjustment_items_created_by_user_id_fkey",
+        "n|con|public.stock_adjustment_items.stock_adjustment_items_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustment_items",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.stock_adjustment_items.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustment_items"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustment_items.stock_adjustment_items_updated_by_user_id_fkey",
+        "n|fk|public.stock_adjustment_items.stock_adjustment_items_updated_by_user_id_fkey",
+        "e|fk|public.stock_adjustment_items.stock_adjustment_items_updated_by_user_id_fkey",
+        "n|con|public.stock_adjustment_items.stock_adjustment_items_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustment_items",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.stock_adjustment_items.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustment_items"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustment_items.stock_adjustment_items_adjustment_fk",
+        "n|fk|public.stock_adjustment_items.stock_adjustment_items_adjustment_fk",
+        "e|fk|public.stock_adjustment_items.stock_adjustment_items_adjustment_fk",
+        "n|con|public.stock_adjustment_items.stock_adjustment_items_adjustment_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustment_items",
+        "n|sch|public",
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|col|public.stock_adjustment_items.organization_id",
+        "n|col|public.stock_adjustment_items.adjustment_id",
+        "n|col|public.stock_adjustments.organization_id",
+        "n|col|public.stock_adjustments.id",
+        "e|uniqueness|public.stock_adjustments.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustment_items"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustment_items.stock_adjustment_items_product_fk",
+        "n|fk|public.stock_adjustment_items.stock_adjustment_items_product_fk",
+        "e|fk|public.stock_adjustment_items.stock_adjustment_items_product_fk",
+        "n|con|public.stock_adjustment_items.stock_adjustment_items_product_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustment_items",
+        "n|sch|public",
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.stock_adjustment_items.organization_id",
+        "n|col|public.stock_adjustment_items.product_id",
+        "n|col|public.products.organization_id",
+        "n|col|public.products.id",
+        "e|uniqueness|public.products.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustments"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustments.stock_adjustments_organization_id_organization_id_fkey",
+        "n|fk|public.stock_adjustments.stock_adjustments_organization_id_organization_id_fkey",
+        "e|fk|public.stock_adjustments.stock_adjustments_organization_id_organization_id_fkey",
+        "n|con|public.stock_adjustments.stock_adjustments_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustments"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustments.stock_adjustments_created_by_user_id_fkey",
+        "n|fk|public.stock_adjustments.stock_adjustments_created_by_user_id_fkey",
+        "e|fk|public.stock_adjustments.stock_adjustments_created_by_user_id_fkey",
+        "n|con|public.stock_adjustments.stock_adjustments_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustments"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustments.stock_adjustments_updated_by_user_id_fkey",
+        "n|fk|public.stock_adjustments.stock_adjustments_updated_by_user_id_fkey",
+        "e|fk|public.stock_adjustments.stock_adjustments_updated_by_user_id_fkey",
+        "n|con|public.stock_adjustments.stock_adjustments_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustments"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustments.stock_adjustments_warehouse_fk",
+        "n|fk|public.stock_adjustments.stock_adjustments_warehouse_fk",
+        "e|fk|public.stock_adjustments.stock_adjustments_warehouse_fk",
+        "n|con|public.stock_adjustments.stock_adjustments_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.organization_id",
+        "n|col|public.stock_adjustments.warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_adjustments"
+      ],
+      "writes": [
+        "s|fk|public.stock_adjustments.stock_adjustments_to_warehouse_fk",
+        "n|fk|public.stock_adjustments.stock_adjustments_to_warehouse_fk",
+        "e|fk|public.stock_adjustments.stock_adjustments_to_warehouse_fk",
+        "n|con|public.stock_adjustments.stock_adjustments_to_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_adjustments",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.stock_adjustments.organization_id",
+        "n|col|public.stock_adjustments.to_warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|fk|public.stock_movements.stock_movements_organization_id_organization_id_fkey",
+        "n|fk|public.stock_movements.stock_movements_organization_id_organization_id_fkey",
+        "e|fk|public.stock_movements.stock_movements_organization_id_organization_id_fkey",
+        "n|con|public.stock_movements.stock_movements_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|fk|public.stock_movements.stock_movements_created_by_user_id_fkey",
+        "n|fk|public.stock_movements.stock_movements_created_by_user_id_fkey",
+        "e|fk|public.stock_movements.stock_movements_created_by_user_id_fkey",
+        "n|con|public.stock_movements.stock_movements_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.stock_movements.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|fk|public.stock_movements.stock_movements_updated_by_user_id_fkey",
+        "n|fk|public.stock_movements.stock_movements_updated_by_user_id_fkey",
+        "e|fk|public.stock_movements.stock_movements_updated_by_user_id_fkey",
+        "n|con|public.stock_movements.stock_movements_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.stock_movements.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|fk|public.stock_movements.stock_movements_warehouse_fk",
+        "n|fk|public.stock_movements.stock_movements_warehouse_fk",
+        "e|fk|public.stock_movements.stock_movements_warehouse_fk",
+        "n|con|public.stock_movements.stock_movements_warehouse_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.warehouse_id",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.warehouses.id",
+        "e|uniqueness|public.warehouses.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|fk|public.stock_movements.stock_movements_product_fk",
+        "n|fk|public.stock_movements.stock_movements_product_fk",
+        "e|fk|public.stock_movements.stock_movements_product_fk",
+        "n|con|public.stock_movements.stock_movements_product_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|tbl|public.products",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.product_id",
+        "n|col|public.products.organization_id",
+        "n|col|public.products.id",
+        "e|uniqueness|public.products.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "stock_movements"
+      ],
+      "writes": [
+        "s|fk|public.stock_movements.stock_movements_reverses_fk",
+        "n|fk|public.stock_movements.stock_movements_reverses_fk",
+        "e|fk|public.stock_movements.stock_movements_reverses_fk",
+        "n|con|public.stock_movements.stock_movements_reverses_fk"
+      ],
+      "reads": [
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|tbl|public.stock_movements",
+        "n|sch|public",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.reverses_movement_id",
+        "n|col|public.stock_movements.organization_id",
+        "n|col|public.stock_movements.id",
+        "e|uniqueness|public.stock_movements.id.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "warehouses"
+      ],
+      "writes": [
+        "s|fk|public.warehouses.warehouses_organization_id_organization_id_fkey",
+        "n|fk|public.warehouses.warehouses_organization_id_organization_id_fkey",
+        "e|fk|public.warehouses.warehouses_organization_id_organization_id_fkey",
+        "n|con|public.warehouses.warehouses_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.warehouses.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "warehouses"
+      ],
+      "writes": [
+        "s|fk|public.warehouses.warehouses_created_by_user_id_fkey",
+        "n|fk|public.warehouses.warehouses_created_by_user_id_fkey",
+        "e|fk|public.warehouses.warehouses_created_by_user_id_fkey",
+        "n|con|public.warehouses.warehouses_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.warehouses.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "warehouses"
+      ],
+      "writes": [
+        "s|fk|public.warehouses.warehouses_updated_by_user_id_fkey",
+        "n|fk|public.warehouses.warehouses_updated_by_user_id_fkey",
+        "e|fk|public.warehouses.warehouses_updated_by_user_id_fkey",
+        "n|con|public.warehouses.warehouses_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.warehouses",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.warehouses.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "alter_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "invoice_sequences"
+      ],
+      "writes": [
+        "s|ck|public.invoice_sequences.invoice_sequences_type_check"
+      ],
+      "reads": [
+        "n|tbl|public.invoice_sequences",
+        "n|sch|public",
+        "n|col|public.invoice_sequences.document_type",
+        "e|col|public.invoice_sequences.document_type"
+      ],
+      "sqlHash": "eeccfaebdb056e8d"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "stock_adjustment_items",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "stock_adjustments",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "stock_movements",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "warehouses",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "allow_negative_stock",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "true",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "restock",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "true",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "adjustment_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "line_no",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "product_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "quantity",
+        "type": "numeric(15,3)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "unit_cost_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "note",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "number",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "adjustment_date",
+        "type": "date",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "kind",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "to_warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "reason",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "notes",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "status",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'posted'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "voided_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "void_reason",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "idempotency_key",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "warehouse_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "product_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "movement_date",
+        "type": "date",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "kind",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "quantity",
+        "type": "numeric(15,3)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "value_paise",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "source_type",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "source_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "source_line_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "reverses_movement_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "note",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "code",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "address_line1",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "address_line2",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "city",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "state",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "state_code",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "postal_code",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "country_code",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'IN'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "is_default",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "archived_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_idempotency_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "idempotency_key",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"idempotency_key\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_date_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "adjustment_date",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_one_reversal_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "reverses_movement_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"reverses_movement_id\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_product_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "product_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "warehouse_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "movement_date",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_source_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "source_type",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "source_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_one_default_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"is_default\"",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "business_invoices",
+        "name": "business_invoices_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "credit_notes",
+        "name": "credit_notes_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_bills",
+        "name": "purchase_bills_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "purchase_returns",
+        "name": "purchase_returns_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_adjustment_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "adjustment_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "stock_adjustments",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_product_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "product_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "products",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_to_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "to_warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_warehouse_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "warehouse_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "warehouses",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_product_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "product_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "products",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_reverses_fk",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "reverses_movement_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "stock_movements",
+        "columnsTo": [
+          "organization_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_line_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "adjustment_id",
+          "line_no"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_number_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "number"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "warehouses",
+        "name": "warehouses_code_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "code"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_quantity_check",
+        "value": "\"quantity\" <> 0",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustment_items",
+        "name": "stock_adjustment_items_cost_check",
+        "value": "\"unit_cost_paise\" is null or \"unit_cost_paise\" >= 0",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_kind_check",
+        "value": "\"kind\" in ('adjustment', 'transfer')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_status_check",
+        "value": "\"status\" in ('posted', 'void')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_reason_check",
+        "value": "\"reason\" is null or \"reason\" in ('opening', 'count', 'damaged', 'lost', 'expired', 'found', 'internal_use', 'other')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_adjustments",
+        "name": "stock_adjustments_transfer_check",
+        "value": "(\"kind\" = 'transfer' and \"to_warehouse_id\" is not null and \"to_warehouse_id\" <> \"warehouse_id\") or (\"kind\" = 'adjustment' and \"to_warehouse_id\" is null)",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_kind_check",
+        "value": "\"kind\" in ('purchase', 'purchase_return', 'sale', 'sales_return', 'adjustment', 'transfer_out', 'transfer_in')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "stock_movements",
+        "name": "stock_movements_quantity_check",
+        "value": "\"quantity\" <> 0",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "checks\u0000[\"public\",\"invoice_sequences\",\"invoice_sequences_type_check\"]",
+      "set": {
+        "value": "\"document_type\" in ('invoice', 'quotation', 'sales_order', 'credit_note', 'debit_note', 'payment', 'refund', 'purchase_order', 'purchase_bill', 'journal_entry', 'purchase_return', 'supplier_payment', 'stock_adjustment')"
+      }
+    }
+  ]
+}

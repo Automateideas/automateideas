@@ -1,7 +1,7 @@
 // Every report, its group and the filters it takes. Pure: the API validates
 // against it and the report pages build their controls from it.
 
-export type ReportFilter = "period" | "asOf" | "groupBy" | "customer" | "supplier" | "invoiceStatus" | "paymentStatus";
+export type ReportFilter = "period" | "asOf" | "groupBy" | "customer" | "supplier" | "invoiceStatus" | "paymentStatus" | "warehouse" | "product";
 
 export type ReportDef = { id: string; group: ReportGroup; label: string; description: string; filters: readonly ReportFilter[] };
 
@@ -10,6 +10,7 @@ export const REPORT_GROUPS = {
   purchases: { label: "Purchases", description: "What you bought and returned, by bill or supplier." },
   payments: { label: "Payments", description: "Money collected, what's owed both ways, and cash flow." },
   tax: { label: "Tax", description: "GST collected and paid, by rate and HSN/SAC." },
+  inventory: { label: "Inventory", description: "Stock on hand and its value, movements and low stock." },
 } as const;
 export type ReportGroup = keyof typeof REPORT_GROUPS;
 
@@ -27,6 +28,9 @@ export const REPORTS: readonly ReportDef[] = [
   { id: "cash-flow", group: "payments", label: "Cash flow", description: "Money in and out of cash and bank, by source.", filters: ["period"] },
   { id: "gst-summary", group: "tax", label: "GST summary", description: "Output tax, input tax credit and net GST payable, by rate.", filters: ["period"] },
   { id: "hsn-summary", group: "tax", label: "HSN/SAC summary of sales", description: "Taxable sales and tax per HSN/SAC code (GSTR-1 table 12).", filters: ["period"] },
+  { id: "stock-summary", group: "inventory", label: "Stock summary and valuation", description: "Quantity and value of every tracked product on a date, at weighted average cost.", filters: ["asOf", "warehouse"] },
+  { id: "stock-movements", group: "inventory", label: "Stock movements", description: "Every stock in and out: sales, purchases, returns, adjustments and transfers.", filters: ["period", "warehouse", "product"] },
+  { id: "low-stock", group: "inventory", label: "Low stock", description: "Products below their minimum or out of stock today.", filters: ["warehouse"] },
 ];
 
 /** Statements from Accounting, exportable through the same API (not listed on report pages). */
@@ -62,6 +66,8 @@ export type ReportParams = {
   groupBy: GroupBy;
   customerId: string | null;
   supplierId: string | null;
+  warehouseId: string | null;
+  productId: string | null;
   status: string | null;
 };
 
@@ -93,6 +99,8 @@ export function readReportParams(params: URLSearchParams, today: string, startMo
     groupBy: (GROUP_BY as readonly string[]).includes(params.get("groupBy") ?? "") ? (params.get("groupBy") as GroupBy) : "month",
     customerId: id("customerId"),
     supplierId: id("supplierId"),
+    warehouseId: id("warehouseId"),
+    productId: id("productId"),
     status: status && statuses.includes(status) ? status : null,
   };
 }

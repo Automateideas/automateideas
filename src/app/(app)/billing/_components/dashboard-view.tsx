@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { LoadError } from "../../_components/page-parts";
 import { PeriodPicker, useSettings } from "./accounting";
 import { fmtDate } from "./documents/documents-ui";
+import { StockBadge } from "./inventory";
 import { PartyFilter } from "./reports-ui";
 
 type Data = Dashboard & { financialYear: { from: string; to: string; label: string } };
@@ -81,6 +82,7 @@ function DashboardBody({ settings }: { settings: NonNullable<ReturnType<typeof u
               valueLabel="Taxable value"
             />
             {q.data.tax ? <TaxCard tax={q.data.tax} href={`/billing/reports/tax?${reportQuery({ report: "gst-summary" })}`} /> : null}
+            {q.data.lowStock?.total ? <LowStockCard low={q.data.lowStock} /> : null}
             <RecentCard d={q.data} />
           </div>
         </div>
@@ -309,6 +311,44 @@ function TaxCard({ tax, href }: { tax: NonNullable<Data["tax"]>; href: string })
 }
 
 const KIND_LABELS: Record<string, string> = { invoice: "Invoice", payment: "Payment received", bill: "Purchase bill", supplier_payment: "Paid to supplier" };
+
+function LowStockCard({ low }: { low: NonNullable<Data["lowStock"]> }) {
+  const qty = (m: number) => (m / 1000).toLocaleString("en-IN", { maximumFractionDigits: 3 });
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Low stock</CardTitle>
+        <CardDescription>
+          {low.total} product{low.total === 1 ? "" : "s"} below minimum or out of stock
+        </CardDescription>
+        <CardAction>
+          <Button variant="ghost" size="sm" render={<Link href="/billing/reports/inventory?report=low-stock" />} nativeButton={false}>
+            All
+            <ArrowRightIcon data-icon="inline-end" />
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <ul className="flex flex-col divide-y">
+          {low.items.map((i) => (
+            <li key={i.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+              <Link href={`/billing/stock/${i.id}`} className="min-w-0 truncate hover:underline">
+                {i.name}
+              </Link>
+              <span className="flex shrink-0 items-center gap-2">
+                <span className="tabular-nums text-muted-foreground">
+                  {qty(i.onHandMilli)}
+                  {i.minStockMilli !== null ? ` / ${qty(i.minStockMilli)}` : ""} {i.unit}
+                </span>
+                <StockBadge status={i.status} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
 
 function RecentCard({ d }: { d: Data }) {
   return (

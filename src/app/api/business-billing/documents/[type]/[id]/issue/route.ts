@@ -2,6 +2,7 @@ import { route } from "@/lib/access";
 import { requireBillingPermission } from "@/lib/business-billing/access";
 import { issueDocument } from "@/lib/business-billing/documents/service";
 import { DOCUMENT_TYPES } from "@/lib/business-billing/documents/types";
+import type { TenantTx } from "@/lib/business-billing/tenant-db";
 import { assertInvoiceQuota } from "@/lib/subscription-billing/entitlements";
 
 import { actionsFor, slugOf } from "../../../_shared";
@@ -12,7 +13,8 @@ export const POST = route(async (_request: Request, { params }: RouteContext<"/a
   const { type, id } = await params;
   const slug = slugOf(type);
   const ctx = await requireBillingPermission(DOCUMENT_TYPES[slug].permission);
-  const beforeIssue = slug === "invoices" ? () => assertInvoiceQuota(ctx.organizationId, ctx.entitlements) : undefined;
+  // Checked inside the issuing transaction, under a per-company lock.
+  const beforeIssue = slug === "invoices" ? (tx: TenantTx) => assertInvoiceQuota(ctx.organizationId, ctx.entitlements, tx) : undefined;
   const doc = await issueDocument(ctx.organizationId, ctx.user.id, slug, id, beforeIssue);
   return Response.json({ ...doc, actions: actionsFor(ctx, doc) });
 });

@@ -34,6 +34,7 @@ import { PAYMENT_METHOD_OPTIONS, methodLabel, validatePayment, validateRefund } 
 
 import { LoadError } from "../../_components/page-parts";
 import { SectionNav } from "../../_components/section-nav";
+import { SendCard } from "./communication-ui";
 import { StatusBadge, fmtDate, useDocumentContext } from "./documents/documents-ui";
 import { BackLink, EmptyList, type Errors, ListSkeleton, ListToolbar, MoneyField, Pager, ReadOnlyNote, SelectField, TextField, focusFirstError, saveError, useRecordList } from "./records-ui";
 
@@ -456,6 +457,7 @@ export function PaymentView({ id }: { id: string }) {
           <AlertDescription>{p.voidReason}. The invoices it paid owe again.</AlertDescription>
         </Alert>
       ) : null}
+      {live ? <SendCard base={`${BASE}/payments/${p.id}`} title="Send receipt" canSend={p.canEdit} reminder={false} /> : null}
 
       <div className="grid gap-4 sm:grid-cols-3">
         {[

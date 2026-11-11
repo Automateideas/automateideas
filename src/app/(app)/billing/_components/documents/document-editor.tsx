@@ -36,6 +36,30 @@ type Lookups = {
   invoices: { id: string; number: string; issueDate: string; totalPaise: number }[];
 };
 type Pick = CatalogueItem & { kind: "product" | "service" };
+
+/** Documents that move stock, and whether they take it out (sales, returns to suppliers). */
+const STOCK_OUT: Partial<Record<DocumentSlug, boolean>> = { invoices: true, "purchase-returns": true, "credit-notes": false, "purchase-bills": false };
+const isStockSlug = (slug: DocumentSlug) => slug in STOCK_OUT;
+type StockLevels = { warehouseId: string; stock: Record<string, number>; warehouses: { id: string; code: string; name: string; isDefault: boolean }[]; allowNegativeStock: boolean };
+
+/** Stock on hand per tracked product in the chosen warehouse; null for documents that don't move stock. */
+function useStockLevels(enabled: boolean, warehouseId: string) {
+  const [data, setData] = useState<StockLevels | null>(null);
+  useEffect(() => {
+    if (!enabled) return;
+    let cancelled = false;
+    api<StockLevels>(`${BASE}/stock/available${warehouseId ? `?warehouseId=${warehouseId}` : ""}`).then(
+      (d) => !cancelled && setData(d),
+      () => undefined,
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, warehouseId]);
+  return enabled ? data : null;
+}
+
+const qtyText = (milli: number) => (milli / 1000).toLocaleString("en-IN", { maximumFractionDigits: 3 });
 type CustomerOption = { id: string; name: string; gstin: string | null };
 
 type Discount = { type: "percent"; percent: string } | { type: "amount"; paise: number } | null;
@@ -59,6 +83,8 @@ type StoredDoc = {
   notes: string | null;
   terms: string | null;
   items: StoredItem[];
+  warehouseId: string | null;
+  restock: boolean;
   actions: { edit: boolean; readOnlyReason: string | null };
 };
 
@@ -100,6 +126,10 @@ type FormState = {
   notes: string;
   terms: string;
   lines: LineForm[];
+  /** Stock documents: "" = the default warehouse. */
+  warehouseId: string;
+  /** Credit notes: the goods came back into stock. */
+  restock: boolean;
 };
 
 let nextKey = 1;
@@ -129,6 +159,8 @@ function toForm(d: StoredDoc | null): FormState {
     charges: (d?.charges ?? []).map((c) => ({ key: nextKey++, label: c.label, amount: paiseToRupees(c.amountPaise), taxRate: cleanDecimal(c.appliedTaxRate) || "0" })),
     notes: d?.notes ?? "",
     terms: d?.terms ?? "",
+    warehouseId: d?.warehouseId ?? "",
+    restock: d?.restock ?? true,
     lines: d?.items.length
       ? d.items.map((i) => {
           const disc = discountForm(i.discount);
@@ -175,6 +207,8 @@ function toPayload(f: FormState, slug: DocumentSlug) {
     charges: f.charges.map((c) => ({ label: c.label, amount: c.amount, taxRate: c.taxRate })),
     notes: f.notes,
     terms: f.terms,
+    ...(isStockSlug(slug) ? { warehouseId: f.warehouseId || null } : {}),
+    ...(slug === "credit-notes" ? { restock: f.restock } : {}),
     lines: f.lines.map((l) => ({
       productId: l.productId || null,
       serviceId: l.serviceId || null,
@@ -233,6 +267,19 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
   const fields = fieldsFor(slug);
   const customers = useApiQuery<{ items: CustomerOption[] }>(`${BASE}/${purchase ? "suppliers" : "customers"}?pageSize=200`);
   const lookups = useApiQuery<Lookups>(`${BASE}/documents/lookups?type=${slug}${form.partyId ? `&${fields.party}=${form.partyId}` : ""}`);
+  const stock = useStockLevels(isStockSlug(slug), form.warehouseId);
+  /** "In stock: 12" under a tracked product's quantity; flags a sale for more than the warehouse holds. */
+  const stockHint = (l: LineForm) => {
+    if (!stock || !l.productId || !(l.productId in stock.stock)) return undefined;
+    const available = stock.stock[l.productId];
+    const short = STOCK_OUT[slug] && Math.round(Number(l.quantity || 0) * 1000) > available;
+    if (!short) return `In stock: ${qtyText(available)}`;
+    return stock.allowNegativeStock ? (
+      <span>In stock: {qtyText(available)}. This takes it below zero.</span>
+    ) : (
+      <span className="text-destructive">Only {qtyText(available)} in stock.</span>
+    );
+  };
   const company = lookups.data?.company;
 
 
@@ -419,6 +466,50 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
                 <TextField id="d-reason" label="Reason" value={form.reason} onValue={(v) => set("reason", v)} error={errors.reason} placeholder={slug === "debit-notes" ? "e.g. Extra freight" : "e.g. Goods returned"} />
               </div>
             ) : null}
+            {stock && (stock.warehouses.length > 1 || slug === "credit-notes") ? (
+              <div className="grid gap-5 md:grid-cols-2 md:items-end">
+                {stock.warehouses.length > 1 ? (
+                  <SelectField
+                    id="d-warehouse"
+                    label={STOCK_OUT[slug] ? "Ship from warehouse" : "Receive into warehouse"}
+                    value={form.warehouseId || stock.warehouseId}
+                    onValue={(v) => set("warehouseId", v)}
+                    options={stock.warehouses.map((w) => ({ value: w.id, label: w.isDefault ? `${w.name} (default)` : w.name }))}
+                    error={errors.warehouseId}
+                  />
+                ) : null}
+                {slug === "credit-notes" ? (
+                  <Field orientation="horizontal">
+                    <Checkbox id="d-restock" checked={form.restock} onCheckedChange={(c) => set("restock", c === true)} />
+                    <FieldLabel htmlFor="d-restock" className="font-normal">
+                      Goods came back: add them to stock (turn off for a price-only credit note)
+                    </FieldLabel>
+                  </Field>
+                ) : null}
+              </div>
+            ) : null}
+            {stock && (stock.warehouses.length > 1 || slug === "credit-notes") ? (
+              <div className="grid gap-5 md:grid-cols-2 md:items-end">
+                {stock.warehouses.length > 1 ? (
+                  <SelectField
+                    id="d-warehouse"
+                    label={STOCK_OUT[slug] ? "Ship from warehouse" : "Receive into warehouse"}
+                    value={form.warehouseId || stock.warehouseId}
+                    onValue={(v) => set("warehouseId", v)}
+                    options={stock.warehouses.map((w) => ({ value: w.id, label: w.isDefault ? `${w.name} (default)` : w.name }))}
+                    error={errors.warehouseId}
+                  />
+                ) : null}
+                {slug === "credit-notes" ? (
+                  <Field orientation="horizontal">
+                    <Checkbox id="d-restock" checked={form.restock} onCheckedChange={(c) => set("restock", c === true)} />
+                    <FieldLabel htmlFor="d-restock" className="font-normal">
+                      Goods came back: add them to stock (turn off for a price-only credit note)
+                    </FieldLabel>
+                  </Field>
+                ) : null}
+              </div>
+            ) : null}
           </FieldGroup>
         </CardContent>
       </Card>
@@ -461,7 +552,7 @@ function DocumentEditor({ slug, initial, defaults }: { slug: DocumentSlug; initi
                 </Field>
                 <TextField id={`l-desc-${l.key}`} label="Description" className="col-span-2 lg:col-span-3" value={l.description} onValue={(v) => setLine(l.key, { description: v })} error={e("description")} />
                 <TextField id={`l-hsn-${l.key}`} label="HSN/SAC" className="lg:col-span-1" inputMode="numeric" maxLength={8} value={l.hsnSac} onValue={(v) => setLine(l.key, { hsnSac: v.replace(/\D/g, "") })} error={e("hsnSac")} />
-                <TextField id={`l-qty-${l.key}`} label={`Qty${l.unitCode ? ` (${l.unitCode})` : ""}`} className="lg:col-span-1" inputMode="decimal" value={l.quantity} onValue={(v) => setLine(l.key, { quantity: v.replace(/[^\d.]/g, "") })} error={e("quantity")} />
+                <TextField id={`l-qty-${l.key}`} label={`Qty${l.unitCode ? ` (${l.unitCode})` : ""}`} className="lg:col-span-1" inputMode="decimal" value={l.quantity} onValue={(v) => setLine(l.key, { quantity: v.replace(/[^\d.]/g, "") })} error={e("quantity")} hint={stockHint(l)} />
                 <div className="lg:col-span-2">
                   <MoneyField id={`l-rate-${l.key}`} label="Rate" value={l.rate} onValue={(v) => setLine(l.key, { rate: v })} error={e("rate")} />
                 </div>

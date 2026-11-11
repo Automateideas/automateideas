@@ -115,6 +115,10 @@ export const billingSettings = pgTable(
     showLogo: boolean("show_logo").default(false).notNull(),
     // Books are closed up to and including this date: nothing can be posted, issued or paid on or before it.
     booksLockedUntil: date("books_locked_until"),
+    // Whether invoices, returns and adjustments may take stock below zero (shown as a warning when allowed).
+    allowNegativeStock: boolean("allow_negative_stock").default(true).notNull(),
+    // Email and reminder settings, see lib/business-billing/communication/settings.ts.
+    communication: jsonb("communication").default({}).notNull(),
     // Design, colour, bank/UPI details, default terms… See lib/business-billing/template.ts.
     documentTemplate: jsonb("document_template").default({}).notNull(),
     // Storage keys (lib/storage.ts) of the signature and stamp images, like organization.logo.
@@ -169,6 +173,7 @@ export const DOCUMENT_TYPES = [
   "journal_entry",
   "purchase_return",
   "supplier_payment",
+  "stock_adjustment",
 ] as const;
 
 /** One counter per document type, financial year and (optional) branch. */
@@ -337,6 +342,26 @@ export const services = pgTable(
   ],
 );
 
+/** Where stock is kept. Each company gets a default "Main warehouse" on first use. */
+export const warehouses = pgTable(
+  "warehouses",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    ...address(),
+    isDefault: boolean("is_default").default(false).notNull(),
+    archivedAt: timestamp("archived_at"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("warehouses", t),
+    unique("warehouses_code_uq").on(t.organizationId, t.code),
+    uniqueIndex("warehouses_one_default_uq").on(t.organizationId).where(sql`${t.isDefault}`),
+  ],
+);
+
 export const priceLists = pgTable(
   "price_lists",
   {
@@ -407,6 +432,8 @@ export const customers = pgTable(
     openingBalancePaise: money("opening_balance_paise"),
     priceListId: text("price_list_id"),
     notes: text("notes"),
+    // Automatic payment reminders (company settings decide when). Manual "send now" ignores this.
+    sendReminders: boolean("send_reminders").default(true).notNull(),
     archivedAt: timestamp("archived_at"),
     ...audit(),
   },
@@ -667,9 +694,12 @@ export const businessInvoices = pgTable(
     dueDate: date("due_date"),
     quotationId: text("quotation_id"),
     salesOrderId: text("sales_order_id"),
+    // Where the goods leave from (products that track stock). Set on issue; default warehouse when empty.
+    warehouseId: text("warehouse_id"),
   },
   (t) => [
     ...documentConstraints("business_invoices", t, t.customerId, customers, INVOICE_STATUSES),
+    tenantFk("business_invoices_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
     tenantFk("business_invoices_quotation_fk", t.organizationId, t.quotationId, quotations),
     tenantFk("business_invoices_sales_order_fk", t.organizationId, t.salesOrderId, salesOrders),
     check("business_invoices_due_check", sql`${t.dueDate} is null or ${t.dueDate} >= ${t.issueDate}`),
@@ -685,9 +715,13 @@ export const creditNotes = pgTable(
     ...partySnapshot(),
     invoiceId: text("invoice_id"),
     reason: text("reason"),
+    // Goods came back (sales return): stock goes up. Off for price-only credit notes (discounts, rate corrections).
+    restock: boolean("restock").default(true).notNull(),
+    warehouseId: text("warehouse_id"),
   },
   (t) => [
     ...documentConstraints("credit_notes", t, t.customerId, customers, NOTE_STATUSES),
+    tenantFk("credit_notes_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
     tenantFk("credit_notes_invoice_fk", t.organizationId, t.invoiceId, businessInvoices),
     index("credit_notes_invoice_idx").on(t.organizationId, t.invoiceId),
   ],
@@ -751,9 +785,12 @@ export const purchaseBills = pgTable(
     supplierBillNumber: text("supplier_bill_number"),
     dueDate: date("due_date"),
     purchaseOrderId: text("purchase_order_id"),
+    // Where the goods arrive (products that track stock).
+    warehouseId: text("warehouse_id"),
   },
   (t) => [
     ...documentConstraints("purchase_bills", t, t.supplierId, suppliers, PURCHASE_BILL_STATUSES),
+    tenantFk("purchase_bills_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
     tenantFk("purchase_bills_order_fk", t.organizationId, t.purchaseOrderId, purchaseOrders),
     uniqueIndex("purchase_bills_supplier_number_uq")
       .on(t.organizationId, t.supplierId, t.supplierBillNumber)
@@ -779,9 +816,11 @@ export const purchaseReturns = pgTable(
     ...partySnapshot(),
     purchaseBillId: text("purchase_bill_id"),
     reason: text("reason"),
+    warehouseId: text("warehouse_id"),
   },
   (t) => [
     ...documentConstraints("purchase_returns", t, t.supplierId, suppliers, NOTE_STATUSES),
+    tenantFk("purchase_returns_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
     tenantFk("purchase_returns_bill_fk", t.organizationId, t.purchaseBillId, purchaseBills),
     index("purchase_returns_bill_idx").on(t.organizationId, t.purchaseBillId),
   ],
@@ -790,6 +829,118 @@ export const purchaseReturns = pgTable(
 export const purchaseReturnItems = pgTable("purchase_return_items", { ...itemColumns(), purchaseReturnId: text("purchase_return_id").notNull() }, (t) => [
   ...itemConstraints("purchase_return_items", t, t.purchaseReturnId, purchaseReturns),
 ]);
+
+/* ---------------- Inventory ---------------- */
+
+export const STOCK_MOVEMENT_KINDS = ["purchase", "purchase_return", "sale", "sales_return", "adjustment", "transfer_out", "transfer_in"] as const;
+export const STOCK_ADJUSTMENT_REASONS = ["opening", "count", "damaged", "lost", "expired", "found", "internal_use", "other"] as const;
+
+/**
+ * Every change to stock, one row per product, warehouse and event. Posted
+ * records: never changed or deleted (drizzle/*_inventory_rls_and_locks); a voided
+ * invoice, bill or adjustment gets an opposite movement instead.
+ *
+ * Value is the change in stock value at weighted average cost: a purchase
+ * adds its taxable cost, a sale removes quantity × average cost at that time.
+ */
+export const stockMovements = pgTable(
+  "stock_movements",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    warehouseId: text("warehouse_id").notNull(),
+    productId: text("product_id").notNull(),
+    movementDate: date("movement_date").notNull(),
+    kind: text("kind").notNull(),
+    // Signed: in > 0, out < 0.
+    quantity: numeric("quantity", { precision: 15, scale: 3 }).notNull(),
+    // Signed change in stock value, paise.
+    valuePaise: bigint("value_paise", { mode: "number" }).notNull(),
+    // What caused it: "document:invoices", "stock_adjustment"…
+    sourceType: text("source_type").notNull(),
+    sourceId: text("source_id").notNull(),
+    sourceLineId: text("source_line_id"),
+    reversesMovementId: text("reverses_movement_id"),
+    note: text("note"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("stock_movements", t),
+    tenantFk("stock_movements_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
+    tenantFk("stock_movements_product_fk", t.organizationId, t.productId, products),
+    tenantFk("stock_movements_reverses_fk", t.organizationId, t.reversesMovementId, t),
+    check("stock_movements_kind_check", inList(t.kind, STOCK_MOVEMENT_KINDS)),
+    check("stock_movements_quantity_check", sql`${t.quantity} <> 0`),
+    // A movement is reversed at most once.
+    uniqueIndex("stock_movements_one_reversal_uq").on(t.organizationId, t.reversesMovementId).where(sql`${t.reversesMovementId} is not null`),
+    index("stock_movements_product_idx").on(t.organizationId, t.productId, t.warehouseId, t.movementDate),
+    index("stock_movements_source_idx").on(t.organizationId, t.sourceType, t.sourceId),
+  ],
+);
+
+export const STOCK_ADJUSTMENT_STATUSES = ["posted", "void"] as const;
+
+/** A stock count correction, opening stock, write-off or transfer between warehouses. */
+export const stockAdjustments = pgTable(
+  "stock_adjustments",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    number: text("number").notNull(),
+    adjustmentDate: date("adjustment_date").notNull(),
+    // "adjustment" (quantities up or down in one warehouse) or "transfer" (from → to).
+    kind: text("kind").notNull(),
+    warehouseId: text("warehouse_id").notNull(),
+    toWarehouseId: text("to_warehouse_id"),
+    reason: text("reason"),
+    notes: text("notes"),
+    status: text("status").default("posted").notNull(),
+    voidedAt: timestamp("voided_at"),
+    voidReason: text("void_reason"),
+    idempotencyKey: text("idempotency_key"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("stock_adjustments", t),
+    unique("stock_adjustments_number_uq").on(t.organizationId, t.number),
+    uniqueIndex("stock_adjustments_idempotency_uq").on(t.organizationId, t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
+    tenantFk("stock_adjustments_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
+    tenantFk("stock_adjustments_to_warehouse_fk", t.organizationId, t.toWarehouseId, warehouses),
+    check("stock_adjustments_kind_check", sql`${t.kind} in ('adjustment', 'transfer')`),
+    check("stock_adjustments_status_check", inList(t.status, STOCK_ADJUSTMENT_STATUSES)),
+    check("stock_adjustments_reason_check", sql`${t.reason} is null or ${inList(t.reason, STOCK_ADJUSTMENT_REASONS)}`),
+    check(
+      "stock_adjustments_transfer_check",
+      sql`(${t.kind} = 'transfer' and ${t.toWarehouseId} is not null and ${t.toWarehouseId} <> ${t.warehouseId}) or (${t.kind} = 'adjustment' and ${t.toWarehouseId} is null)`,
+    ),
+    index("stock_adjustments_date_idx").on(t.organizationId, t.adjustmentDate),
+  ],
+);
+
+export const stockAdjustmentItems = pgTable(
+  "stock_adjustment_items",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    adjustmentId: text("adjustment_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    productId: text("product_id").notNull(),
+    // Adjustments: signed (+ adds, − removes). Transfers: the quantity moved (> 0).
+    quantity: numeric("quantity", { precision: 15, scale: 3 }).notNull(),
+    // Cost per unit for stock added (opening stock, found items); null = current average cost.
+    unitCostPaise: bigint("unit_cost_paise", { mode: "number" }),
+    note: text("note"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("stock_adjustment_items", t),
+    tenantFk("stock_adjustment_items_adjustment_fk", t.organizationId, t.adjustmentId, stockAdjustments),
+    tenantFk("stock_adjustment_items_product_fk", t.organizationId, t.productId, products),
+    unique("stock_adjustment_items_line_uq").on(t.organizationId, t.adjustmentId, t.lineNo),
+    check("stock_adjustment_items_quantity_check", sql`${t.quantity} <> 0`),
+    check("stock_adjustment_items_cost_check", sql`${t.unitCostPaise} is null or ${t.unitCostPaise} >= 0`),
+  ],
+);
 
 /* ---------------- Payments ---------------- */
 
@@ -982,6 +1133,73 @@ export const journalLines = pgTable(
   ],
 );
 
+/* ---------------- Communication ---------------- */
+
+/**
+ * A secret link that lets someone without a login view and download one
+ * document's PDF (sent by email or WhatsApp). Only a SHA-256 hash of the
+ * token is stored. RLS also lets a request holding the token read just its
+ * own row (drizzle/*_communication_rls_and_locks).
+ */
+export const documentShares = pgTable(
+  "document_shares",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    // Document slug ("invoices", "quotations"…) or "receipt" for a payment receipt.
+    documentType: text("document_type").notNull(),
+    documentId: text("document_id").notNull(),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    revokedAt: timestamp("revoked_at"),
+    views: integer("views").default(0).notNull(),
+    lastViewedAt: timestamp("last_viewed_at"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("document_shares", t),
+    uniqueIndex("document_shares_token_uq").on(t.tokenHash),
+    index("document_shares_document_idx").on(t.organizationId, t.documentType, t.documentId),
+  ],
+);
+
+export const MESSAGE_CHANNELS = ["email", "whatsapp"] as const;
+export const MESSAGE_STATUSES = ["sending", "sent", "failed", "logged"] as const;
+
+/**
+ * Every invoice, receipt or reminder sent to a customer. A dedupe key (e.g.
+ * "reminder:<invoice>:after-2") stops the scheduled job sending the same
+ * reminder twice, even if it runs twice at once.
+ */
+export const billingMessages = pgTable(
+  "billing_messages",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    channel: text("channel").notNull(),
+    // "document", "receipt", "reminder".
+    kind: text("kind").notNull(),
+    documentType: text("document_type").notNull(),
+    documentId: text("document_id").notNull(),
+    customerId: text("customer_id"),
+    recipient: text("recipient").notNull(),
+    subject: text("subject"),
+    status: text("status").notNull(),
+    providerMessageId: text("provider_message_id"),
+    error: text("error"),
+    dedupeKey: text("dedupe_key"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("billing_messages", t),
+    tenantFk("billing_messages_customer_fk", t.organizationId, t.customerId, customers),
+    check("billing_messages_channel_check", inList(t.channel, MESSAGE_CHANNELS)),
+    check("billing_messages_status_check", inList(t.status, MESSAGE_STATUSES)),
+    uniqueIndex("billing_messages_dedupe_uq").on(t.organizationId, t.dedupeKey).where(sql`${t.dedupeKey} is not null`),
+    index("billing_messages_document_idx").on(t.organizationId, t.documentType, t.documentId),
+  ],
+);
+
 /* ---------------- System ---------------- */
 
 /** Append-only: the app may add and read rows, never change or delete them. */
@@ -1061,6 +1279,12 @@ export const BUSINESS_BILLING_TABLES = [
   "business_payments",
   "payment_allocations",
   "refunds",
+  "warehouses",
+  "stock_movements",
+  "stock_adjustments",
+  "stock_adjustment_items",
+  "document_shares",
+  "billing_messages",
   "journal_entries",
   "journal_lines",
   "audit_logs",

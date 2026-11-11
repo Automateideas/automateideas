@@ -26,7 +26,7 @@ const A = `reptest-a-${stamp}`;
 const B = `reptest-b-${stamp}`;
 const USER = null as unknown as string;
 const ids: Record<string, string> = {};
-const P: ReportParams = { from: "2026-04-01", to: "2026-11-30", asOf: "2026-11-30", groupBy: "month", customerId: null, supplierId: null, status: null };
+const P: ReportParams = { from: "2026-04-01", to: "2026-11-30", asOf: "2026-11-30", groupBy: "month", customerId: null, supplierId: null, warehouseId: null, productId: null, status: null };
 const run = (id: string, over: Partial<ReportParams> = {}, org = A) => runReport(org, id, { ...P, ...over });
 const col = (t: ReportTable, key: string) => t.rows.filter((r) => r._strong !== 1).reduce((a, r) => a + Number(r[key] ?? 0), 0);
 

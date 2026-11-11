@@ -1,4 +1,4 @@
-import { and, count, eq, gte, inArray, lt } from "drizzle-orm";
+import { and, count, eq, gte, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { APIError } from "better-auth/api";
 
 import { db } from "@/db";
@@ -136,34 +136,71 @@ export function assertFeature(e: Pick<Entitlements, "features" | "effectivePlanI
   }
 }
 
-/** Start and end (exclusive) of the current calendar month, as YYYY-MM-DD. */
-export function monthBounds(now = new Date()) {
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-  const day = (d: Date) => d.toISOString().slice(0, 10);
-  return { start: day(start), end: day(end) };
-}
+const IST_OFFSET = 330 * 60 * 1000;
 
 /**
- * 403 when issuing one more invoice this month would pass the plan's cap.
- * Counts issued (non-draft, non-void) invoices dated this month.
- * Called by invoice issuing (built in a later stage).
+ * The current calendar month in India: start and end (exclusive) as
+ * YYYY-MM-DD, and as instants (`from`, `to`) for timestamp columns.
+ * 1 Dec 02:00 IST is still 30 Nov in UTC, but it's December here.
  */
-export async function assertInvoiceQuota(organizationId: string, e: Pick<Entitlements, "limits" | "effectivePlanId">) {
-  const cap = e.limits.maxInvoicesPerMonth;
-  if (cap === null) return;
-  const { start, end } = monthBounds();
-  const [{ n }] = await db
+export function monthBounds(now = new Date()) {
+  const ist = new Date(now.getTime() + IST_OFFSET);
+  const y = ist.getUTCFullYear();
+  const m = ist.getUTCMonth();
+  const start = new Date(Date.UTC(y, m, 1));
+  const end = new Date(Date.UTC(y, m + 1, 1));
+  const day = (d: Date) => d.toISOString().slice(0, 10);
+  return {
+    start: day(start),
+    end: day(end),
+    from: new Date(start.getTime() - IST_OFFSET),
+    to: new Date(end.getTime() - IST_OFFSET),
+    label: start.toLocaleDateString("en-IN", { month: "long", year: "numeric", timeZone: "UTC" }),
+  };
+}
+
+/** Anything that can run a query: the shared connection or a tenant transaction. */
+type Queryable = Pick<typeof db, "select" | "execute">;
+
+/**
+ * Invoices that count towards the monthly cap: issued this calendar month
+ * (by when they were issued, not the date printed on them, so backdating
+ * doesn't skip the cap) and not void.
+ */
+export async function invoicesIssuedThisMonth(organizationId: string, q: Queryable = db, now = new Date()) {
+  const { from, to } = monthBounds(now);
+  const [{ n }] = await q
     .select({ n: count() })
     .from(businessInvoices)
     .where(
       and(
         eq(businessInvoices.organizationId, organizationId),
-        inArray(businessInvoices.status, ["issued", "partially_paid", "paid"]),
-        gte(businessInvoices.issueDate, start),
-        lt(businessInvoices.issueDate, end),
+        isNotNull(businessInvoices.number),
+        isNull(businessInvoices.voidedAt),
+        gte(businessInvoices.issuedAt, from),
+        lt(businessInvoices.issuedAt, to),
       ),
     );
+  return n;
+}
+
+/** This month's invoice count against the plan's cap, for the subscription page. */
+export async function invoiceUsage(organizationId: string, e: Pick<Entitlements, "limits">) {
+  const used = await invoicesIssuedThisMonth(organizationId);
+  return { used, cap: e.limits.maxInvoicesPerMonth, month: monthBounds().label };
+}
+
+/**
+ * 403 when issuing one more invoice this month would pass the plan's cap.
+ * Pass the issuing transaction: it takes a per-company lock first, so two
+ * invoices issued at the same moment can't both take the last slot.
+ */
+export async function assertInvoiceQuota(organizationId: string, e: Pick<Entitlements, "limits" | "effectivePlanId">, tx?: Queryable) {
+  const cap = e.limits.maxInvoicesPerMonth;
+  if (cap === null) return;
+  // Held until the issuing transaction commits; the next issue then sees this one.
+  if (tx) await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`invoice-quota:${organizationId}`}))`);
+  const n = await invoicesIssuedThisMonth(organizationId, tx ?? db);
   if (n >= cap) {
     throw new APIError("FORBIDDEN", {
       code: "INVOICE_LIMIT_REACHED",

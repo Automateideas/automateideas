@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 import { LoadError } from "../../_components/page-parts";
 import { SectionNav } from "../../_components/section-nav";
-import { PeriodPicker, useSettings } from "./accounting";
+import { AsOfPicker, PeriodPicker, useSettings } from "./accounting";
 import { fmtDate } from "./documents/documents-ui";
 import { ExportButtons } from "./report-export";
 import { EmptyList, ListSkeleton, SelectField } from "./records-ui";
@@ -153,6 +153,9 @@ export function ReportGroupView({ group }: { group: ReportGroup }) {
             groupBy: params.get("groupBy") ?? "month",
             customerId: params.get("customerId") ?? "",
             supplierId: params.get("supplierId") ?? "",
+            warehouseId: params.get("warehouseId") ?? "",
+            productId: params.get("productId") ?? "",
+            asOf: params.get("asOf") ?? settings.data.today,
             status: params.get("status") ?? "",
           }}
           onChange={set}
@@ -163,7 +166,7 @@ export function ReportGroupView({ group }: { group: ReportGroup }) {
   );
 }
 
-type Values = { from: string; to: string; groupBy: string; customerId: string; supplierId: string; status: string };
+type Values = { from: string; to: string; asOf: string; groupBy: string; customerId: string; supplierId: string; warehouseId: string; productId: string; status: string };
 
 function ReportBody({
   reportId,
@@ -190,6 +193,9 @@ function ReportBody({
   if (has("groupBy")) query.set("groupBy", values.groupBy);
   if (has("customer") && values.customerId) query.set("customerId", values.customerId);
   if (has("supplier") && values.supplierId) query.set("supplierId", values.supplierId);
+  if (has("asOf")) query.set("asOf", values.asOf);
+  if (has("warehouse") && values.warehouseId) query.set("warehouseId", values.warehouseId);
+  if (has("product") && values.productId) query.set("productId", values.productId);
   if ((has("invoiceStatus") || has("paymentStatus")) && values.status) query.set("status", values.status);
 
   return (
@@ -197,6 +203,7 @@ function ReportBody({
       <p className="text-sm text-muted-foreground">{description}</p>
       <div className="flex flex-col gap-4 rounded-xl border p-4">
         {has("period") ? <PeriodPicker from={values.from} to={values.to} settings={settings} onChange={(from, to) => onChange({ from, to })} /> : null}
+        {has("asOf") ? <AsOfPicker asOf={values.asOf} settings={settings} onChange={(asOf) => onChange({ asOf })} /> : null}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {has("groupBy") ? (
             <SelectField id="rep-group" label="Group by" value={values.groupBy} onValue={(v) => onChange({ groupBy: v || "month" })} options={GROUP_BY.map((g) => ({ value: g, label: GROUP_BY_LABELS[g] }))} />
@@ -207,6 +214,8 @@ function ReportBody({
           {has("supplier") ? (
             <PartyFilter kind="suppliers" value={values.supplierId} onValue={(v) => onChange({ supplierId: v || null })} />
           ) : null}
+          {has("warehouse") ? <WarehouseFilter value={values.warehouseId} onValue={(v) => onChange({ warehouseId: v || null })} /> : null}
+          {has("product") ? <ProductFilter value={values.productId} onValue={(v) => onChange({ productId: v || null })} /> : null}
           {has("invoiceStatus") || has("paymentStatus") ? (
             <SelectField
               id="rep-status"
@@ -237,6 +246,22 @@ export function PartyFilter({ kind, value, onValue, id = `rep-${kind}` }: { kind
       placeholder={list.status === "loading" ? "Loading…" : undefined}
       options={(list.data?.items ?? []).map((c) => ({ value: c.id, label: c.name }))}
     />
+  );
+}
+
+/** All warehouses (including archived), for a report filter. */
+function WarehouseFilter({ value, onValue }: { value: string; onValue: (v: string) => void }) {
+  const list = useApiQuery<{ items: Option[] }>("/api/business-billing/warehouses?status=all");
+  return (
+    <SelectField id="rep-warehouse" label="Warehouse" value={value} onValue={onValue} noneLabel="All warehouses" placeholder={list.status === "loading" ? "Loading…" : undefined} options={(list.data?.items ?? []).map((w) => ({ value: w.id, label: w.name }))} />
+  );
+}
+
+/** Products that track stock, for a report filter. */
+function ProductFilter({ value, onValue }: { value: string; onValue: (v: string) => void }) {
+  const list = useApiQuery<{ items: Option[] }>("/api/business-billing/stock?pageSize=200");
+  return (
+    <SelectField id="rep-product" label="Product" value={value} onValue={onValue} noneLabel="All products" placeholder={list.status === "loading" ? "Loading…" : undefined} options={(list.data?.items ?? []).map((p) => ({ value: p.id, label: p.name }))} />
   );
 }
 

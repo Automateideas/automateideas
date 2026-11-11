@@ -31,6 +31,8 @@ export type CustomerValues = {
   openingBalancePaise: number;
   priceListId: string | null;
   notes: string | null;
+  /** Automatic payment reminders (when the company has them on). */
+  sendReminders: boolean;
   billingAddress: AddressValues;
   /** null = same as billing. */
   shippingAddress: AddressValues | null;
@@ -104,6 +106,7 @@ export function validateCustomer(raw: Record<string, unknown>): Result<CustomerV
       openingBalancePaise,
       priceListId,
       notes,
+      sendReminders: r.bool("sendReminders", true),
       billingAddress,
       shippingAddress: shippingAddress && !isBlankAddress(shippingAddress) ? shippingAddress : null,
     },

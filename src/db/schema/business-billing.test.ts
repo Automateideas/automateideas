@@ -32,6 +32,10 @@ describe("business billing schema", () => {
       "purchase_order_items", "purchase_bill_items",
       // Stage 10: purchase returns (debit notes to suppliers).
       "purchase_returns", "purchase_return_items",
+      // Stage 14a: inventory (warehouses, stock_movements and stock_adjustments were in the requested list).
+      "warehouses", "stock_movements", "stock_adjustments", "stock_adjustment_items",
+      // Stage 14b: share links and the sent-messages log.
+      "document_shares", "billing_messages",
     ];
     expect([...requested, ...added].sort()).toEqual([...bb.BUSINESS_BILLING_TABLES].sort());
   });

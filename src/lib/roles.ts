@@ -88,6 +88,7 @@ export const BUSINESS_BILLING_PERMISSIONS = [
   "billing.purchases.manage",
   "billing.reports.view",
   "billing.accounting.manage", // chart of accounts, manual journal entries, closing the books
+  "billing.inventory.manage", // warehouses, stock adjustments and transfers
 ] as const;
 export type BusinessBillingPermission = (typeof BUSINESS_BILLING_PERMISSIONS)[number];
 

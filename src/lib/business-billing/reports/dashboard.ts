@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 
 import { todayInIndia } from "../documents/types";
+import { lowStock } from "../inventory/service";
 import { payablesReport } from "../payments/supplier-payments";
 import { outstandingReport } from "../payments/service";
 import { withTenant } from "../tenant-db";
@@ -34,8 +35,8 @@ export type Dashboard = Awaited<ReturnType<typeof billingDashboard>>;
 
 export async function billingDashboard(organizationId: string, p: { from: string; to: string; customerId: string | null }) {
   const today = todayInIndia();
-  const [receivables, payables] = await Promise.all([outstandingReport(organizationId, today), payablesReport(organizationId, today)]);
-  const items = await itemSummary(organizationId, { ...p, asOf: p.to, groupBy: "month", supplierId: null, status: null }, SALES_DOCS, p.customerId);
+  const [receivables, payables, low] = await Promise.all([outstandingReport(organizationId, today), payablesReport(organizationId, today), lowStock(organizationId, 5)]);
+  const items = await itemSummary(organizationId, { ...p, asOf: p.to, groupBy: "month", supplierId: null, warehouseId: null, productId: null, status: null }, SALES_DOCS, p.customerId);
 
   const data = await withTenant(organizationId, async (tx) => {
     const sums = async (docs: typeof SALES_DOCS, partyId: string | null) => {
@@ -132,6 +133,8 @@ export async function billingDashboard(organizationId: string, p: { from: string
     monthly: months.map((m) => ({ month: m, salesPaise: salesBy.get(m) ?? 0, collectedPaise: collectedBy.get(m) ?? 0 })),
     topCustomers: p.customerId ? [] : data.top.map((r) => ({ id: r.id, name: r.name, salesPaise: n(r.total) })),
     topItems: items.slice(0, 5).filter((r) => n(r.taxable) > 0).map((r) => ({ name: String(r.name ?? ""), quantity: Math.round(n(r.qty) * 1000) / 1000, unit: (r.unit as string) ?? null, salesPaise: n(r.taxable) })),
+    // Products that track stock and are below their minimum or out of stock (company-wide, today).
+    lowStock: p.customerId ? null : { total: low.total, items: low.items.map((i) => ({ id: i.id, name: i.name, unit: i.unit, onHandMilli: i.onHandMilli, minStockMilli: i.minStockMilli, status: i.status })) },
     tax: p.customerId ? null : { output: tax(data.output), input: tax(data.input), netPaise: tax(data.output).totalPaise - tax(data.input).totalPaise },
     recent: data.recent.map((r) => ({ kind: String(r.kind), id: String(r.id), number: (r.number as string) ?? null, date: iso(r.date), party: (r.party as string) ?? "", amountPaise: n(r.amount), href: HREF[String(r.kind)](String(r.id)) })),
   };
