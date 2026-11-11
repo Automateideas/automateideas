@@ -10,6 +10,7 @@ import {
   refunds,
 } from "@/db/schema";
 
+import { assertOpenPeriod, postPayment, postRefund, reverseSource } from "../accounting/posting";
 import { allocateDocumentNumber } from "../numbering";
 import { type ListQuery, conflict, invalid, notFound, paged, searchFilter } from "../records";
 import { type TenantTx, withTenant } from "../tenant-db";
@@ -218,6 +219,7 @@ export async function recordPayment(organizationId: string, userId: string, v: P
       const allocated = v.allocations.reduce((a, x) => a + x.amountPaise, 0);
       if (allocated > v.amountPaise) invalid({ allocations: "You've allocated more than the amount received." });
       await checkAllocations(tx, organizationId, v.customerId, v.allocations);
+      await assertOpenPeriod(tx, organizationId, v.paymentDate, "paymentDate");
       const n = await allocateDocumentNumber(tx, organizationId, { documentType: "payment", date: new Date(`${v.paymentDate}T00:00:00Z`) });
       const [row] = await tx
         .insert(businessPayments)
@@ -237,7 +239,10 @@ export async function recordPayment(organizationId: string, userId: string, v: P
         })
         .returning({ id: businessPayments.id });
       await insertAllocations(tx, organizationId, userId, row.id, v.allocations);
-      return { ...(await readPayment(tx, organizationId, row.id)), replayed: false };
+      const detail = await readPayment(tx, organizationId, row.id);
+      // Dr Cash/Bank, Cr Debtors, in this same transaction.
+      await postPayment(tx, organizationId, { id: detail.id, number: detail.number, direction: "received", date: detail.paymentDate, amountPaise: detail.amountPaise, method: detail.method, partyId: detail.customerId, partyName: detail.customerName }, { userId });
+      return { ...detail, replayed: false };
     });
   } catch (e) {
     // Two identical requests at the same moment: the second one hits the unique key.
@@ -296,6 +301,7 @@ export async function voidPayment(organizationId: string, userId: string, paymen
       .set({ status: "void", voidedAt: new Date(), voidReason: reason, updatedBy: userId })
       .where(and(eq(businessPayments.organizationId, organizationId), eq(businessPayments.id, paymentId)));
     for (const a of allocs) await refreshInvoiceStatus(tx, organizationId, a.invoiceId);
+    await reverseSource(tx, organizationId, "payment_received", paymentId, todayInIndia(), `Void payment ${p.number ?? ""}: ${reason}`, userId);
     return readPayment(tx, organizationId, paymentId);
   });
 }
@@ -354,12 +360,15 @@ export async function recordRefund(organizationId: string, userId: string, v: Re
         }
         invoiceToRefresh = cn.invoiceId;
       }
+      await assertOpenPeriod(tx, organizationId, v.refundDate, "refundDate");
       const n = await allocateDocumentNumber(tx, organizationId, { documentType: "refund", date: new Date(`${v.refundDate}T00:00:00Z`) });
       const [row] = await tx
         .insert(refunds)
         .values({ organizationId, ...v, number: n.number, idempotencyKey, createdBy: userId, updatedBy: userId })
         .returning();
       await refreshInvoiceStatus(tx, organizationId, invoiceToRefresh);
+      const [cust] = await tx.select({ name: customers.name }).from(customers).where(and(eq(customers.organizationId, organizationId), eq(customers.id, v.customerId)));
+      await postRefund(tx, organizationId, { id: row.id, number: row.number, date: row.refundDate, amountPaise: row.amountPaise, method: row.method, customerId: v.customerId, customerName: cust?.name ?? "" }, { userId });
       return { ...row, replayed: false };
     });
   } catch (e) {
@@ -385,6 +394,7 @@ export async function voidRefund(organizationId: string, userId: string, id: str
       const [cn] = await tx.select({ invoiceId: creditNotes.invoiceId }).from(creditNotes).where(and(eq(creditNotes.organizationId, organizationId), eq(creditNotes.id, r.creditNoteId)));
       await refreshInvoiceStatus(tx, organizationId, cn?.invoiceId);
     }
+    await reverseSource(tx, organizationId, "refund", id, todayInIndia(), `Void refund ${r.number ?? ""}: ${reason}`, userId);
     return updated;
   });
 }

@@ -3,6 +3,7 @@ import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { businessPayments, paymentAllocations, purchaseBills, purchaseReturns, suppliers } from "@/db/schema";
 
 import { todayInIndia } from "../documents/types";
+import { assertOpenPeriod, postPayment, reverseSource } from "../accounting/posting";
 import { allocateDocumentNumber } from "../numbering";
 import { type ListQuery, conflict, invalid, notFound, paged, searchFilter } from "../records";
 import { type TenantTx, withTenant } from "../tenant-db";
@@ -172,6 +173,7 @@ export async function recordSupplierPayment(organizationId: string, userId: stri
       await requireSupplier(tx, organizationId, v.supplierId);
       if (v.allocations.reduce((a, x) => a + x.amountPaise, 0) > v.amountPaise) invalid({ allocations: "You've allocated more than the amount paid." });
       await checkBillAllocations(tx, organizationId, v.supplierId, v.allocations);
+      await assertOpenPeriod(tx, organizationId, v.paymentDate, "paymentDate");
       const n = await allocateDocumentNumber(tx, organizationId, { documentType: "supplier_payment", date: new Date(`${v.paymentDate}T00:00:00Z`) });
       const [row] = await tx
         .insert(businessPayments)
@@ -191,7 +193,10 @@ export async function recordSupplierPayment(organizationId: string, userId: stri
         })
         .returning({ id: businessPayments.id });
       await insertBillAllocations(tx, organizationId, userId, row.id, v.allocations);
-      return { ...(await readSupplierPayment(tx, organizationId, row.id)), replayed: false };
+      const detail = await readSupplierPayment(tx, organizationId, row.id);
+      // Dr Creditors, Cr Cash/Bank, in this same transaction.
+      await postPayment(tx, organizationId, { id: detail.id, number: detail.number, direction: "made", date: detail.paymentDate, amountPaise: detail.amountPaise, method: detail.method, partyId: detail.supplierId, partyName: detail.supplierName }, { userId });
+      return { ...detail, replayed: false };
     });
   } catch (e) {
     if (isUnique(e, "business_payments_idempotency_uq")) {
@@ -243,6 +248,7 @@ export async function voidSupplierPayment(organizationId: string, userId: string
       .set({ status: "void", voidedAt: new Date(), voidReason: reason, updatedBy: userId })
       .where(and(eq(businessPayments.organizationId, organizationId), eq(businessPayments.id, paymentId)));
     for (const a of allocs) await refreshBillStatus(tx, organizationId, a.billId);
+    await reverseSource(tx, organizationId, "payment_made", paymentId, todayInIndia(), `Void payment ${p.number ?? ""}: ${reason}`, userId);
     return readSupplierPayment(tx, organizationId, paymentId);
   });
 }

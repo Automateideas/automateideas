@@ -2,7 +2,9 @@ import { and, asc, count, eq, isNull, ne, or, sql } from "drizzle-orm";
 
 import { customerAddresses, customers, priceLists } from "@/db/schema";
 
+import { syncOpeningBalance } from "./accounting/posting";
 import type { CustomerValues } from "./contacts-validation";
+import { todayInIndia } from "./documents/types";
 import type { AddressValues } from "./fields";
 import { type ListQuery, conflict, guardUnique, invalid, notFound, paged, searchFilter, statusFilter, where } from "./records";
 import { type TenantTx, withTenant } from "./tenant-db";
@@ -224,6 +226,7 @@ export async function createCustomer(organizationId: string, userId: string, v: 
           .values({ organizationId, ...columns(v), createdBy: userId, updatedBy: userId })
           .returning({ id: customers.id });
         await writeAddresses(tx, organizationId, row.id, userId, v);
+        await syncOpeningBalance(tx, organizationId, { kind: "customer", id: row.id, name: v.name, openingBalancePaise: v.openingBalancePaise }, todayInIndia(), userId);
         return readCustomer(tx, organizationId, row.id);
       }),
     UNIQUE,
@@ -246,6 +249,8 @@ export async function updateCustomer(organizationId: string, userId: string, id:
           .set({ ...columns(v), updatedBy: userId })
           .where(and(eq(customers.organizationId, organizationId), eq(customers.id, id)));
         await writeAddresses(tx, organizationId, id, userId, v);
+        // An edited opening balance posts only the difference.
+        await syncOpeningBalance(tx, organizationId, { kind: "customer", id, name: v.name, openingBalancePaise: v.openingBalancePaise }, todayInIndia(), userId);
         return readCustomer(tx, organizationId, id);
       }),
     UNIQUE,

@@ -40,6 +40,7 @@ export function SettingsNav() {
         { href: "/billing/settings/invoices", label: "Invoice numbering" },
         { href: "/billing/settings/branding", label: "Branding" },
         { href: "/billing/settings/templates", label: "Templates" },
+        { href: "/billing/settings/accounting", label: "Accounting" },
       ]}
     />
   );

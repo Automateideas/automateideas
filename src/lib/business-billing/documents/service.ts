@@ -29,6 +29,7 @@ import {
   suppliers,
 } from "@/db/schema";
 
+import { assertOpenPeriod, documentSource, isPostedDocument, postDocument, reverseSource } from "../accounting/posting";
 import { type AddressValues, stateByCode } from "../fields";
 import { allocateDocumentNumber } from "../numbering";
 import { billBalances, invoiceBalances, refreshBillStatus, refreshInvoiceStatus } from "../payments/balances";
@@ -786,6 +787,8 @@ export async function issueDocument(organizationId: string, userId: string, slug
           }
         }
         if (beforeIssue) await beforeIssue();
+        // Documents that reach the books can't be dated inside a closed period.
+        if (isPostedDocument(slug)) await assertOpenPeriod(tx, organizationId, values.issueDate, "issueDate");
 
         const seller = await sellerSnapshot(tx, organizationId);
         const n = await allocateDocumentNumber(tx, organizationId, { documentType: type.numbering, date: new Date(`${values.issueDate}T00:00:00Z`) });
@@ -830,6 +833,30 @@ export async function issueDocument(organizationId: string, userId: string, slug
         // A note or return changes what its invoice or bill still owes.
         if (type.source === "invoices") await refreshInvoiceStatus(tx, organizationId, values.sourceId);
         if (type.source === "purchase-bills") await refreshBillStatus(tx, organizationId, values.sourceId);
+        // Double-entry posting, in this same transaction.
+        if (isPostedDocument(slug)) {
+          await postDocument(
+            tx,
+            organizationId,
+            slug,
+            {
+              id,
+              number: n.number,
+              issueDate: values.issueDate,
+              partyId: values.partyId,
+              partyName: party.name,
+              reverseCharge: values.reverseCharge,
+              taxablePaise: result.taxablePaise,
+              cgstPaise: result.cgstPaise,
+              sgstPaise: result.sgstPaise,
+              igstPaise: result.igstPaise,
+              cessPaise: result.cessPaise,
+              roundOffPaise: result.roundOffPaise,
+              totalPaise: result.totalPaise,
+            },
+            { userId },
+          );
+        }
         return readDocument(tx, organizationId, slug, id);
       }),
     type.singular,
@@ -887,6 +914,8 @@ export async function voidDocument(organizationId: string, userId: string, slug:
         const sourceId = r.sourceKey ? ((current as Record<string, unknown>)[r.sourceKey] as string | null) : null;
         if (type.source === "invoices") await refreshInvoiceStatus(tx, organizationId, sourceId);
         if (type.source === "purchase-bills") await refreshBillStatus(tx, organizationId, sourceId);
+        // The books get a reversing entry dated today; the original stays.
+        if (isPostedDocument(slug)) await reverseSource(tx, organizationId, documentSource(slug), id, todayInIndia(), `Void ${current.number ?? ""}: ${reason}`, userId);
         return readDocument(tx, organizationId, slug, id);
       }),
     type.singular,

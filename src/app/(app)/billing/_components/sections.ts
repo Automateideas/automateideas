@@ -1,5 +1,6 @@
 import {
   BarChart3Icon,
+  BookOpenIcon,
   BoxIcon,
   FileTextIcon,
   type LucideIcon,
@@ -93,10 +94,18 @@ export const BILLING_SECTIONS: readonly BillingSection[] = [
     empty: { title: "No purchases yet", description: "Record bills from your suppliers." },
   },
   {
+    slug: "accounting",
+    label: "Accounting",
+    Icon: BookOpenIcon,
+    summary: "Your books: ledgers, trial balance, profit and loss, balance sheet.",
+    tone: "ink",
+    empty: { title: "Nothing posted yet", description: "Entries appear as you issue invoices, record bills and take payments." },
+  },
+  {
     slug: "reports",
     label: "Reports",
     Icon: BarChart3Icon,
-    summary: "Sales, purchases, tax and payments at a glance.",
+    summary: "Sales, purchases, payments and GST, with CSV and Excel downloads.",
     tone: "ink",
     empty: { title: "No reports yet", description: "Reports appear once you have invoices and payments." },
   },
@@ -112,7 +121,7 @@ export const billingSection = (slug: string) => {
 export const CATALOGUE_EXTRA_PATHS = ["/billing/categories", "/billing/units", "/billing/price-lists"] as const;
 
 /** Sections whose pages are built (no "Coming soon" placeholder). */
-export const BUILT_SECTIONS = ["invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases"] as const;
+export const BUILT_SECTIONS = ["invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases", "accounting", "reports"] as const;
 
 /** Purchase pages outside the section list; the Purchases tab stays active on them. */
 export const PURCHASE_EXTRA_PATHS = ["/billing/purchase-bills", "/billing/purchase-orders", "/billing/purchase-returns", "/billing/supplier-payments", "/billing/payables"] as const;
@@ -122,6 +131,9 @@ export const PAYMENT_EXTRA_PATHS = ["/billing/refunds", "/billing/outstanding"] 
 
 /** Sales pages outside the section list; the Invoices tab stays active on them. */
 export const SALES_EXTRA_PATHS = ["/billing/sales-orders", "/billing/credit-notes", "/billing/debit-notes"] as const;
+
+/** Accounting pages outside the section list; the Accounting tab stays active on them. */
+export const ACCOUNTING_EXTRA_PATHS = ["/billing/journal-entries", "/billing/ledger", "/billing/trial-balance", "/billing/profit-loss", "/billing/balance-sheet"] as const;
 
 /** Tabs: Overview, every section, then Settings. */
 export const BILLING_NAV = [
@@ -134,6 +146,7 @@ export const BILLING_NAV = [
     ...(s.slug === "invoices" ? { alsoActiveOn: SALES_EXTRA_PATHS } : {}),
     ...(s.slug === "payments" ? { alsoActiveOn: PAYMENT_EXTRA_PATHS } : {}),
     ...(s.slug === "purchases" ? { alsoActiveOn: PURCHASE_EXTRA_PATHS } : {}),
+    ...(s.slug === "accounting" ? { alsoActiveOn: ACCOUNTING_EXTRA_PATHS } : {}),
   })),
   { href: "/billing/settings", label: "Settings", matchNested: true },
 ];

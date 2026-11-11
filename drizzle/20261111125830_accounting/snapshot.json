@@ -1,0 +1,133 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "750fcdbe-f507-4097-9ccb-b335a13c67fd",
+  "prevIds": [
+    "8e747da3-f115-461a-8c73-5cd79f62ba88"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "accounts",
+        "system_key"
+      ],
+      "writes": [
+        "s|col|public.accounts.system_key",
+        "n|col|public.accounts.system_key",
+        "e|col|public.accounts.system_key"
+      ],
+      "reads": [
+        "n|tbl|public.accounts",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "billing_settings",
+        "books_locked_until"
+      ],
+      "writes": [
+        "s|col|public.billing_settings.books_locked_until",
+        "n|col|public.billing_settings.books_locked_until",
+        "e|col|public.billing_settings.books_locked_until"
+      ],
+      "reads": [
+        "n|tbl|public.billing_settings",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "accounts",
+        "accounts_system_key_uq"
+      ],
+      "writes": [
+        "s|idx|public.accounts_system_key_uq",
+        "n|idx|public.accounts_system_key_uq",
+        "e|idx|public.accounts_system_key_uq",
+        "n|rel|public.accounts_system_key_uq"
+      ],
+      "reads": [
+        "n|tbl|public.accounts",
+        "n|sch|public",
+        "n|col|public.accounts.organization_id",
+        "n|col|public.accounts.system_key"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "accounts",
+        "name": "system_key",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "billing_settings",
+        "name": "books_locked_until",
+        "type": "date",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "accounts",
+        "name": "accounts_system_key_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "system_key",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"system_key\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

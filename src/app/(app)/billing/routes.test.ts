@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { BILLING_NAV, BILLING_SECTIONS } from "./_components/sections";
 
 const billingDir = __dirname;
-const REQUIRED = ["", "invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases", "reports", "settings"];
+const REQUIRED = ["", "invoices", "quotations", "customers", "suppliers", "products", "services", "payments", "purchases", "accounting", "reports", "settings"];
 
 describe("business billing routes", () => {
   it.each(REQUIRED)("/billing/%s has a page", (segment) => {
@@ -79,6 +79,26 @@ describe("business billing routes", () => {
     }
     const api = path.resolve(billingDir, "../../api/business-billing");
     for (const r of ["supplier-payments", "supplier-payments/[id]", "supplier-payments/[id]/allocate", "supplier-payments/[id]/void", "supplier-payments/open-items", "suppliers/[id]/account", "payables", "documents/[type]/[id]/received"]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
+  });
+
+  it("has the report pages, the dashboard API and the export API", () => {
+    for (const seg of ["reports", "reports/sales", "reports/purchases", "reports/payments", "reports/tax"]) {
+      expect(existsSync(path.join(billingDir, seg, "page.tsx")), seg).toBe(true);
+    }
+    const api = path.resolve(billingDir, "../../api/business-billing");
+    for (const r of ["dashboard", "reports/[report]"]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
+  });
+
+  it("has the accounting pages and APIs", () => {
+    for (const seg of ["accounting", "journal-entries", "journal-entries/create", "journal-entries/[id]", "ledger", "trial-balance", "profit-loss", "balance-sheet", "settings/accounting"]) {
+      expect(existsSync(path.join(billingDir, seg, "page.tsx")), seg).toBe(true);
+    }
+    const api = path.resolve(billingDir, "../../api/business-billing/accounting");
+    for (const r of ["accounts", "accounts/[id]", "accounts/[id]/archive", "journal", "journal/lookups", "journal/[id]", "journal/[id]/reverse", "ledger", "trial-balance", "profit-loss", "balance-sheet", "settings", "backfill"]) {
       expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
     }
   });

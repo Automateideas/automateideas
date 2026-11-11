@@ -1,0 +1,2 @@
+ALTER TABLE "journal_entries" ADD COLUMN "idempotency_key" text;--> statement-breakpoint
+CREATE UNIQUE INDEX "journal_entries_idempotency_uq" ON "journal_entries" ("organization_id","idempotency_key") WHERE "idempotency_key" is not null;

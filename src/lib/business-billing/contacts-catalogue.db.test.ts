@@ -1,19 +1,8 @@
-import { inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "@/db";
-import {
-  customerAddresses,
-  customers,
-  organization,
-  priceListItems,
-  priceLists,
-  productCategories,
-  products,
-  services,
-  suppliers,
-  units,
-} from "@/db/schema";
+import { organization } from "@/db/schema";
+import { removeTestTenants } from "@/test/cleanup-tenants";
 
 import {
   createCategory,
@@ -71,13 +60,8 @@ beforeAll(async () => {
   ]);
 });
 
-afterAll(async () => {
-  const orgs = [A, B];
-  for (const t of [priceListItems, customerAddresses, customers, priceLists, products, services, productCategories, units, suppliers]) {
-    await db.delete(t).where(inArray(t.organizationId, orgs));
-  }
-  await db.delete(organization).where(inArray(organization.id, orgs));
-});
+// Customers and suppliers now post opening balances to the journal, so clean every tenant table.
+afterAll(() => removeTestTenants([A, B]));
 
 describe("customers", () => {
   let id = "";

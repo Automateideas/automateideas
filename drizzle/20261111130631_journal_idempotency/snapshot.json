@@ -1,0 +1,99 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "48961829-cadb-4cd6-a4f3-784ac1fdda8d",
+  "prevIds": [
+    "ede78634-96fe-4c58-a108-d93f7331571c"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "journal_entries",
+        "idempotency_key"
+      ],
+      "writes": [
+        "s|col|public.journal_entries.idempotency_key",
+        "n|col|public.journal_entries.idempotency_key",
+        "e|col|public.journal_entries.idempotency_key"
+      ],
+      "reads": [
+        "n|tbl|public.journal_entries",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "journal_entries",
+        "journal_entries_idempotency_uq"
+      ],
+      "writes": [
+        "s|idx|public.journal_entries_idempotency_uq",
+        "n|idx|public.journal_entries_idempotency_uq",
+        "e|idx|public.journal_entries_idempotency_uq",
+        "n|rel|public.journal_entries_idempotency_uq"
+      ],
+      "reads": [
+        "n|tbl|public.journal_entries",
+        "n|sch|public",
+        "n|col|public.journal_entries.organization_id",
+        "n|col|public.journal_entries.idempotency_key"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "journal_entries",
+        "name": "idempotency_key",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "journal_entries",
+        "name": "journal_entries_idempotency_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "idempotency_key",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"idempotency_key\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

@@ -1,27 +1,9 @@
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { db } from "@/db";
-import {
-  billingSettings,
-  businessInvoiceItems,
-  businessInvoices,
-  creditNoteItems,
-  creditNotes,
-  customerAddresses,
-  customers,
-  debitNoteItems,
-  debitNotes,
-  invoiceSequences,
-  organization,
-  products,
-  quotationItems,
-  quotations,
-  salesOrderItems,
-  salesOrders,
-  services,
-  units,
-} from "@/db/schema";
+import { businessInvoiceItems, businessInvoices, organization } from "@/db/schema";
+import { removeTestTenants } from "@/test/cleanup-tenants";
 import { countFinancialRecords } from "@/lib/financial-records";
 
 import { createProduct, createService, listUnits } from "../catalogue";
@@ -91,18 +73,8 @@ beforeAll(async () => {
   serviceId = (await createService(A, USER, { name: "Fitting", code: null, description: null, categoryId: null, unitId: null, sacCode: "998729", taxCategory: "taxable", taxRate: "18", ratePaise: 10000 })).id;
 });
 
-afterAll(async () => {
-  const orgs = [A, B];
-  // Issued documents are locked by triggers; the test cleanup turns them off for its own rows only.
-  await db.transaction(async (tx) => {
-    await tx.execute(sql`set local session_replication_role = replica`);
-    // Replica mode also skips ON DELETE CASCADE, so lines go first, explicitly.
-    for (const t of [creditNoteItems, debitNoteItems, businessInvoiceItems, salesOrderItems, quotationItems]) await tx.delete(t).where(inArray(t.organizationId, orgs));
-    for (const t of [creditNotes, debitNotes, businessInvoices, salesOrders, quotations]) await tx.delete(t).where(inArray(t.organizationId, orgs));
-  });
-  for (const t of [invoiceSequences, customerAddresses, customers, products, services, units, billingSettings]) await db.delete(t).where(inArray(t.organizationId, orgs));
-  await db.delete(organization).where(inArray(organization.id, orgs));
-});
+// Issued documents and journals are locked by triggers; clean every tenant table with them off.
+afterAll(() => removeTestTenants([A, B]));
 
 describe("drafts", () => {
   let id = "";

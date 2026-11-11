@@ -113,6 +113,8 @@ export const billingSettings = pgTable(
     documentNumbering: jsonb("document_numbering").default({}).notNull(),
     // Whether documents show the workspace logo (organization.logo, uploaded via /api/organization/logo).
     showLogo: boolean("show_logo").default(false).notNull(),
+    // Books are closed up to and including this date: nothing can be posted, issued or paid on or before it.
+    booksLockedUntil: date("books_locked_until"),
     // Design, colour, bank/UPI details, default terms… See lib/business-billing/template.ts.
     documentTemplate: jsonb("document_template").default({}).notNull(),
     // Storage keys (lib/storage.ts) of the signature and stamp images, like organization.logo.
@@ -212,12 +214,15 @@ export const accounts = pgTable(
     parentId: text("parent_id"),
     // Receivables, GST payable, sales…: can't be archived or removed.
     isSystem: boolean("is_system").default(false).notNull(),
+    // Stable key the app posts to (e.g. "receivables", "output_cgst"), whatever the account is renamed to.
+    systemKey: text("system_key"),
     archivedAt: timestamp("archived_at"),
     ...audit(),
   },
   (t) => [
     tenantKey("accounts", t),
     unique("accounts_code_uq").on(t.organizationId, t.code),
+    uniqueIndex("accounts_system_key_uq").on(t.organizationId, t.systemKey).where(sql`${t.systemKey} is not null`),
     tenantFk("accounts_parent_fk", t.organizationId, t.parentId, t),
     check("accounts_type_check", inList(t.type, ACCOUNT_TYPES)),
     index("accounts_parent_idx").on(t.organizationId, t.parentId),
@@ -921,10 +926,13 @@ export const journalEntries = pgTable(
     // Posted entries are never edited; mistakes get a reversing entry.
     postedAt: timestamp("posted_at"),
     reversesEntryId: text("reverses_entry_id"),
+    // Manual entries: one per submit, so a double click or retry can't post twice.
+    idempotencyKey: text("idempotency_key"),
     ...audit(),
   },
   (t) => [
     tenantKey("journal_entries", t),
+    uniqueIndex("journal_entries_idempotency_uq").on(t.organizationId, t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
     uniqueIndex("journal_entries_number_uq").on(t.organizationId, t.number).where(sql`${t.number} is not null`),
     tenantFk("journal_entries_reverses_fk", t.organizationId, t.reversesEntryId, t),
     // An entry can be reversed only once.
@@ -933,6 +941,10 @@ export const journalEntries = pgTable(
       .where(sql`${t.reversesEntryId} is not null`),
     index("journal_entries_date_idx").on(t.organizationId, t.entryDate),
     index("journal_entries_source_idx").on(t.organizationId, t.sourceType, t.sourceId),
+    // One original posting per document or payment (reversals and adjustments are separate).
+    uniqueIndex("journal_entries_one_posting_uq")
+      .on(t.organizationId, t.sourceType, t.sourceId)
+      .where(sql`${t.sourceId} is not null and ${t.reversesEntryId} is null and ${t.sourceType} not in ('manual', 'opening')`),
   ],
 );
 

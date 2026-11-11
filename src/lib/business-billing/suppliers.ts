@@ -2,7 +2,9 @@ import { and, asc, count, eq, isNull, ne, sql } from "drizzle-orm";
 
 import { suppliers } from "@/db/schema";
 
+import { syncOpeningBalance } from "./accounting/posting";
 import type { SupplierValues } from "./contacts-validation";
+import { todayInIndia } from "./documents/types";
 import { type ListQuery, conflict, guardUnique, notFound, paged, searchFilter, statusFilter, where } from "./records";
 import { type TenantTx, withTenant } from "./tenant-db";
 
@@ -99,6 +101,7 @@ export async function createSupplier(organizationId: string, userId: string, v: 
           .insert(suppliers)
           .values({ organizationId, ...v, createdBy: userId, updatedBy: userId })
           .returning({ id: suppliers.id });
+        await syncOpeningBalance(tx, organizationId, { kind: "supplier", id: row.id, name: v.name, openingBalancePaise: v.openingBalancePaise }, todayInIndia(), userId);
         return readSupplier(tx, organizationId, row.id);
       }),
     UNIQUE,
@@ -115,6 +118,7 @@ export async function updateSupplier(organizationId: string, userId: string, id:
           .update(suppliers)
           .set({ ...v, updatedBy: userId })
           .where(and(eq(suppliers.organizationId, organizationId), eq(suppliers.id, id)));
+        await syncOpeningBalance(tx, organizationId, { kind: "supplier", id, name: v.name, openingBalancePaise: v.openingBalancePaise }, todayInIndia(), userId);
         return readSupplier(tx, organizationId, id);
       }),
     UNIQUE,

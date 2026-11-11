@@ -13,6 +13,7 @@ import { BRAND_TONES } from "@/lib/brand-tones";
 import { cn } from "@/lib/utils";
 
 import { LoadError } from "../../_components/page-parts";
+import { BillingDashboard } from "./dashboard-view";
 import { BILLING_SECTIONS, BUILT_SECTIONS } from "./sections";
 
 type Overview = {
@@ -20,7 +21,7 @@ type Overview = {
   permissions: string[];
 };
 
-/** /billing: company setup status and a card for each section. */
+/** /billing: company setup status, the dashboard (with billing.reports.view) and a card for each section. */
 export function BillingOverview() {
   const overview = useApiQuery<Overview>("/api/business-billing/overview");
 
@@ -59,6 +60,9 @@ export function BillingOverview() {
         </Alert>
       )}
 
+      {overview.data?.company.configured && overview.data.permissions.includes("billing.reports.view") ? <BillingDashboard /> : null}
+
+      <h2 className="sr-only">Sections</h2>
       <ul className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {BILLING_SECTIONS.map(({ slug, label, Icon, summary, tone }) => (
           <li key={slug}>

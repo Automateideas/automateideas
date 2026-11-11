@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "journal_entries_one_posting_uq" ON "journal_entries" ("organization_id","source_type","source_id") WHERE "source_id" is not null and "reverses_entry_id" is null and "source_type" not in ('manual', 'opening');

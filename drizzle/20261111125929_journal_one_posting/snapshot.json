@@ -1,0 +1,73 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "ede78634-96fe-4c58-a108-d93f7331571c",
+  "prevIds": [
+    "a14f1abc-694c-496f-a2b4-58830707a44b"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "journal_entries",
+        "journal_entries_one_posting_uq"
+      ],
+      "writes": [
+        "s|idx|public.journal_entries_one_posting_uq",
+        "n|idx|public.journal_entries_one_posting_uq",
+        "e|idx|public.journal_entries_one_posting_uq",
+        "n|rel|public.journal_entries_one_posting_uq"
+      ],
+      "reads": [
+        "n|tbl|public.journal_entries",
+        "n|sch|public",
+        "n|col|public.journal_entries.organization_id",
+        "n|col|public.journal_entries.source_type",
+        "n|col|public.journal_entries.source_id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "journal_entries",
+        "name": "journal_entries_one_posting_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "source_type",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "source_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"source_id\" is not null and \"reverses_entry_id\" is null and \"source_type\" not in ('manual', 'opening')",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-import { SectionPlaceholder } from "../_components/section-placeholder";
+import { ReportsHome } from "../_components/reports-ui";
 
 export const metadata: Metadata = {
   title: "Reports · Billing",
 };
 
 export default function Page() {
-  return <SectionPlaceholder slug="reports" />;
+  return <ReportsHome />;
 }
