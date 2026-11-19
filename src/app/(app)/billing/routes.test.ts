@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -79,6 +79,66 @@ describe("business billing routes", () => {
     }
     const api = path.resolve(billingDir, "../../api/business-billing");
     for (const r of ["supplier-payments", "supplier-payments/[id]", "supplier-payments/[id]/allocate", "supplier-payments/[id]/void", "supplier-payments/open-items", "suppliers/[id]/account", "payables", "documents/[type]/[id]/received"]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
+  });
+
+  it("guards every API route (security review): billing permission, sign-in, or a reviewed public route", () => {
+    const apiDir = path.resolve(billingDir, "../../api");
+    const files: string[] = [];
+    const walk = (d: string) => {
+      for (const e of readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) walk(p);
+        else if (e.name === "route.ts") files.push(p);
+      }
+    };
+    walk(apiDir);
+    // Public on purpose, each with its own check: the secret token, a signature, or the cron secret.
+    const PUBLIC: Record<string, string> = {
+      "auth/[...all]": "toNextJsHandler",
+      "share/[token]": "resolveShare",
+      "webhooks/payu": "verifyPayuHash",
+      "subscription/return": "verifyPayuHash",
+      "webhooks/whatsapp": "timingSafeEqual",
+      "cron/billing": "cronJob",
+      "cron/reminders": "cronJob",
+    };
+    const unguarded: string[] = [];
+    for (const f of files) {
+      const rel = path.relative(apiDir, path.dirname(f)).split(path.sep).join("/");
+      const src = readFileSync(f, "utf8");
+      if (rel.startsWith("business-billing/")) {
+        if (!src.includes("requireBillingPermission") || !src.includes("route(")) unguarded.push(rel);
+      } else if (PUBLIC[rel]) {
+        if (!src.includes(PUBLIC[rel])) unguarded.push(rel);
+      } else if (!/requireOrgRole|requireSession/.test(src)) unguarded.push(rel);
+    }
+    expect(unguarded).toEqual([]);
+    expect(files.length).toBeGreaterThan(100);
+  });
+
+  it("has the WhatsApp APIs, webhook and setup guide", () => {
+    const api = path.resolve(billingDir, "../../api");
+    for (const r of [
+      "business-billing/whatsapp",
+      "business-billing/whatsapp/connect",
+      "business-billing/whatsapp/templates",
+      "business-billing/documents/[type]/[id]/whatsapp",
+      "business-billing/payments/[id]/whatsapp",
+      "webhooks/whatsapp",
+    ]) {
+      expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
+    }
+    expect(existsSync(path.resolve(billingDir, "../../../../docs/whatsapp-setup.md"))).toBe(true);
+  });
+
+  it("has recurring invoice pages and APIs, and one scheduled job", () => {
+    for (const seg of ["recurring-invoices", "recurring-invoices/[id]"]) {
+      expect(existsSync(path.join(billingDir, seg, "page.tsx")), seg).toBe(true);
+    }
+    const api = path.resolve(billingDir, "../../api");
+    for (const r of ["business-billing/recurring-invoices", "business-billing/recurring-invoices/[id]", "business-billing/recurring-invoices/[id]/status", "business-billing/recurring-invoices/[id]/template", "business-billing/recurring-invoices/[id]/run", "cron/billing"]) {
       expect(existsSync(path.join(api, r, "route.ts")), r).toBe(true);
     }
   });

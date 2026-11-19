@@ -43,6 +43,7 @@ export function SettingsNav() {
         { href: "/billing/settings/communication", label: "Email and reminders" },
         { href: "/billing/settings/accounting", label: "Accounting" },
         { href: "/billing/settings/inventory", label: "Inventory" },
+        { href: "/billing/settings/activity", label: "Activity" },
       ]}
     />
   );

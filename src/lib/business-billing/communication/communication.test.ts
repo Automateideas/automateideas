@@ -5,7 +5,7 @@ import { validateSend } from "./service";
 import { DEFAULT_COMMUNICATION, type ReminderSettings, readCommunication, reminderDue, validateCommunication } from "./settings";
 import { documentEmail, reminderEmail, whatsappNumber, whatsappText } from "./templates";
 
-const S: ReminderSettings = { enabled: true, beforeDays: 3, onDueDate: true, afterEveryDays: 7, maxAfter: 3, sendHour: 9 };
+const S: ReminderSettings = { enabled: true, beforeDays: 3, onDueDate: true, afterEveryDays: 7, maxAfter: 3, sendHour: 9, viaEmail: true, viaWhatsApp: false };
 const none = new Set<string>();
 const due = "2026-11-20";
 const at = (today: string, sent: string[] = [], hour = 10, s = S) => reminderDue(due, today, hour, s, new Set(sent))?.key ?? null;
@@ -53,7 +53,7 @@ describe("settings", () => {
 
   it("validates", () => {
     const ok = validateCommunication({ reminders: { enabled: true, beforeDays: "2", onDueDate: false, afterEveryDays: "", maxAfter: "3", sendHour: "10" }, autoReceiptEmail: true });
-    expect(ok).toEqual({ ok: true, values: { reminders: { enabled: true, beforeDays: 2, onDueDate: false, afterEveryDays: null, maxAfter: 3, sendHour: 10 }, autoReceiptEmail: true } });
+    expect(ok).toEqual({ ok: true, values: { reminders: { enabled: true, beforeDays: 2, onDueDate: false, afterEveryDays: null, maxAfter: 3, sendHour: 10, viaEmail: true, viaWhatsApp: false }, autoReceiptEmail: true, autoReceiptWhatsApp: false, whatsappShared: false } });
     const nothing = validateCommunication({ reminders: { enabled: true, beforeDays: "", onDueDate: false, afterEveryDays: "", maxAfter: 3, sendHour: 9 } });
     expect(!nothing.ok && nothing.errors["reminders.enabled"]).toMatch(/at least one/);
     const bad = validateCommunication({ reminders: { enabled: false, beforeDays: "45", maxAfter: 3, sendHour: 9 } });

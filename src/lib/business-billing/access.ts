@@ -3,6 +3,7 @@ import { APIError } from "better-auth/api";
 import { requireOrgRole } from "@/lib/access";
 import { ORG_ROLES, hasBillingPermission, type BusinessBillingPermission } from "@/lib/roles";
 import { assertFeature, assertWritable, getEntitlements } from "@/lib/subscription-billing/entitlements";
+import { setAuditActor } from "@/lib/audit";
 
 /** Permissions that only read. Everything else changes records. */
 const READ_PERMISSIONS: readonly BusinessBillingPermission[] = ["billing.view", "billing.reports.view"];
@@ -29,7 +30,11 @@ export async function requireBillingPermission(permission: BusinessBillingPermis
 
   const entitlements = await getEntitlements(ctx.organizationId);
   assertFeature(entitlements, "billing");
-  if (!READ_PERMISSIONS.includes(permission)) assertWritable(entitlements);
+  if (!READ_PERMISSIONS.includes(permission)) {
+    assertWritable(entitlements);
+    // Successful changes in this request are written to the audit trail (lib/audit.ts).
+    setAuditActor(ctx.organizationId, ctx.user.id);
+  }
 
   return { ...ctx, entitlements };
 }

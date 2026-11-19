@@ -2,7 +2,10 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { DownloadIcon, FileTextIcon } from "lucide-react";
 
+import { headers } from "next/headers";
+
 import { sharedSummary } from "@/lib/business-billing/communication/public";
+import { SHARE_LIMIT_PER_MINUTE, clientIp, rateLimit } from "@/lib/rate-limit";
 
 export const metadata: Metadata = {
   title: "Document",
@@ -27,6 +30,14 @@ export default function Page({ params }: PageProps<"/share/[token]">) {
 
 async function Shared({ params }: { params: PageProps<"/share/[token]">["params"] }) {
   const { token } = await params;
+  if (!rateLimit(`share:${clientIp(await headers())}`, SHARE_LIMIT_PER_MINUTE, 60_000).ok) {
+    return (
+      <section className="w-full max-w-md rounded-xl border bg-background p-6 text-center">
+        <h1 className="text-lg font-semibold">Too many requests</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Please wait a minute and try again.</p>
+      </section>
+    );
+  }
   const d = await sharedSummary(token);
   if (!d) {
     return (

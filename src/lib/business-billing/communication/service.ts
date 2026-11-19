@@ -14,9 +14,11 @@ import { conflict, invalid } from "../records";
 import { getBillingSettings } from "../settings";
 import { type TenantTx, withTenant } from "../tenant-db";
 import { deliver, emailMode } from "./email";
+import { assertSendRate } from "./limits";
 import { type CommunicationSettings, SENDABLE_DOCUMENTS, readCommunication, reminderDue } from "./settings";
 import { createShare } from "./shares";
-import { type Company, type Rendered, defaultDocumentMessage, documentEmail, receiptEmail, reminderEmail, whatsappNumber, whatsappText } from "./templates";
+import { type Company, type Rendered, defaultDocumentMessage, documentEmail, longDate, receiptEmail, reminderEmail, reminderPhrase, rupees, whatsappNumber, whatsappText } from "./templates";
+import { senderFor, sendTemplate } from "../whatsapp/service";
 
 // Sending documents to customers: email (with the PDF attached and a link),
 // WhatsApp share links, payment receipts and payment reminders. Every send is
@@ -113,6 +115,7 @@ async function finishMessage(organizationId: string, id: string, status: "sent" 
 /** Sends one email and logs it; a failure is logged too, then reported (409 EMAIL_FAILED). */
 async function sendLogged(organizationId: string, e: { to: string[]; cc: string[]; company: Company; rendered: Rendered; attachment: { filename: string; content: Buffer } | null; log: Omit<LogInput, "channel" | "recipient" | "subject" | "status"> }) {
   if (emailMode() === "off") conflict("EMAIL_NOT_CONFIGURED", "Email isn't set up on this server yet (RESEND_API_KEY). Ask your administrator.");
+  await assertSendRate(organizationId);
   const id = await logMessage(organizationId, { ...e.log, channel: "email", recipient: [...e.to, ...e.cc].join(", "), subject: e.rendered.subject, status: "sending" });
   if (!id) return null; // someone else is already sending this exact reminder
   try {
@@ -149,6 +152,8 @@ export async function documentEmailDefaults(organizationId: string, slug: Docume
     subject: `${label} ${doc.number ?? ""} from ${company.name}`,
     message: defaultDocumentMessage({ company, partyName: doc.partyName ?? contact?.name ?? "", label, number: doc.number ?? "", totalPaise: doc.totalPaise, dueDate: slug === "invoices" ? doc.extraDate : null }),
     emailMode: emailMode(),
+    // Whether "Send on WhatsApp" can go through the Cloud API (else the wa.me link is used).
+    whatsappApi: !!(await senderFor(organizationId)).sender,
     canSend: doc.status !== "draft" && doc.status !== "void" && isSendable(slug),
   };
 }
@@ -193,7 +198,7 @@ export async function shareDocument(organizationId: string, userId: string, slug
 export async function receiptEmailDefaults(organizationId: string, paymentId: string) {
   const p = await getPayment(organizationId, paymentId);
   const contact = await withTenant(organizationId, (tx) => contactOf(tx, organizationId, "customer", p.customerId));
-  return { to: contact?.email ? [contact.email] : [], whatsappNumber: whatsappNumber(contact?.phone), emailMode: emailMode(), canSend: p.status !== "void" };
+  return { to: contact?.email ? [contact.email] : [], whatsappNumber: whatsappNumber(contact?.phone), emailMode: emailMode(), whatsappApi: !!(await senderFor(organizationId)).sender, canSend: p.status !== "void" };
 }
 
 export async function sendReceiptEmail(organizationId: string, userId: string, paymentId: string, v: SendInput) {
@@ -214,39 +219,103 @@ export async function sendReceiptEmail(organizationId: string, userId: string, p
   });
 }
 
-/** After a payment is recorded: email the receipt if the company turned that on and the customer has an email. Never throws. */
+/* ---------------- WhatsApp (Cloud API) ---------------- */
+
+/** Sends an issued document on WhatsApp through the company's number (or the shared one). */
+export async function sendDocumentWhatsApp(organizationId: string, userId: string, slug: DocumentSlug, id: string, to: string | null) {
+  const doc = await getDocument(organizationId, slug, id);
+  requireSendable(slug, doc.status);
+  const contact = await withTenant(organizationId, (tx) => contactOf(tx, organizationId, DOCUMENT_TYPES[slug].party, doc.partyId));
+  const phone = whatsappNumber(to ?? contact?.phone);
+  if (!phone) invalid({ to: to ? "Enter a valid mobile number, e.g. 98765 43210." : `${doc.partyName ?? "This contact"} has no valid mobile number. Enter one.` });
+  const company = await companyOf(organizationId);
+  const share = await withTenant(organizationId, (tx) => createShare(tx, organizationId, userId, slug, id));
+  return sendTemplate(organizationId, userId, {
+    kind: "document",
+    to: phone,
+    params: [doc.partyName ?? contact?.name ?? "", company.name, DOCUMENT_TYPES[slug].singular.toLowerCase(), doc.number ?? "", rupees(doc.totalPaise)],
+    shareToken: share.token,
+    log: { kind: "document", documentType: slug, documentId: id, customerId: doc.customerId },
+  });
+}
+
+/** Sends a payment receipt on WhatsApp. */
+export async function sendReceiptWhatsApp(organizationId: string, userId: string, paymentId: string, to: string | null) {
+  const p = await getPayment(organizationId, paymentId);
+  if (p.status === "void") conflict("VOID", "This payment is void.");
+  const contact = await withTenant(organizationId, (tx) => contactOf(tx, organizationId, "customer", p.customerId));
+  const phone = whatsappNumber(to ?? contact?.phone);
+  if (!phone) invalid({ to: to ? "Enter a valid mobile number, e.g. 98765 43210." : `${p.customerName} has no valid mobile number. Enter one.` });
+  const company = await companyOf(organizationId);
+  const share = await withTenant(organizationId, (tx) => createShare(tx, organizationId, userId, "receipt", paymentId));
+  return sendTemplate(organizationId, userId, {
+    kind: "receipt",
+    to: phone,
+    params: [p.customerName, company.name, rupees(p.amountPaise), longDate(p.paymentDate), p.number ?? ""],
+    shareToken: share.token,
+    log: { kind: "receipt", documentType: "receipt", documentId: paymentId, customerId: p.customerId },
+  });
+}
+
+/** After a payment is recorded: send the receipt by email and/or WhatsApp, as the company chose. Never throws. */
 export async function autoSendReceipt(organizationId: string, userId: string, paymentId: string) {
-  try {
-    const s = await communicationSettings(organizationId);
-    if (!s.autoReceiptEmail || emailMode() === "off") return null;
-    const d = await receiptEmailDefaults(organizationId, paymentId);
-    if (!d.to.length) return null;
-    return await sendReceiptEmail(organizationId, userId, paymentId, { to: d.to, cc: [], subject: null, message: null, attachPdf: true });
-  } catch (e) {
-    console.error("Automatic receipt email failed", { paymentId, error: (e as Error).message });
-    return null;
+  const s = await communicationSettings(organizationId).catch(() => null);
+  if (!s) return null;
+  let sent = null;
+  if (s.autoReceiptEmail && emailMode() !== "off") {
+    try {
+      const d = await receiptEmailDefaults(organizationId, paymentId);
+      if (d.to.length) sent = await sendReceiptEmail(organizationId, userId, paymentId, { to: d.to, cc: [], subject: null, message: null, attachPdf: true });
+    } catch (e) {
+      console.error("Automatic receipt email failed", { paymentId, error: (e as Error).message });
+    }
   }
+  if (s.autoReceiptWhatsApp) {
+    try {
+      const d = await receiptEmailDefaults(organizationId, paymentId);
+      if (d.whatsappNumber && (await senderFor(organizationId)).sender) sent = (await sendReceiptWhatsApp(organizationId, userId, paymentId, null)) ?? sent;
+    } catch (e) {
+      console.error("Automatic receipt WhatsApp failed", { paymentId, error: (e as Error).message });
+    }
+  }
+  return sent;
 }
 
 /* ---------------- Reminders ---------------- */
 
-type ReminderTarget = { id: string; number: string | null; dueDate: string; balancePaise: number; customerId: string; customerName: string; email: string | null; sendReminders: boolean };
+type ReminderTarget = { id: string; number: string | null; dueDate: string; balancePaise: number; customerId: string; customerName: string; email: string | null; phone: string | null; sendReminders: boolean };
+type Channel = "email" | "whatsapp";
+const dedupePrefix: Record<Channel, string> = { email: "reminder", whatsapp: "reminder-wa" };
 
 async function reminderTargets(tx: TenantTx, organizationId: string, invoiceIds?: string[]): Promise<ReminderTarget[]> {
   const open = (await openInvoices(tx, organizationId, null)).filter((b) => b.balancePaise > 0 && (!invoiceIds || invoiceIds.includes(b.id)));
   if (!open.length) return [];
   const people = await tx
-    .select({ id: customers.id, name: customers.name, email: customers.email, sendReminders: customers.sendReminders })
+    .select({ id: customers.id, name: customers.name, email: customers.email, phone: customers.phone, sendReminders: customers.sendReminders })
     .from(customers)
     .where(and(eq(customers.organizationId, organizationId), inArray(customers.id, [...new Set(open.map((b) => b.customerId))])));
   const byId = new Map(people.map((c) => [c.id, c]));
   return open.map((b) => {
     const c = byId.get(b.customerId);
-    return { id: b.id, number: b.number, dueDate: b.dueDate ?? b.issueDate, balancePaise: b.balancePaise, customerId: b.customerId, customerName: c?.name ?? "", email: c?.email ?? null, sendReminders: c?.sendReminders ?? false };
+    return { id: b.id, number: b.number, dueDate: b.dueDate ?? b.issueDate, balancePaise: b.balancePaise, customerId: b.customerId, customerName: c?.name ?? "", email: c?.email ?? null, phone: c?.phone ?? null, sendReminders: c?.sendReminders ?? false };
   });
 }
 
-async function sendReminderTo(organizationId: string, userId: string | null, t: ReminderTarget, stage: { key: string; kind: "before" | "due" | "after" | "manual"; daysLate: number }, dedupe: boolean) {
+async function sendReminderTo(organizationId: string, userId: string | null, t: ReminderTarget, stage: { key: string; kind: "before" | "due" | "after" | "manual"; daysLate: number }, dedupe: boolean, channel: Channel = "email") {
+  const dedupeKey = dedupe ? `${dedupePrefix[channel]}:${t.id}:${stage.key}` : null;
+  if (channel === "whatsapp") {
+    const phone = whatsappNumber(t.phone);
+    if (!phone) conflict("NO_PHONE", `${t.customerName} has no valid mobile number. Add one on the customer first.`);
+    const company = await companyOf(organizationId);
+    const share = await withTenant(organizationId, (tx) => createShare(tx, organizationId, userId, "invoices", t.id));
+    return sendTemplate(organizationId, userId, {
+      kind: "reminder",
+      to: phone,
+      params: [t.customerName, company.name, t.number ?? "", rupees(t.balancePaise), reminderPhrase(t.dueDate, stage.daysLate)],
+      shareToken: share.token,
+      log: { kind: "reminder", documentType: "invoices", documentId: t.id, customerId: t.customerId, dedupeKey },
+    });
+  }
   if (!t.email) conflict("NO_EMAIL", `${t.customerName} has no email address. Add one on the customer first.`);
   const company = await companyOf(organizationId);
   const share = await withTenant(organizationId, (tx) => createShare(tx, organizationId, userId, "invoices", t.id));
@@ -257,19 +326,19 @@ async function sendReminderTo(organizationId: string, userId: string | null, t: 
     company,
     rendered,
     attachment: null,
-    log: { kind: "reminder", documentType: "invoices", documentId: t.id, customerId: t.customerId, userId, dedupeKey: dedupe ? `reminder:${t.id}:${stage.key}` : null },
+    log: { kind: "reminder", documentType: "invoices", documentId: t.id, customerId: t.customerId, userId, dedupeKey },
   });
 }
 
 const daysBetween = (from: string, to: string) => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
 
-/** "Send reminder now" on an unpaid invoice (ignores the schedule and the customer's opt-out). */
-export async function sendReminderNow(organizationId: string, userId: string, invoiceId: string) {
+/** "Send reminder now" on an unpaid invoice, by email or WhatsApp (ignores the schedule and the customer's opt-out). */
+export async function sendReminderNow(organizationId: string, userId: string, invoiceId: string, channel: Channel = "email") {
   const doc = await getDocument(organizationId, "invoices", invoiceId);
   if (doc.status === "draft" || doc.status === "void") conflict("NOT_ISSUED", doc.status === "void" ? "This invoice is void." : "Issue the invoice first.");
   const [t] = await withTenant(organizationId, (tx) => reminderTargets(tx, organizationId, [invoiceId]));
   if (!t) conflict("PAID", "This invoice is fully paid; there's nothing to remind about.");
-  return sendReminderTo(organizationId, userId, t, { key: "manual", kind: "manual", daysLate: daysBetween(t.dueDate, todayInIndia()) }, false);
+  return sendReminderTo(organizationId, userId, t, { key: "manual", kind: "manual", daysLate: daysBetween(t.dueDate, todayInIndia()) }, false, channel);
 }
 
 export type ReminderRun = { organizations: number; checked: number; sent: number; failed: number; skipped: number };
@@ -283,35 +352,47 @@ export async function runCompanyReminders(organizationId: string, now = new Date
   if ((await getEntitlements(organizationId)).access.state === "read_only") return result;
   const today = todayInIndia(now);
   const hourIst = new Date(now.getTime() + 330 * 60_000).getUTCHours();
+  // Channels the company chose and can use: email (when this server sends email), WhatsApp (when a number is set up).
+  const channels: Channel[] = [];
+  if (s.reminders.viaEmail && emailMode() !== "off") channels.push("email");
+  if (s.reminders.viaWhatsApp && (await senderFor(organizationId)).sender) channels.push("whatsapp");
+  if (!channels.length) return result;
+  const reachable = (t: ReminderTarget, c: Channel) => (c === "email" ? !!t.email : !!whatsappNumber(t.phone));
   const { targets, sentKeys } = await withTenant(organizationId, async (tx) => {
-    const targets = (await reminderTargets(tx, organizationId)).filter((t) => t.email && t.sendReminders);
+    const targets = (await reminderTargets(tx, organizationId)).filter((t) => t.sendReminders && channels.some((c) => reachable(t, c)));
     const rows = targets.length
       ? await tx
           .select({ documentId: billingMessages.documentId, dedupeKey: billingMessages.dedupeKey })
           .from(billingMessages)
           .where(and(eq(billingMessages.organizationId, organizationId), eq(billingMessages.kind, "reminder"), inArray(billingMessages.documentId, targets.map((t) => t.id)), sql`${billingMessages.dedupeKey} is not null`))
       : [];
+    // "reminder:<invoice>:after-2" (email) and "reminder-wa:<invoice>:after-2" (WhatsApp) are tracked separately.
     const sentKeys = new Map<string, Set<string>>();
     for (const r of rows) {
-      const set = sentKeys.get(r.documentId) ?? new Set<string>();
-      set.add(r.dedupeKey!.split(":").at(-1)!);
-      sentKeys.set(r.documentId, set);
+      const [prefix, , stage] = r.dedupeKey!.split(":");
+      const key = `${prefix}|${r.documentId}`;
+      const set = sentKeys.get(key) ?? new Set<string>();
+      set.add(stage);
+      sentKeys.set(key, set);
     }
     return { targets, sentKeys };
   });
   for (const t of targets.slice(0, 500)) {
-    result.checked++;
-    const stage = reminderDue(t.dueDate, today, hourIst, s.reminders, sentKeys.get(t.id) ?? new Set());
-    if (!stage) {
-      result.skipped++;
-      continue;
-    }
-    try {
-      const r = await sendReminderTo(organizationId, null, t, stage, true);
-      if (r) result.sent++;
-      else result.skipped++;
-    } catch {
-      result.failed++;
+    for (const channel of channels) {
+      if (!reachable(t, channel)) continue;
+      result.checked++;
+      const stage = reminderDue(t.dueDate, today, hourIst, s.reminders, sentKeys.get(`${dedupePrefix[channel]}|${t.id}`) ?? new Set());
+      if (!stage) {
+        result.skipped++;
+        continue;
+      }
+      try {
+        const r = await sendReminderTo(organizationId, null, t, stage, true, channel);
+        if (r) result.sent++;
+        else result.skipped++;
+      } catch {
+        result.failed++;
+      }
     }
   }
   return result;
@@ -320,7 +401,6 @@ export async function runCompanyReminders(organizationId: string, now = new Date
 /** Every company's due reminders (the scheduled job). Safe to run often and twice at once. */
 export async function runReminders(now = new Date()): Promise<ReminderRun> {
   const total: ReminderRun = { organizations: 0, checked: 0, sent: 0, failed: 0, skipped: 0 };
-  if (emailMode() === "off") return total;
   const orgs = await db.select({ id: organization.id }).from(organization);
   for (const o of orgs) {
     const r = await runCompanyReminders(o.id, now);

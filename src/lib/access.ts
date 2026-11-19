@@ -5,6 +5,7 @@ import { APIError } from "better-auth/api";
 import { db } from "@/db";
 import { member } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { recordAudit, runWithAuditScope } from "@/lib/audit";
 import { type OrgRole } from "@/lib/roles";
 
 // Role rules live in lib/roles.ts (shared with the browser). Re-exported for the API routes.
@@ -96,13 +97,57 @@ function toErrorResponse(error: unknown) {
   );
 }
 
-/** Wraps a route handler so thrown APIErrors become `{ error: { code, message } }` JSON. */
+const UNSAFE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+/** Origins allowed to send changes with a signed-in cookie: this app's own address(es). */
+function allowedOrigin(request: Request, origin: string) {
+  const own = [process.env.BETTER_AUTH_URL, ...(process.env.TRUSTED_ORIGINS ?? "").split(",")]
+    .map((u) => {
+      try {
+        return u ? new URL(u.trim()).origin : null;
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+  if (own.includes(origin)) return true;
+  // Same host as this request (direct, or as forwarded by a proxy).
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  try {
+    return !!host && new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Wraps a route handler so thrown APIErrors become `{ error: { code, message } }` JSON.
+ *
+ * Also, for changes (POST/PUT/PATCH/DELETE):
+ * - refuses requests a browser sent from another website (Origin header not
+ *   this app): defence in depth on top of SameSite cookies;
+ * - writes the Business Billing audit trail when the change succeeds (lib/audit.ts).
+ */
 export function route<A extends unknown[]>(fn: (...args: A) => Promise<Response>) {
   return async (...args: A) => {
-    try {
-      return await fn(...args);
-    } catch (error) {
-      return toErrorResponse(error);
+    const request = args[0] instanceof Request ? args[0] : null;
+    if (request && UNSAFE.has(request.method)) {
+      const origin = request.headers.get("origin");
+      if (origin && origin !== "null" && !allowedOrigin(request, origin)) {
+        return Response.json({ error: { code: "CROSS_SITE_REQUEST", message: "This request came from another website and was refused." } }, { status: 403 });
+      }
     }
+    return runWithAuditScope(async () => {
+      // Read the body for the audit trail before the handler consumes it.
+      const bodyText = request && UNSAFE.has(request.method) && request.headers.get("content-type")?.includes("json") ? await request.clone().text().catch(() => null) : null;
+      let response: Response;
+      try {
+        response = await fn(...args);
+      } catch (error) {
+        return toErrorResponse(error);
+      }
+      if (request) await recordAudit(request, bodyText, response);
+      return response;
+    });
   };
 }

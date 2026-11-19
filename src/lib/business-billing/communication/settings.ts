@@ -16,17 +16,26 @@ export type ReminderSettings = {
   maxAfter: number;
   /** Not before this hour of the day (India time, 0–23). */
   sendHour: number;
+  /** Channels: email (to customers with an email) and WhatsApp (to customers with a phone number). */
+  viaEmail: boolean;
+  viaWhatsApp: boolean;
 };
 
 export type CommunicationSettings = {
   reminders: ReminderSettings;
   /** Email a receipt to the customer when a payment is recorded (if they have an email). */
   autoReceiptEmail: boolean;
+  /** Send the receipt on WhatsApp too (if they have a phone number and WhatsApp is set up). */
+  autoReceiptWhatsApp: boolean;
+  /** Send WhatsApp messages from the shared Automate Ideas number (option A) when the company hasn't connected its own. */
+  whatsappShared: boolean;
 };
 
 export const DEFAULT_COMMUNICATION: CommunicationSettings = {
-  reminders: { enabled: false, beforeDays: 3, onDueDate: true, afterEveryDays: 7, maxAfter: 3, sendHour: 9 },
+  reminders: { enabled: false, beforeDays: 3, onDueDate: true, afterEveryDays: 7, maxAfter: 3, sendHour: 9, viaEmail: true, viaWhatsApp: false },
   autoReceiptEmail: false,
+  autoReceiptWhatsApp: false,
+  whatsappShared: false,
 };
 
 const int = (v: unknown, min: number, max: number, fallback: number | null) => (typeof v === "number" && Number.isInteger(v) && v >= min && v <= max ? v : fallback);
@@ -44,12 +53,16 @@ export function readCommunication(json: unknown): CommunicationSettings {
       afterEveryDays: r.afterEveryDays === null ? null : int(r.afterEveryDays, 1, 60, d.afterEveryDays),
       maxAfter: int(r.maxAfter, 1, 10, d.maxAfter)!,
       sendHour: int(r.sendHour, 0, 23, d.sendHour)!,
+      viaEmail: typeof r.viaEmail === "boolean" ? r.viaEmail : d.viaEmail,
+      viaWhatsApp: typeof r.viaWhatsApp === "boolean" ? r.viaWhatsApp : d.viaWhatsApp,
     },
     autoReceiptEmail: typeof o.autoReceiptEmail === "boolean" ? o.autoReceiptEmail : DEFAULT_COMMUNICATION.autoReceiptEmail,
+    autoReceiptWhatsApp: typeof o.autoReceiptWhatsApp === "boolean" ? o.autoReceiptWhatsApp : DEFAULT_COMMUNICATION.autoReceiptWhatsApp,
+    whatsappShared: typeof o.whatsappShared === "boolean" ? o.whatsappShared : DEFAULT_COMMUNICATION.whatsappShared,
   };
 }
 
-/** { reminders: { enabled, beforeDays, onDueDate, afterEveryDays, maxAfter, sendHour }, autoReceiptEmail } */
+/** { reminders: { enabled, beforeDays, onDueDate, afterEveryDays, maxAfter, sendHour, viaEmail, viaWhatsApp }, autoReceiptEmail, autoReceiptWhatsApp, whatsappShared } */
 export function validateCommunication(raw: Record<string, unknown>): { ok: true; values: CommunicationSettings } | { ok: false; errors: FieldErrors } {
   const errors: FieldErrors = {};
   const rem = raw.reminders && typeof raw.reminders === "object" ? (raw.reminders as Record<string, unknown>) : {};
@@ -60,15 +73,20 @@ export function validateCommunication(raw: Record<string, unknown>): { ok: true;
   const afterEveryDays = r.int("afterEveryDays", 1, 60, "Enter 1 to 60 days, or leave blank for none.");
   const maxAfter = r.int("maxAfter", 1, 10, "Enter 1 to 10.", true);
   const sendHour = r.int("sendHour", 0, 23, "Choose an hour.", true);
+  const viaEmail = r.bool("viaEmail", true);
+  const viaWhatsApp = r.bool("viaWhatsApp", false);
   for (const [k, v] of Object.entries(r.errors)) errors[`reminders.${k}`] = v;
   if (enabled && beforeDays === null && !onDueDate && afterEveryDays === null && !Object.keys(errors).length) {
     errors["reminders.enabled"] = "Choose at least one: before the due date, on it, or after it.";
   }
+  if (enabled && !viaEmail && !viaWhatsApp && !errors["reminders.enabled"]) errors["reminders.viaEmail"] = "Choose email, WhatsApp or both.";
   const top = new FieldReader(raw);
   const autoReceiptEmail = top.bool("autoReceiptEmail", false);
+  const autoReceiptWhatsApp = top.bool("autoReceiptWhatsApp", false);
+  const whatsappShared = top.bool("whatsappShared", false);
   Object.assign(errors, top.errors);
   if (Object.keys(errors).length) return { ok: false, errors };
-  return { ok: true, values: { reminders: { enabled, beforeDays, onDueDate, afterEveryDays, maxAfter: maxAfter!, sendHour: sendHour! }, autoReceiptEmail } };
+  return { ok: true, values: { reminders: { enabled, beforeDays, onDueDate, afterEveryDays, maxAfter: maxAfter!, sendHour: sendHour!, viaEmail, viaWhatsApp }, autoReceiptEmail, autoReceiptWhatsApp, whatsappShared } };
 }
 
 /* ---------------- Which reminder is due ---------------- */

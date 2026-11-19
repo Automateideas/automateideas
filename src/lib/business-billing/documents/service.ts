@@ -393,6 +393,8 @@ async function readDocument(tx: TenantTx, organizationId: string, slug: Document
     quotationId: (row.quotationId as string | null) ?? null,
     salesOrderId: (row.salesOrderId as string | null) ?? null,
     purchaseOrderId: (row.purchaseOrderId as string | null) ?? null,
+    /** Invoices: the recurring invoice that created it. */
+    recurringInvoiceId: (row.recurringInvoiceId as string | null) ?? null,
     reason: (row.reason as string | null) ?? null,
     /** Where stock moves (invoices, credit notes, bills, returns); null until issued = default warehouse. */
     warehouseId,
@@ -661,23 +663,22 @@ function headerValues(slug: DocumentSlug, v: DocumentValues, r: DocumentTaxResul
   };
 }
 
-type Links = { quotationId?: string; salesOrderId?: string; purchaseOrderId?: string };
+type Links = { quotationId?: string; salesOrderId?: string; purchaseOrderId?: string; recurringInvoiceId?: string };
 
 export async function createDraft(organizationId: string, userId: string, slug: DocumentSlug, v: DocumentValues, links: Links = {}) {
+  return guardLock(() => withTenant(organizationId, (tx) => createDraftIn(tx, organizationId, userId, slug, v, links)), DOCUMENT_TYPES[slug].singular);
+}
+
+/** createDraft inside the caller's transaction (e.g. a recurring invoice creates its draft and moves its schedule together). */
+export async function createDraftIn(tx: TenantTx, organizationId: string, userId: string | null, slug: DocumentSlug, v: DocumentValues, links: Links = {}) {
   const r = reg(slug);
-  return guardLock(
-    () =>
-      withTenant(organizationId, async (tx) => {
-        const { values, result, party } = await prepare(tx, organizationId, slug, v);
-        const [row] = await tx
-          .insert(r.table)
-          .values({ organizationId, status: "draft", ...headerValues(slug, values, result, party), ...links, createdBy: userId, updatedBy: userId } as unknown as typeof businessInvoices.$inferInsert)
-          .returning({ id: r.table.id });
-        await tx.insert(r.items).values(itemRows(slug, organizationId, row.id, userId, values, result));
-        return readDocument(tx, organizationId, slug, row.id);
-      }),
-    DOCUMENT_TYPES[slug].singular,
-  );
+  const { values, result, party } = await prepare(tx, organizationId, slug, v);
+  const [row] = await tx
+    .insert(r.table)
+    .values({ organizationId, status: "draft", ...headerValues(slug, values, result, party), ...links, createdBy: userId, updatedBy: userId } as unknown as typeof businessInvoices.$inferInsert)
+    .returning({ id: r.table.id });
+  await tx.insert(r.items).values(itemRows(slug, organizationId, row.id, userId, values, result));
+  return readDocument(tx, organizationId, slug, row.id);
 }
 
 async function lockRow(tx: TenantTx, organizationId: string, slug: DocumentSlug, id: string) {
@@ -730,7 +731,8 @@ export async function deleteDraft(organizationId: string, slug: DocumentSlug, id
 /* ---------------- Issuing ---------------- */
 
 /** Rebuilds the editable values of a stored draft (to recalculate at issue time). */
-function valuesFromStored(doc: DocumentDetail): DocumentValues {
+/** A saved document's values in the shape drafts are created from (e.g. a recurring invoice's template). */
+export function valuesFromStored(doc: DocumentDetail): DocumentValues {
   return {
     partyId: doc.partyId,
     issueDate: doc.issueDate,

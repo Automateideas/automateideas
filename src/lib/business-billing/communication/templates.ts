@@ -86,3 +86,15 @@ export function whatsappNumber(phone: string | null | undefined): string | null 
   if (d.length === 10) d = `91${d}`;
   return d.length >= 11 && d.length <= 15 ? d : null;
 }
+
+/** "₹1,180.00" */
+export const rupees = inr;
+/** "20 November 2026" */
+export const longDate = day;
+
+/** The end of a reminder sentence: "is due on 20 November 2026", "is due today", "was due on … and is still unpaid". */
+export function reminderPhrase(dueDate: string, daysLate: number) {
+  if (daysLate < 0) return `is due on ${day(dueDate)}`;
+  if (daysLate === 0) return "is due today";
+  return `was due on ${day(dueDate)} and is still unpaid`;
+}

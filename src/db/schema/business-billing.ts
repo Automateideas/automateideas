@@ -685,6 +685,56 @@ export const salesOrders = pgTable(
   ],
 );
 
+export const RECURRING_FREQUENCIES = ["weekly", "monthly", "quarterly", "yearly"] as const;
+export const RECURRING_STATUSES = ["active", "paused", "ended"] as const;
+
+/**
+ * A schedule that creates an invoice for a customer every week, month,
+ * quarter or year, from a template (lines, discounts, notes) copied from an
+ * invoice. See lib/business-billing/recurring.
+ */
+export const recurringInvoices = pgTable(
+  "recurring_invoices",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    name: text("name").notNull(),
+    customerId: text("customer_id").notNull(),
+    // DocumentValues without the customer and dates (lib/business-billing/documents/validation.ts).
+    template: jsonb("template").notNull(),
+    // Total of one invoice from the template when it was saved, for lists.
+    totalPaise: money("total_paise"),
+    frequency: text("frequency").notNull(),
+    // Every N weeks / months / quarters / years.
+    interval: integer("interval").default(1).notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date"),
+    maxCount: integer("max_count"),
+    // Date of the next invoice; null once ended.
+    nextRunDate: date("next_run_date"),
+    generatedCount: integer("generated_count").default(0).notNull(),
+    lastRunDate: date("last_run_date"),
+    // Days from invoice date to due date; null = the customer's payment terms.
+    dueDays: integer("due_days"),
+    autoIssue: boolean("auto_issue").default(true).notNull(),
+    autoEmail: boolean("auto_email").default(false).notNull(),
+    status: text("status").default("active").notNull(),
+    sourceInvoiceId: text("source_invoice_id"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("recurring_invoices", t),
+    tenantFk("recurring_invoices_customer_fk", t.organizationId, t.customerId, customers),
+    check("recurring_invoices_frequency_check", inList(t.frequency, RECURRING_FREQUENCIES)),
+    check("recurring_invoices_status_check", inList(t.status, RECURRING_STATUSES)),
+    check("recurring_invoices_interval_check", sql`${t.interval} between 1 and 52`),
+    check("recurring_invoices_end_check", sql`${t.endDate} is null or ${t.endDate} >= ${t.startDate}`),
+    check("recurring_invoices_max_check", sql`${t.maxCount} is null or ${t.maxCount} >= 1`),
+    check("recurring_invoices_due_check", sql`${t.dueDays} is null or ${t.dueDays} between 0 and 365`),
+    index("recurring_invoices_next_idx").on(t.organizationId, t.status, t.nextRunDate),
+  ],
+);
+
 export const businessInvoices = pgTable(
   "business_invoices",
   {
@@ -696,10 +746,14 @@ export const businessInvoices = pgTable(
     salesOrderId: text("sales_order_id"),
     // Where the goods leave from (products that track stock). Set on issue; default warehouse when empty.
     warehouseId: text("warehouse_id"),
+    // The recurring invoice that created this one, if any.
+    recurringInvoiceId: text("recurring_invoice_id"),
   },
   (t) => [
     ...documentConstraints("business_invoices", t, t.customerId, customers, INVOICE_STATUSES),
     tenantFk("business_invoices_warehouse_fk", t.organizationId, t.warehouseId, warehouses),
+    tenantFk("business_invoices_recurring_fk", t.organizationId, t.recurringInvoiceId, recurringInvoices),
+    index("business_invoices_recurring_idx").on(t.organizationId, t.recurringInvoiceId),
     tenantFk("business_invoices_quotation_fk", t.organizationId, t.quotationId, quotations),
     tenantFk("business_invoices_sales_order_fk", t.organizationId, t.salesOrderId, salesOrders),
     check("business_invoices_due_check", sql`${t.dueDate} is null or ${t.dueDate} >= ${t.issueDate}`),
@@ -1133,6 +1187,31 @@ export const journalLines = pgTable(
   ],
 );
 
+export const RECURRING_RUN_STATUSES = ["created", "issued", "emailed", "failed"] as const;
+
+/** One row per scheduled date of a recurring invoice: what was created, and what went wrong. */
+export const recurringInvoiceRuns = pgTable(
+  "recurring_invoice_runs",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    recurringInvoiceId: text("recurring_invoice_id").notNull(),
+    runDate: date("run_date").notNull(),
+    invoiceId: text("invoice_id"),
+    status: text("status").notNull(),
+    error: text("error"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("recurring_invoice_runs", t),
+    tenantFk("recurring_invoice_runs_profile_fk", t.organizationId, t.recurringInvoiceId, recurringInvoices),
+    tenantFk("recurring_invoice_runs_invoice_fk", t.organizationId, t.invoiceId, businessInvoices),
+    // Never two invoices for the same scheduled date.
+    unique("recurring_invoice_runs_date_uq").on(t.organizationId, t.recurringInvoiceId, t.runDate),
+    check("recurring_invoice_runs_status_check", inList(t.status, RECURRING_RUN_STATUSES)),
+  ],
+);
+
 /* ---------------- Communication ---------------- */
 
 /**
@@ -1164,7 +1243,7 @@ export const documentShares = pgTable(
 );
 
 export const MESSAGE_CHANNELS = ["email", "whatsapp"] as const;
-export const MESSAGE_STATUSES = ["sending", "sent", "failed", "logged"] as const;
+export const MESSAGE_STATUSES = ["sending", "sent", "delivered", "read", "failed", "logged"] as const;
 
 /**
  * Every invoice, receipt or reminder sent to a customer. A dedupe key (e.g.
@@ -1197,6 +1276,42 @@ export const billingMessages = pgTable(
     check("billing_messages_status_check", inList(t.status, MESSAGE_STATUSES)),
     uniqueIndex("billing_messages_dedupe_uq").on(t.organizationId, t.dedupeKey).where(sql`${t.dedupeKey} is not null`),
     index("billing_messages_document_idx").on(t.organizationId, t.documentType, t.documentId),
+  ],
+);
+
+export const WHATSAPP_CONNECTION_STATUSES = ["connected", "error", "disconnected"] as const;
+
+/**
+ * A company's own WhatsApp Business number, connected through Meta's
+ * Embedded Signup (option B). The access token is encrypted
+ * (lib/crypto/secret-box.ts); without a connection, the company can use
+ * the shared Automate Ideas number (option A) if the server has one.
+ */
+export const whatsappConnections = pgTable(
+  "whatsapp_connections",
+  {
+    id: pk(),
+    organizationId: tenantId(),
+    wabaId: text("waba_id").notNull(),
+    phoneNumberId: text("phone_number_id").notNull(),
+    businessId: text("business_id"),
+    displayPhoneNumber: text("display_phone_number"),
+    verifiedName: text("verified_name"),
+    tokenEncrypted: text("token_encrypted").notNull(),
+    pinEncrypted: text("pin_encrypted"),
+    status: text("status").notNull(),
+    // { "<template name>": "APPROVED" | "PENDING" | "REJECTED" | … }
+    templates: jsonb("templates").default({}).notNull(),
+    lastError: text("last_error"),
+    connectedAt: timestamp("connected_at"),
+    ...audit(),
+  },
+  (t) => [
+    tenantKey("whatsapp_connections", t),
+    // One connection per company; a number belongs to one company.
+    uniqueIndex("whatsapp_connections_org_uq").on(t.organizationId),
+    uniqueIndex("whatsapp_connections_phone_uq").on(t.phoneNumberId),
+    check("whatsapp_connections_status_check", inList(t.status, WHATSAPP_CONNECTION_STATUSES)),
   ],
 );
 
@@ -1283,8 +1398,11 @@ export const BUSINESS_BILLING_TABLES = [
   "stock_movements",
   "stock_adjustments",
   "stock_adjustment_items",
+  "recurring_invoices",
+  "recurring_invoice_runs",
   "document_shares",
   "billing_messages",
+  "whatsapp_connections",
   "journal_entries",
   "journal_lines",
   "audit_logs",

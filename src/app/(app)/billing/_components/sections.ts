@@ -139,7 +139,7 @@ export const PURCHASE_EXTRA_PATHS = ["/billing/purchase-bills", "/billing/purcha
 export const PAYMENT_EXTRA_PATHS = ["/billing/refunds", "/billing/outstanding"] as const;
 
 /** Sales pages outside the section list; the Invoices tab stays active on them. */
-export const SALES_EXTRA_PATHS = ["/billing/sales-orders", "/billing/credit-notes", "/billing/debit-notes"] as const;
+export const SALES_EXTRA_PATHS = ["/billing/sales-orders", "/billing/credit-notes", "/billing/debit-notes", "/billing/recurring-invoices"] as const;
 
 /** Inventory pages outside the section list; the Inventory tab stays active on them. */
 export const INVENTORY_EXTRA_PATHS = ["/billing/warehouses", "/billing/stock-adjustments"] as const;

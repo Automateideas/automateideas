@@ -14,7 +14,10 @@ import { randomBytes } from "node:crypto";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { TRIAL_SEATS, trialEndDate } from "@/lib/subscription-billing/plan";
-import { assertCanInvite, getSeatUsage } from "@/lib/subscription-billing/seats";
+import {
+  assertCanInvite,
+  getSeatUsage,
+} from "@/lib/subscription-billing/seats";
 import { sendInvitationEmail, sendVerificationEmail } from "@/lib/email";
 import { assertOrgDeletable } from "@/lib/financial-records";
 import { INVITABLE_ROLES, ac, orgRoles } from "@/lib/roles";
@@ -238,16 +241,29 @@ export const auth = betterAuth({
             },
             subscriptionId: { type: "string", required: false, input: false },
             trialEndsAt: { type: "date", required: false, input: false },
-            planId: { type: "string", required: true, defaultValue: "starter", input: false },
-            billingCycle: { type: "string", required: true, defaultValue: "monthly", input: false },
+            planId: {
+              type: "string",
+              required: true,
+              defaultValue: "starter",
+              input: false,
+            },
+            billingCycle: {
+              type: "string",
+              required: true,
+              defaultValue: "monthly",
+              input: false,
+            },
             currentPeriodEnd: { type: "date", required: false, input: false },
-            cancelAtPeriodEnd: { type: "boolean", required: true, defaultValue: false, input: false },
+            cancelAtPeriodEnd: {
+              type: "boolean",
+              required: true,
+              defaultValue: false,
+              input: false,
+            },
           },
         },
       },
     }),
-
-    nextCookies(),
     lastLoginMethod(),
     haveIBeenPwned({
       enabled: process.env.NODE_ENV === "production",
@@ -256,5 +272,6 @@ export const auth = betterAuth({
     oneTap({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
     }),
+    nextCookies(),
   ],
 });

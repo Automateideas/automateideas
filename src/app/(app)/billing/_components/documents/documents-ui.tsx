@@ -34,13 +34,19 @@ import { BackLink, EmptyList, ListSkeleton, ListToolbar, Pager, ReadOnlyNote, Se
 import { InvoicePaymentPanel, type InvoicePayment } from "../payments";
 import { BillPaymentPanel } from "../supplier-payments";
 import { SendCard } from "../communication-ui";
+import { MakeRecurringButton } from "../recurring-ui";
 import { DocumentPaper, type PaperDocument, type PaperLook, type Seller } from "./document-paper";
 
 const BASE = "/api/business-billing/documents";
 
 /** Invoices · Quotations · Sales orders · Credit notes · Debit notes. */
 export function SalesNav() {
-  return <SectionNav label="Sales documents" links={SALES_SLUGS.map((s) => ({ href: `/billing/${s}`, label: DOCUMENT_TYPES[s].plural, matchNested: true }))} />;
+  return (
+    <SectionNav
+      label="Sales documents"
+      links={[...SALES_SLUGS.map((s) => ({ href: `/billing/${s}`, label: DOCUMENT_TYPES[s].plural, matchNested: true })), { href: "/billing/recurring-invoices", label: "Recurring", matchNested: true }]}
+    />
+  );
 }
 
 /** Bills · Purchase orders · Returns · Supplier payments · Payables. */
@@ -191,6 +197,7 @@ type Detail = Omit<PaperDocument, "related"> & {
   related: { slug: DocumentSlug; id: string; number: string | null; status: string; totalPaise: number }[];
   voidedAt: string | null;
   warehouseName?: string | null;
+  recurringInvoiceId?: string | null;
   restock?: boolean;
   actions: Actions;
 };
@@ -321,6 +328,7 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
               Create {DOCUMENT_TYPES[to].singular.toLowerCase()}
             </Button>
           ))}
+          {slug === "invoices" && a.canEdit && doc.status !== "void" ? <MakeRecurringButton invoiceId={doc.id} number={doc.number} /> : null}
           <Button variant="outline" render={<a href={`/api/business-billing/documents/${slug}/${id}/pdf?download=1`} />} nativeButton={false}>
             <DownloadIcon data-icon="inline-start" />
             Download PDF
@@ -356,6 +364,15 @@ export function DocumentView({ slug, id }: { slug: DocumentSlug; id: string }) {
           <AlertTitle>Void</AlertTitle>
           <AlertDescription>{doc.voidReason}. The number stays used; this document no longer counts.</AlertDescription>
         </Alert>
+      ) : null}
+      {doc.recurringInvoiceId ? (
+        <p className="text-sm text-muted-foreground">
+          Created by a{" "}
+          <Link href={`/billing/recurring-invoices/${doc.recurringInvoiceId}`} className="underline underline-offset-2">
+            recurring invoice
+          </Link>
+          .
+        </p>
       ) : null}
       {doc.status !== "draft" && doc.warehouseName ? (
         <p className="text-sm text-muted-foreground">

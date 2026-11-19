@@ -1,0 +1,594 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "a52ce142-e308-4148-afac-2699614734d9",
+  "prevIds": [
+    "c94f14e7-8804-4caf-8495-2f24d63ab719"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "whatsapp_connections"
+      ],
+      "writes": [
+        "s|tbl|public.whatsapp_connections",
+        "n|tbl|public.whatsapp_connections",
+        "e|tbl|public.whatsapp_connections",
+        "n|rel|public.whatsapp_connections",
+        "n|type|public.whatsapp_connections",
+        "n|rel|public.whatsapp_connections_pkey",
+        "n|rel|public.whatsapp_connections_org_id_uq"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "whatsapp_connections",
+        "whatsapp_connections_org_uq"
+      ],
+      "writes": [
+        "s|idx|public.whatsapp_connections_org_uq",
+        "n|idx|public.whatsapp_connections_org_uq",
+        "e|idx|public.whatsapp_connections_org_uq",
+        "n|rel|public.whatsapp_connections_org_uq"
+      ],
+      "reads": [
+        "n|tbl|public.whatsapp_connections",
+        "n|sch|public",
+        "n|col|public.whatsapp_connections.organization_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "whatsapp_connections",
+        "whatsapp_connections_phone_uq"
+      ],
+      "writes": [
+        "s|idx|public.whatsapp_connections_phone_uq",
+        "n|idx|public.whatsapp_connections_phone_uq",
+        "e|idx|public.whatsapp_connections_phone_uq",
+        "n|rel|public.whatsapp_connections_phone_uq"
+      ],
+      "reads": [
+        "n|tbl|public.whatsapp_connections",
+        "n|sch|public",
+        "n|col|public.whatsapp_connections.phone_number_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "whatsapp_connections"
+      ],
+      "writes": [
+        "s|fk|public.whatsapp_connections.whatsapp_connections_organization_id_organization_id_fkey",
+        "n|fk|public.whatsapp_connections.whatsapp_connections_organization_id_organization_id_fkey",
+        "e|fk|public.whatsapp_connections.whatsapp_connections_organization_id_organization_id_fkey",
+        "n|con|public.whatsapp_connections.whatsapp_connections_organization_id_organization_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.whatsapp_connections",
+        "n|sch|public",
+        "n|tbl|public.organization",
+        "n|sch|public",
+        "n|col|public.whatsapp_connections.organization_id",
+        "n|col|public.organization.id",
+        "e|uniqueness|public.organization.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "whatsapp_connections"
+      ],
+      "writes": [
+        "s|fk|public.whatsapp_connections.whatsapp_connections_created_by_user_id_fkey",
+        "n|fk|public.whatsapp_connections.whatsapp_connections_created_by_user_id_fkey",
+        "e|fk|public.whatsapp_connections.whatsapp_connections_created_by_user_id_fkey",
+        "n|con|public.whatsapp_connections.whatsapp_connections_created_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.whatsapp_connections",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.whatsapp_connections.created_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "whatsapp_connections"
+      ],
+      "writes": [
+        "s|fk|public.whatsapp_connections.whatsapp_connections_updated_by_user_id_fkey",
+        "n|fk|public.whatsapp_connections.whatsapp_connections_updated_by_user_id_fkey",
+        "e|fk|public.whatsapp_connections.whatsapp_connections_updated_by_user_id_fkey",
+        "n|con|public.whatsapp_connections.whatsapp_connections_updated_by_user_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.whatsapp_connections",
+        "n|sch|public",
+        "n|tbl|public.user",
+        "n|sch|public",
+        "n|col|public.whatsapp_connections.updated_by",
+        "n|col|public.user.id",
+        "e|uniqueness|public.user.id"
+      ]
+    },
+    {
+      "statementType": "alter_check",
+      "statementTarget": [
+        "table",
+        "public",
+        "billing_messages"
+      ],
+      "writes": [
+        "s|ck|public.billing_messages.billing_messages_status_check"
+      ],
+      "reads": [
+        "n|tbl|public.billing_messages",
+        "n|sch|public",
+        "n|col|public.billing_messages.status",
+        "e|col|public.billing_messages.status"
+      ],
+      "sqlHash": "23efcd7e1827211e"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "whatsapp_connections",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "organization_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "waba_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "phone_number_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "business_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "display_phone_number",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "verified_name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "token_encrypted",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "pin_encrypted",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "status",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "templates",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "last_error",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "connected_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "updated_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "created_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "updated_by",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_org_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "organization_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_phone_uq",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "phone_number_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_organization_id_organization_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "organization_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "organization",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_created_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "created_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_updated_by_user_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "updated_by"
+        ],
+        "schemaTo": "public",
+        "tableTo": "user",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_org_id_uq",
+        "nameExplicit": true,
+        "columns": [
+          "organization_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "whatsapp_connections",
+        "name": "whatsapp_connections_status_check",
+        "value": "\"status\" in ('connected', 'error', 'disconnected')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "checks\u0000[\"public\",\"billing_messages\",\"billing_messages_status_check\"]",
+      "set": {
+        "value": "\"status\" in ('sending', 'sent', 'delivered', 'read', 'failed', 'logged')"
+      }
+    }
+  ]
+}

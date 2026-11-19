@@ -36,6 +36,10 @@ describe("business billing schema", () => {
       "warehouses", "stock_movements", "stock_adjustments", "stock_adjustment_items",
       // Stage 14b: share links and the sent-messages log.
       "document_shares", "billing_messages",
+      // Stage 14c: recurring invoices.
+      "recurring_invoices", "recurring_invoice_runs",
+      // Stage 14d: a company's own WhatsApp number.
+      "whatsapp_connections",
     ];
     expect([...requested, ...added].sort()).toEqual([...bb.BUSINESS_BILLING_TABLES].sort());
   });
